@@ -15,9 +15,15 @@
     "@reduxjs/toolkit": "^2.6.1",
     "axios": "^1.8.3",
     "expo": "~52.0.38",
+    "expo-linear-gradient": "~14.0.2",
     "expo-status-bar": "~2.0.1",
+    "nativewind": "^4.1.23",
     "react": "18.3.1",
+    "react-addons-shallow-compare": "^15.6.3",
     "react-native": "0.76.7",
+    "react-native-gifted-charts": "^1.4.58",
+    "react-native-svg": "15.8.0",
+    "tailwindcss": "3.4.17"
     "react-native-gesture-handler": "^2.24.0",
     "react-native-reanimated": "^3.17.1",
     "react-native-safe-area-context": "^5.3.0",
@@ -27,6 +33,7 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~18.3.12",
+    "@types/react-native-snap-carousel": "^3.8.11",
     "typescript": "^5.3.3"
   },
   "private": true
