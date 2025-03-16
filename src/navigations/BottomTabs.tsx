@@ -8,6 +8,7 @@ import Posts from "../screens/Post/Posts";
 import Exercises from "../screens/Exercise/Exercises";
 
 import { Ionicons } from "@expo/vector-icons";
+import HomeScreen from "../screens/HomeScreen";
 
 export type BottomTabParamList = {
   Homes: undefined;
@@ -58,7 +59,7 @@ export default function BottomTabs() {
     >
       <Tab.Screen
         name="Homes"
-        component={Homes}
+        component={HomeScreen}
         options={{ title: "Trang chủ" }}
       />
       <Tab.Screen
