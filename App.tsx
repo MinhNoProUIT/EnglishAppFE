@@ -5,13 +5,16 @@ import UsersList from "./src/screens/UserList";
 import HomeScreen from "./src/screens/HomeScreen";
 import { SafeAreaView } from "react-native";
 import "./global.css"
+import { NavigationContainer } from "@react-navigation/native";
+import AppNavigator from "./src/navigations/AppNavigator";
+
 
 export default function App() {
   return (
     <Provider store={store}>
-      <SafeAreaView>
-        <HomeScreen />
-      </SafeAreaView>
+      <NavigationContainer>
+        <AppNavigator />
+      </NavigationContainer>
     </Provider>
   );
 }
