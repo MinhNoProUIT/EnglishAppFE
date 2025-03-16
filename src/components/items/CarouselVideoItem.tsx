@@ -23,7 +23,7 @@ export default function CarouselVideoItem() {
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View className="w-72 bg-white rounded-xl shadow-lg mr-4 items-center justify-center">
+          <View className="w-72 bg-white rounded-xl shadow-sm mr-4 items-center justify-center mb-4">
             <Image
               source={{ uri: item.image }}
               className="w-full h-36 rounded-t-xl"
