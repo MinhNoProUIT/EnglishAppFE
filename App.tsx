@@ -1,15 +1,15 @@
 import React from "react";
 import { Provider } from "react-redux";
 import { store } from "./src/redux/store";
-import UsersList from "./src/screens/UserList";
-import { SafeAreaView } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import AppNavigator from "./src/navigations/AppNavigator";
 
 export default function App() {
   return (
     <Provider store={store}>
-      <SafeAreaView>
-        <UsersList />
-      </SafeAreaView>
+      <NavigationContainer>
+        <AppNavigator />
+      </NavigationContainer>
     </Provider>
   );
 }
