@@ -1,14 +1,13 @@
 // src/navigation/BottomTabs.tsx
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import Homes from "../screens/Home/Homes";
 import Courses from "../screens/Course/Courses";
 import Settings from "../screens/Setting/Settings";
 import Posts from "../screens/Post/Posts";
 import Exercises from "../screens/Exercise/Exercises";
 
 import { Ionicons } from "@expo/vector-icons";
-import HomeScreen from "../screens/HomeScreen";
+import HomeScreen from "../screens/Home/HomeScreen";
 
 export type BottomTabParamList = {
   Homes: undefined;
