@@ -43,23 +43,20 @@ export default function BottomTabs() {
         tabBarInactiveTintColor: "rgb(0, 0, 0)",
         tabBarStyle: {
           position: "absolute",
-          borderRadius: 15,
-          margin: 10,
+          paddingBottom: 20,
           backgroundColor: "#fff",
-          borderWidth: 1,
-          borderColor: "#007AFF",
           elevation: 5,
           shadowColor: "#000",
           shadowOpacity: 0.1,
           shadowRadius: 10,
-          height: 55,
+          height: 75,
         },
       })}
     >
       <Tab.Screen
         name="Homes"
         component={HomeScreen}
-        options={{ title: "Trang chủ" }}
+        options={{ title: "Trang chủ", headerShown: false }}
       />
       <Tab.Screen
         name="Exercises"
