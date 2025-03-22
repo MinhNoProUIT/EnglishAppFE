@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  Animated,
+  TouchableHighlight,
+  TouchableNativeFeedback,
+} from "react-native";
 import {
   Feather,
   FontAwesome5,
@@ -27,30 +36,21 @@ const courses = [
 ];
 
 const Profile = () => {
-  const [progress, setProgress] = useState(0);
   const navigation = useNavigation<SettingsScreenNavigationProp>(); // Hook navigation
+  const [backgroundColor, setBackgroundColor] = useState("#008CBA");
 
-  const navigateToProfile = () => {
-    navigation.navigate("Profile"); // Điều hướng đến màn hình Profile
+  // Hiệu ứng thay đổi màu nền khi nhấn
+  const onPressIn = () => {
+    setBackgroundColor("#DDDDDD"); // Thay đổi màu khi nhấn
   };
-  useEffect(() => {
-    // Giả lập tiến trình đang tải (mỗi giây tăng thêm 10%)
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 1) {
-          clearInterval(interval);
-          return 1;
-        }
-        return prev + 0.1;
-      });
-    }, 1000);
 
-    return () => clearInterval(interval);
-  }, []);
+  const onPressOut = () => {
+    setBackgroundColor("#008CBA"); // Quay lại màu ban đầu
+  };
 
   return (
-    <ScrollView className="">
-      <View className=" rounded-lg ">
+    <ScrollView>
+      <View style={{ marginLeft: 10, marginRight: 10 }}>
         <View
           style={{
             flex: 1,
@@ -96,6 +96,7 @@ const Profile = () => {
             justifyContent: "center",
             alignItems: "center",
             marginTop: 5,
+            marginBottom: 10,
           }}
         >
           <Text style={{ fontSize: 18, fontWeight: "bold" }}>
@@ -103,267 +104,334 @@ const Profile = () => {
           </Text>
           <Text style={{ fontSize: 12 }}>minh8dclv123@gmail.com</Text>
         </View>
-        <View style={{ marginTop: 10, padding: 10 }}>
-          <View
-            style={{
-              borderColor: "rgb(122, 116, 116)",
-              borderTopWidth: 1.5,
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-          >
+        <TouchableOpacity>
+          <View>
             <View
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                padding: 5,
-                margin: 5,
+                justifyContent: "center",
               }}
             >
-              <Ionicons name="person-outline" size={20} color="black" />
-              <Text style={{ fontWeight: "bold", fontSize: 18 }}> Country</Text>
-            </View>
+              <View
+                style={{
+                  borderColor: "rgb(201, 192, 192)",
+                  borderBottomWidth: 1,
+                  padding: 15,
 
-            <Ionicons name="chevron-forward" size={24} color="black" />
-          </View>
-          <View
-            style={{
-              borderColor: "rgb(122, 116, 116)",
-              borderTopWidth: 1.5,
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                padding: 5,
-                margin: 5,
-              }}
-            >
-              <AntDesign name="earth" size={20} color="black" />
-              <Text style={{ fontWeight: "bold", fontSize: 18 }}>
-                {" "}
-                Native language
-              </Text>
-            </View>
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexDirection: "row",
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 10,
+                  }}
+                >
+                  <View
+                    style={{
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 180,
+                    }}
+                  >
+                    <Image
+                      source={require("../../../assets/infoPerson.jpg")}
+                      className="w-10 h-10 rounded-full"
+                      resizeMode="contain"
+                    />
+                  </View>
 
-            <Text style={{ fontWeight: "bold", fontSize: 18, color: "gray" }}>
-              {" "}
-              Persian
-            </Text>
-          </View>
-          <View
-            style={{
-              borderColor: "rgb(122, 116, 116)",
-              borderTopWidth: 1.5,
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                padding: 5,
-                margin: 5,
-              }}
-            >
-              <Feather name="book-open" size={20} color="black" />
-              <Text style={{ fontWeight: "bold", fontSize: 18 }}>
-                {" "}
-                Learning language
-              </Text>
-            </View>
+                  <Text style={{ fontWeight: "bold", fontSize: 18 }}>
+                    {" "}
+                    Thông tin tài khoản
+                  </Text>
+                </View>
 
-            <Text style={{ fontWeight: "bold", fontSize: 18, color: "gray" }}>
-              {" "}
-              English
-            </Text>
+                <Ionicons
+                  name="chevron-forward"
+                  size={24}
+                  color="rgb(10, 179, 66)"
+                />
+              </View>
+            </View>
           </View>
-          <View
-            style={{
-              borderColor: "rgb(122, 116, 116)",
-              borderTopWidth: 1.5,
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-          >
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <View>
             <View
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                padding: 5,
-                margin: 5,
+                justifyContent: "center",
               }}
             >
-              <Ionicons name="notifications-outline" size={20} color="black" />
-              <Text style={{ fontWeight: "bold", fontSize: 18 }}>
-                {" "}
-                Notifications
-              </Text>
-            </View>
+              <View
+                style={{
+                  borderColor: "rgb(201, 192, 192)",
+                  borderBottomWidth: 1,
+                  padding: 15,
 
-            <Ionicons name="chevron-forward" size={24} color="black" />
-          </View>
-          <View
-            style={{
-              borderColor: "rgb(122, 116, 116)",
-              borderTopWidth: 1.5,
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                padding: 5,
-                margin: 5,
-              }}
-            >
-              <MaterialIcons
-                name="format-list-bulleted-add"
-                size={20}
-                color="black"
-              />
-              <Text style={{ fontWeight: "bold", fontSize: 18 }}>
-                {" "}
-                Term of Service
-              </Text>
-            </View>
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexDirection: "row",
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 10,
+                  }}
+                >
+                  <View
+                    style={{
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 180,
+                    }}
+                  >
+                    <Image
+                      source={require("../../../assets/terms_of_service.jpg")}
+                      className="w-10 h-10 rounded-full"
+                      resizeMode="contain"
+                    />
+                  </View>
 
-            <Ionicons name="chevron-forward" size={24} color="black" />
-          </View>
-          <View
-            style={{
-              borderColor: "rgb(122, 116, 116)",
-              borderTopWidth: 1.5,
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                padding: 5,
-                margin: 5,
-              }}
-            >
-              <FontAwesome6 name="check-circle" size={20} color="black" />
-              <Text style={{ fontWeight: "bold", fontSize: 18 }}>
-                {" "}
-                Privacy policy
-              </Text>
-            </View>
+                  <Text style={{ fontWeight: "bold", fontSize: 18 }}>
+                    {" "}
+                    Điều khoản dịch vụ
+                  </Text>
+                </View>
 
-            <Ionicons name="chevron-forward" size={24} color="black" />
+                <Ionicons
+                  name="chevron-forward"
+                  size={24}
+                  color="rgb(10, 179, 66)"
+                />
+              </View>
+            </View>
           </View>
-          <View
-            style={{
-              borderColor: "rgb(122, 116, 116)",
-              borderTopWidth: 1.5,
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-          >
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <View>
             <View
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                padding: 5,
-                margin: 5,
+                justifyContent: "center",
               }}
             >
-              <FontAwesome5 name="question-circle" size={20} color="black" />
-              <Text style={{ fontWeight: "bold", fontSize: 18 }}> Help</Text>
-            </View>
+              <View
+                style={{
+                  borderColor: "rgb(201, 192, 192)",
+                  borderBottomWidth: 1,
+                  padding: 15,
 
-            <Ionicons name="chevron-forward" size={24} color="black" />
-          </View>
-          <View
-            style={{
-              borderColor: "rgb(122, 116, 116)",
-              borderTopWidth: 1.5,
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                padding: 5,
-                margin: 5,
-              }}
-            >
-              <Foundation name="crown" size={25} color="black" />
-              <Text style={{ fontWeight: "bold", fontSize: 18 }}>
-                {" "}
-                Start Speak Up Plus Now!
-              </Text>
-            </View>
-          </View>
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexDirection: "row",
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 10,
+                  }}
+                >
+                  <View
+                    style={{
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 180,
+                    }}
+                  >
+                    <Image
+                      source={require("../../../assets/privacy_policy.jpg")}
+                      className="w-10 h-10 rounded-full"
+                      resizeMode="contain"
+                    />
+                  </View>
 
-          <View
-            style={{
-              borderColor: "rgb(122, 116, 116)",
-              borderTopWidth: 1.5,
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                padding: 5,
-                margin: 5,
-              }}
-            >
-              <SimpleLineIcons name="logout" size={18} color="red" />
-              <Text style={{ fontWeight: "bold", fontSize: 18, color: "red" }}>
-                {" "}
-                Logout
-              </Text>
+                  <Text style={{ fontWeight: "bold", fontSize: 18 }}>
+                    {" "}
+                    Chính sách bảo mật
+                  </Text>
+                </View>
+
+                <Ionicons
+                  name="chevron-forward"
+                  size={24}
+                  color="rgb(10, 179, 66)"
+                />
+              </View>
             </View>
           </View>
-          <View
-            style={{
-              borderColor: "rgb(122, 116, 116)",
-              borderTopWidth: 1.5,
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-          >
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <View>
             <View
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                padding: 5,
-                margin: 5,
+                justifyContent: "center",
               }}
             >
-              <AntDesign name="delete" size={20} color="red" />
-              <Text style={{ fontWeight: "bold", fontSize: 18, color: "red" }}>
-                {" "}
-                Delete account
-              </Text>
+              <View
+                style={{
+                  borderColor: "rgb(201, 192, 192)",
+                  borderBottomWidth: 1,
+                  padding: 15,
+
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexDirection: "row",
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 10,
+                  }}
+                >
+                  <View
+                    style={{
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 180,
+                    }}
+                  >
+                    <Image
+                      source={require("../../../assets/setting_blue.jpg")}
+                      className="w-10 h-10 rounded-full"
+                      resizeMode="contain"
+                    />
+                  </View>
+
+                  <Text style={{ fontWeight: "bold", fontSize: 18 }}>
+                    {" "}
+                    Cài đặt khác
+                  </Text>
+                </View>
+
+                <Ionicons
+                  name="chevron-forward"
+                  size={24}
+                  color="rgb(10, 179, 66)"
+                />
+              </View>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <View>
+            <View
+              style={{
+                justifyContent: "center",
+              }}
+            >
+              <View
+                style={{
+                  borderColor: "rgb(201, 192, 192)",
+                  borderBottomWidth: 1,
+                  padding: 15,
+
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexDirection: "row",
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 10,
+                  }}
+                >
+                  <View
+                    style={{
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 180,
+                    }}
+                  >
+                    <Image
+                      source={require("../../../assets/logout.png")}
+                      className="w-10 h-10 rounded-full"
+                      resizeMode="contain"
+                    />
+                  </View>
+
+                  <Text
+                    style={{ fontWeight: "bold", fontSize: 18, color: "red" }}
+                  >
+                    {" "}
+                    Đăng xuất
+                  </Text>
+                </View>
+
+                <Ionicons
+                  name="chevron-forward"
+                  size={24}
+                  color="rgb(255, 0, 0)"
+                />
+              </View>
+            </View>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <View>
+            <View
+              style={{
+                justifyContent: "center",
+              }}
+            >
+              <View
+                style={{
+                  borderColor: "rgb(201, 192, 192)",
+                  borderBottomWidth: 1,
+                  padding: 15,
+
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexDirection: "row",
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 10,
+                  }}
+                >
+                  <View
+                    style={{
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 180,
+                    }}
+                  >
+                    <Image
+                      source={require("../../../assets/trash.jpg")}
+                      className="w-10 h-10 rounded-full"
+                      resizeMode="contain"
+                    />
+                  </View>
+
+                  <Text
+                    style={{ fontWeight: "bold", fontSize: 18, color: "red" }}
+                  >
+                    {" "}
+                    Xóa tài khoản
+                  </Text>
+                </View>
+
+                <Ionicons
+                  name="chevron-forward"
+                  size={24}
+                  color="rgb(255, 0, 0)"
+                />
+              </View>
+            </View>
+          </View>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
