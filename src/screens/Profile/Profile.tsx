@@ -8,19 +8,19 @@ import * as Progress from "react-native-progress";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigations/AppNavigator";
-import ProfileUser from "./SettingComponents/ProfileUser";
-import Achievement from "./SettingComponents/Achievement";
+import ProfileUser from "./ProfileComponents/ProfileUser";
+import Achievement from "./ProfileComponents/Achievement";
 type SettingsScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
-  "Profile"
+  "Setting"
 >;
 
-const Settings = () => {
+const Profile = () => {
   const [progress, setProgress] = useState(0);
   const navigation = useNavigation<SettingsScreenNavigationProp>();
 
   const navigateToProfile = () => {
-    navigation.navigate("Profile");
+    navigation.navigate("Setting");
   };
   useEffect(() => {
     const interval = setInterval(() => {
@@ -44,4 +44,4 @@ const Settings = () => {
   );
 };
 
-export default Settings;
+export default Profile;

@@ -2,17 +2,20 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Courses from "../screens/Course/Courses";
-import Settings from "../screens/Setting/Settings";
+import Profile from "../screens/Profile/Profile";
 import Posts from "../screens/Post/Posts";
 import Exercises from "../screens/Exercise/Exercises";
 
 import { Ionicons } from "@expo/vector-icons";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import HomeScreen from "../screens/Home/HomeScreen";
+import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
 
 export type BottomTabParamList = {
   Homes: undefined;
   Courses: undefined;
-  Settings: undefined;
+  Profile: undefined;
   Posts: undefined;
   Exercises: undefined;
 };
@@ -30,7 +33,7 @@ export default function BottomTabs() {
             iconName = focused ? "home" : "home-outline";
           else if (route.name === "Courses")
             iconName = focused ? "book" : "book-outline";
-          else if (route.name === "Settings")
+          else if (route.name === "Profile")
             iconName = focused ? "settings" : "settings-outline";
           else if (route.name === "Posts")
             iconName = focused ? "newspaper" : "newspaper-outline";
@@ -74,10 +77,74 @@ export default function BottomTabs() {
         options={{ title: "Bài đăng" }}
       />
       <Tab.Screen
-        name="Settings"
-        component={Settings}
-        options={{ title: "Cài đặt" }}
+        name="Profile"
+        component={Profile}
+        options={{
+          title: "Cá nhân",
+          headerShown: true,
+          header: ({ navigation }) => (
+            <View style={styles.headerContainer}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: 10,
+                  marginLeft: 10,
+                }}
+              >
+                <FontAwesome6 name="coins" size={24} style={styles.coin} />=
+                <Text style={styles.titlecoin}>500</Text>
+              </View>
+              <Text style={styles.headerTitle}>Cá nhân</Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: 10,
+                  marginRight: 10,
+                }}
+              >
+                <AntDesign name="shoppingcart" size={24} style={styles.icon} />
+                <Ionicons name="notifications" size={24} style={styles.icon} />
+              </View>
+            </View>
+          ),
+        }}
       />
     </Tab.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  headerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#4CAF50",
+    height: 80,
+  },
+
+  headerTitle: {
+    color: "white",
+    fontSize: 20,
+    flex: 1,
+    textAlign: "center",
+    fontWeight: "bold",
+    marginTop: 20,
+  },
+
+  titlecoin: {
+    color: "white",
+    marginTop: 20,
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+
+  icon: {
+    color: "white",
+    marginTop: 20,
+  },
+
+  coin: {
+    color: "rgb(243, 207, 5)",
+    marginTop: 20,
+  },
+});

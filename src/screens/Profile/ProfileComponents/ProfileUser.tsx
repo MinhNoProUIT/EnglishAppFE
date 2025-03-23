@@ -18,7 +18,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../../navigations/AppNavigator";
 type SettingsScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
-  "Profile"
+  "Setting"
 >;
 
 const ProfileUser = () => {
@@ -42,7 +42,7 @@ const ProfileUser = () => {
     ).start();
   }, []);
   const navigateToProfile = () => {
-    navigation.navigate("Profile"); // Điều hướng đến màn hình Profile
+    navigation.navigate("Setting"); // Điều hướng đến màn hình Setting
   };
   return (
     <View className="bg-[#FFFAF0] p-6 rounded-lg m-3">

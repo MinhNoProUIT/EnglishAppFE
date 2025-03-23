@@ -22,13 +22,13 @@ import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import * as Progress from "react-native-progress";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../navigations/AppNavigator";
+import { RootStackParamList } from "../../../navigations/AppNavigator";
 
 import Octicons from "@expo/vector-icons/Octicons";
 
 type SettingsScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
-  "Profile"
+  "Setting"
 >;
 
 const courses = [
@@ -68,7 +68,7 @@ const Profile = () => {
                 height: 128,
                 borderRadius: 64,
               }}
-              source={require("../../../assets/book_cartoon.jpg")}
+              source={require("../../../../assets/book_cartoon.jpg")}
             />
 
             {/* Nút TouchableOpacity */}
@@ -137,7 +137,7 @@ const Profile = () => {
                     }}
                   >
                     <Image
-                      source={require("../../../assets/infoPerson.jpg")}
+                      source={require("../../../../assets/infoPerson.jpg")}
                       className="w-10 h-10 rounded-full"
                       resizeMode="contain"
                     />
@@ -191,7 +191,7 @@ const Profile = () => {
                     }}
                   >
                     <Image
-                      source={require("../../../assets/terms_of_service.jpg")}
+                      source={require("../../../../assets/terms_of_service.jpg")}
                       className="w-10 h-10 rounded-full"
                       resizeMode="contain"
                     />
@@ -245,7 +245,7 @@ const Profile = () => {
                     }}
                   >
                     <Image
-                      source={require("../../../assets/privacy_policy.jpg")}
+                      source={require("../../../../assets/privacy_policy.jpg")}
                       className="w-10 h-10 rounded-full"
                       resizeMode="contain"
                     />
@@ -299,7 +299,7 @@ const Profile = () => {
                     }}
                   >
                     <Image
-                      source={require("../../../assets/setting_blue.jpg")}
+                      source={require("../../../../assets/setting_blue.jpg")}
                       className="w-10 h-10 rounded-full"
                       resizeMode="contain"
                     />
@@ -353,7 +353,7 @@ const Profile = () => {
                     }}
                   >
                     <Image
-                      source={require("../../../assets/logout.png")}
+                      source={require("../../../../assets/logout.png")}
                       className="w-10 h-10 rounded-full"
                       resizeMode="contain"
                     />
@@ -409,7 +409,7 @@ const Profile = () => {
                     }}
                   >
                     <Image
-                      source={require("../../../assets/trash.jpg")}
+                      source={require("../../../../assets/trash.jpg")}
                       className="w-10 h-10 rounded-full"
                       resizeMode="contain"
                     />
