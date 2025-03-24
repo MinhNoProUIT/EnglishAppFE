@@ -1,10 +1,11 @@
 import React from "react";
 import { View, Text } from "react-native";
 
-export default function Settings() {
+const TermsOfService = () => {
   return (
     <View>
-      <Text>Cài đặt</Text>
+      <Text>TermsOfService</Text>
     </View>
   );
-}
+};
+export default TermsOfService;

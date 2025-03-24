@@ -23,7 +23,7 @@ const data = [
 
 const HomeScreen = () => {
   return (
-    <ScrollView className="px-6 pt-10">
+    <ScrollView className="px-6 pt-20 bg-white">
       {/* header */}
       <View className="flex-row items-center justify-between mb-1">
         <Text className="text-2xl font-bold">Hi, Maya</Text>
@@ -93,10 +93,10 @@ const HomeScreen = () => {
           <ChangeCircle name="change-circle" size={20} color="black" />
         </TouchableOpacity>
       </View>
-      <View className="relative w-full h-48 rounded-lg overflow-hidden shadow-lg">
+      <View className="relative w-full h-48 rounded-lg overflow-hidden shadow-lg mb-32">
         <ImageBackground
           source={{ uri: "https://picsum.photos/400/300" }}
-          className="w-full h-full"
+          className="w-full h-full "
           resizeMode="cover"
         >
           <View className="absolute top-0 right-0 bg-white/80 px-4 py-4 rounded-tl-3xl w-[45%] h-full">

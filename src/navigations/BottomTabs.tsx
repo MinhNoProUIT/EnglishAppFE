@@ -2,18 +2,25 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Courses from "../screens/Course/Courses";
-import Settings from "../screens/Setting/Settings";
+import Profile from "../screens/Profile/Profile";
 import Posts from "../screens/Post/Posts";
 import Exercises from "../screens/Exercise/Exercises";
 
 import { Ionicons } from "@expo/vector-icons";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import HomeScreen from "../screens/Home/HomeScreen";
+
 import SignUp from "../screens/Login/SignUp";
+
+import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
+import ProfileHeader from "../components/headers/ProfileHeader";
+
 
 export type BottomTabParamList = {
   Homes: undefined;
   Courses: undefined;
-  Settings: undefined;
+  Profile: undefined;
   Posts: undefined;
   Exercises: undefined;
   Login: undefined;
@@ -32,7 +39,7 @@ export default function BottomTabs() {
             iconName = focused ? "home" : "home-outline";
           else if (route.name === "Courses")
             iconName = focused ? "book" : "book-outline";
-          else if (route.name === "Settings")
+          else if (route.name === "Profile")
             iconName = focused ? "settings" : "settings-outline";
           else if (route.name === "Posts")
             iconName = focused ? "newspaper" : "newspaper-outline";
@@ -47,23 +54,20 @@ export default function BottomTabs() {
         tabBarInactiveTintColor: "rgb(0, 0, 0)",
         tabBarStyle: {
           position: "absolute",
-          borderRadius: 15,
-          margin: 10,
+          paddingBottom: 20,
           backgroundColor: "#fff",
-          borderWidth: 1,
-          borderColor: "#007AFF",
           elevation: 5,
           shadowColor: "#000",
           shadowOpacity: 0.1,
           shadowRadius: 10,
-          height: 55,
+          height: 75,
         },
       })}
     >
       <Tab.Screen
         name="Homes"
         component={HomeScreen}
-        options={{ title: "Trang chủ" }}
+        options={{ title: "Trang chủ", headerShown: false }}
       />
       <Tab.Screen
         name="Exercises"
@@ -81,9 +85,13 @@ export default function BottomTabs() {
         options={{ title: "Bài đăng" }}
       />
       <Tab.Screen
-        name="Settings"
-        component={Settings}
-        options={{ title: "Cài đặt" }}
+        name="Profile"
+        component={Profile}
+        options={{
+          title: "Cá nhân",
+          headerShown: true,
+          header: () => <ProfileHeader />,
+        }}
       />
       <Tab.Screen
         name="Login"
