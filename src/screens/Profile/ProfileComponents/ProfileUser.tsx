@@ -16,14 +16,15 @@ import * as Progress from "react-native-progress";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../../navigations/AppNavigator";
-type SettingsScreenNavigationProp = StackNavigationProp<
+type ProfilesScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
-  "Setting"
+  "Profile"
 >;
 
 const ProfileUser = () => {
-  const navigation = useNavigation<SettingsScreenNavigationProp>(); // Hook navigation
+  const navigation = useNavigation<ProfilesScreenNavigationProp>(); // Hook navigation
   const scale = new Animated.Value(0.8);
+  const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
   useEffect(() => {
     // Tạo hiệu ứng lặp đi lặp lại
     Animated.loop(
@@ -120,9 +121,9 @@ const ProfileUser = () => {
             khóa học bạn nhé!!!
           </Text>
 
-          <Animated.View
+          <AnimatedTouchable
             style={{
-              transform: [{ scale }], // Áp dụng hiệu ứng phóng to/thu nhỏ
+              transform: [{ scale }],
               marginLeft: 10,
               width: 100,
               height: 30,
@@ -134,12 +135,8 @@ const ProfileUser = () => {
               justifyContent: "center",
             }}
           >
-            <TouchableOpacity>
-              <Text style={{ fontWeight: "bold", color: "white" }}>
-                Mua ngay
-              </Text>
-            </TouchableOpacity>
-          </Animated.View>
+            <Text style={{ fontWeight: "bold", color: "white" }}>Mua ngay</Text>
+          </AnimatedTouchable>
         </View>
         <View>
           <Image

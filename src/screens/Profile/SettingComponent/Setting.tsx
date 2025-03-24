@@ -47,6 +47,9 @@ const Profile = () => {
   const onPressOut = () => {
     setBackgroundColor("#008CBA"); // Quay lại màu ban đầu
   };
+  const navigateToAccInfo = (navigationName: keyof RootStackParamList) => {
+    navigation.navigate(navigationName); // Điều hướng đến màn hình Setting
+  };
 
   return (
     <ScrollView>
@@ -104,7 +107,9 @@ const Profile = () => {
           </Text>
           <Text style={{ fontSize: 12 }}>minh8dclv123@gmail.com</Text>
         </View>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigateToAccInfo("AccountInfomation")}
+        >
           <View>
             <View
               style={{
