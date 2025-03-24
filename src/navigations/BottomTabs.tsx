@@ -8,6 +8,7 @@ import Exercises from "../screens/Exercise/Exercises";
 
 import { Ionicons } from "@expo/vector-icons";
 import HomeScreen from "../screens/Home/HomeScreen";
+import SignUp from "../screens/Login/SignUp";
 
 export type BottomTabParamList = {
   Homes: undefined;
@@ -15,6 +16,7 @@ export type BottomTabParamList = {
   Settings: undefined;
   Posts: undefined;
   Exercises: undefined;
+  Login: undefined;
 };
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
@@ -35,6 +37,8 @@ export default function BottomTabs() {
           else if (route.name === "Posts")
             iconName = focused ? "newspaper" : "newspaper-outline";
           else if (route.name === "Exercises")
+            iconName = focused ? "pencil" : "pencil-outline";
+          else if (route.name === "Login")
             iconName = focused ? "pencil" : "pencil-outline";
 
           return <Ionicons name={iconName as any} size={size} color={color} />;
@@ -80,6 +84,11 @@ export default function BottomTabs() {
         name="Settings"
         component={Settings}
         options={{ title: "Cài đặt" }}
+      />
+      <Tab.Screen
+        name="Login"
+        component={SignUp}
+        options={{ title: "Đăng nhập" }}
       />
     </Tab.Navigator>
   );
