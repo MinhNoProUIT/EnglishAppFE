@@ -2,18 +2,29 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import BottomTabs from "./BottomTabs";
+
+import SignUp from "../screens/Login/SignUp";
+import SignIn from "../screens/Login/SignIn";
+
 import Setting from "../screens/Profile/SettingComponent/Setting";
 import Profile from "../screens/Profile/Profile";
 import AccountInfomation from "../screens/Profile/AccInfoComponent/AccountInfomation";
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+
 //import UserDetails from "../screens/UserDetails";
 
 export type RootStackParamList = {
   MainTabs: undefined;
+
+  SignUp: undefined;
+  SignIn: undefined;
+  UserDetails: { userId: number };
+
   Setting: undefined;
   AccountInfomation: undefined;
   Profile: undefined;
+
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -26,6 +37,11 @@ export default function AppNavigator() {
       }}
     >
       <Stack.Screen name="MainTabs" component={BottomTabs} />
+
+      {/* <Stack.Screen name="UserDetails" component={UserDetails} /> */}
+      <Stack.Screen name="SignUp" component={SignUp} />
+      <Stack.Screen name="SignIn" component={SignIn} />
+
       <Stack.Screen
         name="Setting"
         component={Setting}
@@ -57,6 +73,7 @@ export default function AppNavigator() {
           ),
         }}
       />
+
     </Stack.Navigator>
   );
 }

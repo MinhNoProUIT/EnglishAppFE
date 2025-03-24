@@ -10,8 +10,12 @@ import { Ionicons } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import HomeScreen from "../screens/Home/HomeScreen";
+
+import SignUp from "../screens/Login/SignUp";
+
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
 import ProfileHeader from "../components/headers/ProfileHeader";
+
 
 export type BottomTabParamList = {
   Homes: undefined;
@@ -19,6 +23,7 @@ export type BottomTabParamList = {
   Profile: undefined;
   Posts: undefined;
   Exercises: undefined;
+  Login: undefined;
 };
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
@@ -39,6 +44,8 @@ export default function BottomTabs() {
           else if (route.name === "Posts")
             iconName = focused ? "newspaper" : "newspaper-outline";
           else if (route.name === "Exercises")
+            iconName = focused ? "pencil" : "pencil-outline";
+          else if (route.name === "Login")
             iconName = focused ? "pencil" : "pencil-outline";
 
           return <Ionicons name={iconName as any} size={size} color={color} />;
@@ -85,6 +92,11 @@ export default function BottomTabs() {
           headerShown: true,
           header: () => <ProfileHeader />,
         }}
+      />
+      <Tab.Screen
+        name="Login"
+        component={SignUp}
+        options={{ title: "Đăng nhập" }}
       />
     </Tab.Navigator>
   );
