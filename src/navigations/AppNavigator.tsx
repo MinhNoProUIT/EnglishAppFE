@@ -6,6 +6,12 @@ import BottomTabs from "./BottomTabs";
 import SignUp from "../screens/Login/SignUp";
 import SignIn from "../screens/Login/SignIn";
 
+import PreviewWord from "../screens/Exercise/PreviewWord";
+import PairWord from "../screens/Exercise/PairWord";
+import GuessWord from "../screens/Exercise/GuessWord";
+import RecallWord from "../screens/Exercise/RecallWord";
+import WordsList from "../screens/Exercise/WordsList";
+
 import Setting from "../screens/Profile/SettingComponent/Setting";
 import Profile from "../screens/Profile/Profile";
 import AccountInfomation from "../screens/Profile/AccInfoComponent/AccountInfomation";
@@ -25,6 +31,12 @@ export type RootStackParamList = {
   AccountInfomation: undefined;
   Profile: undefined;
 
+  PreviewWord: undefined;
+  PairWord: undefined;
+  GuessWord: undefined;
+  RecallWord: undefined;
+  WordsList: undefined;
+
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -41,6 +53,12 @@ export default function AppNavigator() {
       {/* <Stack.Screen name="UserDetails" component={UserDetails} /> */}
       <Stack.Screen name="SignUp" component={SignUp} />
       <Stack.Screen name="SignIn" component={SignIn} />
+
+      <Stack.Screen name="PreviewWord" component={PreviewWord} options={{ title: 'Preview it', headerShown: true }} />
+      <Stack.Screen name="PairWord" component={PairWord} options={{ title: 'Pair it', headerShown: true }} />
+      <Stack.Screen name="GuessWord" component={GuessWord} options={{ title: 'Guess it', headerShown: true }} />
+      <Stack.Screen name="RecallWord" component={RecallWord} options={{ title: 'Recall it', headerShown: true }} />
+      <Stack.Screen name="WordsList" component={WordsList} options={{ title: 'Vocabulary', headerShown: true }} />
 
       <Stack.Screen
         name="Setting"
