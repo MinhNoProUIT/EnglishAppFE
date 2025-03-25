@@ -77,7 +77,7 @@ export default function BottomTabs() {
       <Tab.Screen
         name="Courses"
         component={Courses}
-        options={{ title: "Khóa học" }}
+        options={{ title: "Khóa học", headerShown: false  }}
       />
       <Tab.Screen
         name="Posts"
