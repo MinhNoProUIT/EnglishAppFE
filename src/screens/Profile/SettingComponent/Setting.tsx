@@ -35,7 +35,7 @@ const courses = [
   { id: "1", title: "Travel", image: "https://picsum.photos/200/300" },
 ];
 
-const Profile = () => {
+const Setting = () => {
   const navigation = useNavigation<SettingsScreenNavigationProp>(); // Hook navigation
   const [backgroundColor, setBackgroundColor] = useState("#008CBA");
 
@@ -230,7 +230,6 @@ const Profile = () => {
         </TouchableOpacity>
         <TouchableOpacity onPress={navigatetoPrivacyPolicy}>
           <View>
-            np
             <View
               style={{
                 justifyContent: "center",
@@ -454,4 +453,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default Setting;

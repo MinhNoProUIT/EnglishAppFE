@@ -121,10 +121,8 @@ const ProfileUser = () => {
             khóa học bạn nhé!!!
           </Text>
 
-          <AnimatedTouchable
+          <TouchableOpacity
             style={{
-              transform: [{ scale }],
-              marginLeft: 10,
               width: 100,
               height: 30,
               borderRadius: 5,
@@ -136,7 +134,7 @@ const ProfileUser = () => {
             }}
           >
             <Text style={{ fontWeight: "bold", color: "white" }}>Mua ngay</Text>
-          </AnimatedTouchable>
+          </TouchableOpacity>
         </View>
         <View>
           <Image
