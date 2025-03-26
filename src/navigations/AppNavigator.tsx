@@ -6,14 +6,26 @@ import BottomTabs from "./BottomTabs";
 import SignUp from "../screens/Login/SignUp";
 import SignIn from "../screens/Login/SignIn";
 
+import PreviewWord from "../screens/Exercise/PreviewWord";
+import PairWord from "../screens/Exercise/PairWord";
+import GuessWord from "../screens/Exercise/GuessWord";
+import RecallWord from "../screens/Exercise/RecallWord";
+import WordsList from "../screens/Exercise/WordsList";
+
 import Setting from "../screens/Profile/SettingComponent/Setting";
 import Profile from "../screens/Profile/Profile";
 import AccountInfomation from "../screens/Profile/AccInfoComponent/AccountInfomation";
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+
 import ForgotPassword from "../screens/Login/ForgotPassword";
 import ResetPassword from "../screens/Login/ResetPassword";
 import ChangePassword from "../screens/Login/ChangePassword";
+
+
+import TermsOfService from "../screens/Profile/TermsOfServiceComponent/TermsOfService";
+import PrivacyPolicy from "../screens/Profile/PrivacyPolicyComponent/PrivacyPolicy";
+import AnotherSetting from "../screens/Profile/AnotherSettingComponent/AnotherSetting";
 
 //import UserDetails from "../screens/UserDetails";
 
@@ -29,6 +41,17 @@ export type RootStackParamList = {
   Setting: undefined;
   AccountInfomation: undefined;
   Profile: undefined;
+
+  PreviewWord: undefined;
+  PairWord: undefined;
+  GuessWord: undefined;
+  RecallWord: undefined;
+  WordsList: undefined;
+
+  TermsOfService: undefined;
+  PrivacyPolicy: undefined;
+  AnotherSetting: undefined;
+
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -47,6 +70,32 @@ export default function AppNavigator() {
       <Stack.Screen name="SignIn" component={SignIn} />
       <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
       <Stack.Screen name="ChangePassword" component={ChangePassword} />
+
+      <Stack.Screen
+        name="PreviewWord"
+        component={PreviewWord}
+        options={{ title: "Preview it", headerShown: true }}
+      />
+      <Stack.Screen
+        name="PairWord"
+        component={PairWord}
+        options={{ title: "Pair it", headerShown: true }}
+      />
+      <Stack.Screen
+        name="GuessWord"
+        component={GuessWord}
+        options={{ title: "Guess it", headerShown: true }}
+      />
+      <Stack.Screen
+        name="RecallWord"
+        component={RecallWord}
+        options={{ title: "Recall it", headerShown: true }}
+      />
+      <Stack.Screen
+        name="WordsList"
+        component={WordsList}
+        options={{ title: "Vocabulary", headerShown: true }}
+      />
 
       <Stack.Screen
         name="Setting"
@@ -79,6 +128,56 @@ export default function AppNavigator() {
           ),
         }}
       />
+
+
+      <Stack.Screen
+        name="TermsOfService"
+        component={TermsOfService}
+        options={{
+          headerShown: true,
+          header: ({ navigation }) => (
+            <View style={styles.headerContainer}>
+              <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
+                <Ionicons name="chevron-back-outline" size={24} color="white" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Điều khoản dịch vụ</Text>
+            </View>
+          ),
+        }}
+      />
+
+      <Stack.Screen
+        name="PrivacyPolicy"
+        component={PrivacyPolicy}
+        options={{
+          headerShown: true,
+          header: ({ navigation }) => (
+            <View style={styles.headerContainer}>
+              <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
+                <Ionicons name="chevron-back-outline" size={24} color="white" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Chính sách bảo mật</Text>
+            </View>
+          ),
+        }}
+      />
+
+      <Stack.Screen
+        name="AnotherSetting"
+        component={AnotherSetting}
+        options={{
+          headerShown: true,
+          header: ({ navigation }) => (
+            <View style={styles.headerContainer}>
+              <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
+                <Ionicons name="chevron-back-outline" size={24} color="white" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Cài đặt khác</Text>
+            </View>
+          ),
+        }}
+      />
+
     </Stack.Navigator>
   );
 }

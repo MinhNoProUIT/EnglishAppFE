@@ -35,7 +35,7 @@ const courses = [
   { id: "1", title: "Travel", image: "https://picsum.photos/200/300" },
 ];
 
-const Profile = () => {
+const Setting = () => {
   const navigation = useNavigation<SettingsScreenNavigationProp>(); // Hook navigation
   const [backgroundColor, setBackgroundColor] = useState("#008CBA");
 
@@ -48,9 +48,20 @@ const Profile = () => {
     setBackgroundColor("#008CBA"); // Quay lại màu ban đầu
   };
   const navigateToAccInfo = (navigationName: keyof RootStackParamList) => {
-    navigation.navigate(navigationName); // Điều hướng đến màn hình Setting
+    navigation.navigate("AccountInfomation"); // Điều hướng đến màn hình Setting
   };
 
+  const navigateToTersmofService = () => {
+    navigation.navigate("TermsOfService");
+  };
+
+  const navigatetoPrivacyPolicy = () => {
+    navigation.navigate("PrivacyPolicy");
+  };
+
+  const navigatetoAnotherSetting = () => {
+    navigation.navigate("AnotherSetting");
+  };
   return (
     <ScrollView>
       <View style={{ marginLeft: 10, marginRight: 10 }}>
@@ -163,7 +174,7 @@ const Profile = () => {
             </View>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigateToTersmofService()}>
           <View>
             <View
               style={{
@@ -217,7 +228,7 @@ const Profile = () => {
             </View>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={navigatetoPrivacyPolicy}>
           <View>
             <View
               style={{
@@ -271,7 +282,7 @@ const Profile = () => {
             </View>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={navigatetoAnotherSetting}>
           <View>
             <View
               style={{
@@ -442,4 +453,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default Setting;
