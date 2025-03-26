@@ -11,6 +11,9 @@ import Profile from "../screens/Profile/Profile";
 import AccountInfomation from "../screens/Profile/AccInfoComponent/AccountInfomation";
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import ForgotPassword from "../screens/Login/ForgotPassword";
+import ResetPassword from "../screens/Login/ResetPassword";
+import ChangePassword from "../screens/Login/ChangePassword";
 
 //import UserDetails from "../screens/UserDetails";
 
@@ -19,12 +22,13 @@ export type RootStackParamList = {
 
   SignUp: undefined;
   SignIn: undefined;
+  ForgotPassword: undefined;
+  ChangePassword: undefined;
   UserDetails: { userId: number };
 
   Setting: undefined;
   AccountInfomation: undefined;
   Profile: undefined;
-
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -41,6 +45,8 @@ export default function AppNavigator() {
       {/* <Stack.Screen name="UserDetails" component={UserDetails} /> */}
       <Stack.Screen name="SignUp" component={SignUp} />
       <Stack.Screen name="SignIn" component={SignIn} />
+      <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+      <Stack.Screen name="ChangePassword" component={ChangePassword} />
 
       <Stack.Screen
         name="Setting"
@@ -73,7 +79,6 @@ export default function AppNavigator() {
           ),
         }}
       />
-
     </Stack.Navigator>
   );
 }
