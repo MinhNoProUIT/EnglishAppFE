@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Icon from '@expo/vector-icons/SimpleLineIcons';
-import { ProgressBar } from 'react-native-paper';
+import Icon from "@expo/vector-icons/SimpleLineIcons";
+import { ProgressBar } from "react-native-paper";
 import CourseDetailMenu from "./CourseDetailMenu";
 import RepeatModeMenu from "../Exercise/RepeatModeMenu";
 import { useNavigation } from "@react-navigation/native";
@@ -10,36 +10,58 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
-  FlatList
+  FlatList,
 } from "react-native";
+import { RootStackParamList } from "../../navigations/AppNavigator";
+import { StackNavigationProp } from "@react-navigation/stack";
 
 const courses = [
-  { id: '1', title: 'Hang out with friends', lesson: 1, students: 127, advanced: 76, points: 76, days: 23, image: 'https://picsum.photos/200/300' },
-  { id: '2', title: 'Friends Series', lesson: 4, students: 15, advanced: 34, points: 15, days: 45, image: "https://picsum.photos/200/150" },
+  {
+    id: "1",
+    title: "Hang out with friends",
+    lesson: 1,
+    students: 127,
+    advanced: 76,
+    points: 76,
+    days: 23,
+    image: "https://picsum.photos/200/300",
+  },
+  {
+    id: "2",
+    title: "Friends Series",
+    lesson: 4,
+    students: 15,
+    advanced: 34,
+    points: 15,
+    days: 45,
+    image: "https://picsum.photos/200/150",
+  },
 ];
+type OngoingCoursesScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "OnGoingCourses"
+>;
 
 export default function OngoingCourses() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<OngoingCoursesScreenNavigationProp>();
   const [detailMenuVisible, setDetailMenuVisible] = useState(false);
   const [repeatModeMenuVisible, setRepeatModeMenuVisible] = useState(false);
 
   return (
     <View style={{ flex: 1 }}>
-
       {/* list courses */}
-      <FlatList style={styles.coursesList}
+      <FlatList
+        style={styles.coursesList}
         data={courses}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card}
-            onPress={() => setDetailMenuVisible(true)}>
-            <Image style={styles.image}
-              source={{ uri: item.image }}
-            />
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => setDetailMenuVisible(true)}
+          >
+            <Image style={styles.image} source={{ uri: item.image }} />
             <View style={styles.info}>
-              <Text style={styles.title}>
-                {item.title}
-              </Text>
+              <Text style={styles.title}>{item.title}</Text>
               <View style={styles.infoRow}>
                 <View style={styles.detail}>
                   <Icon name="book-open" size={14} />
@@ -47,7 +69,9 @@ export default function OngoingCourses() {
                 </View>
                 <View style={styles.detail}>
                   <Icon name="star" size={14} />
-                  <Text style={styles.detailText}>Advanced: {item.advanced}</Text>
+                  <Text style={styles.detailText}>
+                    Advanced: {item.advanced}
+                  </Text>
                 </View>
               </View>
               <ProgressBar
@@ -57,7 +81,9 @@ export default function OngoingCourses() {
               />
               <View style={styles.infoRow}>
                 <View style={styles.detail}>
-                  <Text style={styles.detailText}>points: {item.points} / 100</Text>
+                  <Text style={styles.detailText}>
+                    points: {item.points} / 100
+                  </Text>
                 </View>
                 <View style={styles.detail}>
                   <Text style={styles.detailText}>days: {item.days}</Text>
@@ -73,32 +99,32 @@ export default function OngoingCourses() {
         visible={detailMenuVisible}
         onClose={() => setDetailMenuVisible(false)}
         onLearn={() => {
-          setDetailMenuVisible(false); // Đóng modal trước          
-          navigation.navigate('PreviewWord'); // Điều hướng đến RecallWord
+          setDetailMenuVisible(false); // Đóng modal trước
+          navigation.navigate("PreviewWord"); // Điều hướng đến RecallWord
         }}
         onRepeat={() => {
           setDetailMenuVisible(false); // Đóng modal trước
           setRepeatModeMenuVisible(true); // Mở menu chọn repeat mode
         }}
         onReview={() => {
-          setDetailMenuVisible(false); // Đóng modal trước          
-          navigation.navigate('WordsList'); // Điều hướng đến RecallWord
+          setDetailMenuVisible(false); // Đóng modal trước
+          navigation.navigate("WordsList"); // Điều hướng đến RecallWord
         }}
       />
       <RepeatModeMenu
         visible={repeatModeMenuVisible}
         onClose={() => setRepeatModeMenuVisible(false)}
         onPair={() => {
-          setRepeatModeMenuVisible(false); // Đóng modal trước          
-          navigation.navigate('PairWord'); // Điều hướng đến RecallWord
+          setRepeatModeMenuVisible(false); // Đóng modal trước
+          navigation.navigate("PairWord"); // Điều hướng đến RecallWord
         }}
         onGuess={() => {
-          setRepeatModeMenuVisible(false); // Đóng modal trước          
-          navigation.navigate('GuessWord'); // Điều hướng đến GuessWord}
+          setRepeatModeMenuVisible(false); // Đóng modal trước
+          navigation.navigate("GuessWord"); // Điều hướng đến GuessWord}
         }}
         onRecall={() => {
-          setRepeatModeMenuVisible(false); // Đóng modal trước          
-          navigation.navigate('RecallWord'); // Điều hướng đến RecallWord}
+          setRepeatModeMenuVisible(false); // Đóng modal trước
+          navigation.navigate("RecallWord"); // Điều hướng đến RecallWord}
         }}
       />
     </View>
@@ -106,14 +132,14 @@ export default function OngoingCourses() {
 }
 const styles = StyleSheet.create({
   coursesList: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingVertical: 12,
     paddingHorizontal: 18,
   },
   card: {
-    flexDirection: 'row',
+    flexDirection: "row",
     height: 130,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderColor: "#F3F3F5",
     borderWidth: 2,
     borderRadius: 8,
@@ -128,25 +154,25 @@ const styles = StyleSheet.create({
   },
   info: {
     gap: 14,
-    alignSelf: 'center',
+    alignSelf: "center",
   },
   title: {
     fontSize: 12,
     fontWeight: 500,
   },
   infoRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     width: 190,
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   detail: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 5,
   },
   detailText: {
     fontSize: 10,
     fontWeight: 500,
-    color: '#515960'
-  }
+    color: "#515960",
+  },
 });

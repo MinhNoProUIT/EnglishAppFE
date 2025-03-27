@@ -17,7 +17,7 @@ export default function ProfileHeader() {
             <FontAwesome6 name="coins" size={24} style={styles.coin} />
           </View>
         </TouchableOpacity>
-        <Text style={styles.titlecoin}>500</Text>
+        <Text style={styles.titlecoin}>600</Text>
       </View>
       <Text style={styles.headerTitle}>Cá nhân</Text>
       <View style={{ flexDirection: "row", gap: 10, marginRight: 20 }}>

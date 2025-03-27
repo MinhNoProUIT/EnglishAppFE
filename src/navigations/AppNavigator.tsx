@@ -22,11 +22,9 @@ import ForgotPassword from "../screens/Login/ForgotPassword";
 import ResetPassword from "../screens/Login/ResetPassword";
 import ChangePassword from "../screens/Login/ChangePassword";
 
-
 import TermsOfService from "../screens/Profile/TermsOfServiceComponent/TermsOfService";
 import PrivacyPolicy from "../screens/Profile/PrivacyPolicyComponent/PrivacyPolicy";
 import AnotherSetting from "../screens/Profile/AnotherSettingComponent/AnotherSetting";
-
 //import UserDetails from "../screens/UserDetails";
 
 export type RootStackParamList = {
@@ -41,6 +39,8 @@ export type RootStackParamList = {
   Setting: undefined;
   AccountInfomation: undefined;
   Profile: undefined;
+  OnGoingCourses: undefined;
+  CompletedCourses: undefined;
 
   PreviewWord: undefined;
   PairWord: undefined;
@@ -51,7 +51,6 @@ export type RootStackParamList = {
   TermsOfService: undefined;
   PrivacyPolicy: undefined;
   AnotherSetting: undefined;
-
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -129,7 +128,6 @@ export default function AppNavigator() {
         }}
       />
 
-
       <Stack.Screen
         name="TermsOfService"
         component={TermsOfService}
@@ -177,7 +175,6 @@ export default function AppNavigator() {
           ),
         }}
       />
-
     </Stack.Navigator>
   );
 }
