@@ -4,37 +4,15 @@ import { ActivityIndicator, Avatar } from "react-native-paper";
 import Heart from '@expo/vector-icons/Entypo';
 import Comment from '@expo/vector-icons/FontAwesome5';
 import Share from '@expo/vector-icons/Feather';
-import RBSheet from 'react-native-raw-bottom-sheet';
-import translateDate from './../../utils/translateDate';
+import ShareBottomSheet from "../../components/bottomSheet/ShareBottomSheet";
+import CommentBottomSheet from "../../components/bottomSheet/CommentBottomSheet";
+import { PostData } from "../../interfaces/PostInterface";
 
 const { width } = Dimensions.get("window");
 
-interface RBSheetRef {
+export interface RBSheetRef {
   open: () => void;
   close: () => void;
-}
-
-interface PostData {
-  id: number;
-  images: string[];
-  fullname: string;
-  avatar: string;
-  isLike: boolean;
-  totalLike: number;
-  totalCmt: number;
-  totalShare: number;
-  content: string;
-}
-
-interface Comment {
-  id: number;
-  postId: number;
-  fullname: string;
-  avatar: string;
-  isLike: boolean;
-  totalLike: number;
-  content: string;
-  createDate: Date;
 }
 
 const data = [
@@ -42,8 +20,6 @@ const data = [
     id: 1,
     images: [
       'https://picsum.photos/400/400',
-      'https://picsum.photos/100/100',
-      'https://picsum.photos/100/300'
     ],
     fullname: "Dương Lâm",
     avatar: 'https://picsum.photos/100/100',
@@ -130,69 +106,6 @@ const data = [
   },
 ];
 
-const comments = [
-  {
-    id: 1,
-    postId: 1,
-    fullname: "Dương Lâm",
-    avatar: 'https://picsum.photos/100/100',
-    isLike: false,
-    totalLike: 2,
-    content: "Từ vựng này rất hay nha mọi người !!!",
-    createDate: new Date("2025-03-02T00:00:00Z")
-  },
-  {
-    id: 2,
-    postId: 1,
-    fullname: "hehee",
-    avatar: 'https://picsum.photos/100/100',
-    isLike: false,
-    totalLike: 0,
-    content: "Cần học nhé",
-    createDate: new Date("2025-03-10T00:00:00Z")
-  },
-  {
-    id: 3,
-    postId: 1,
-    fullname: "hehee",
-    avatar: 'https://picsum.photos/100/100',
-    isLike: false,
-    totalLike: 0,
-    content: "Cần học nhé",
-    createDate: new Date("2025-03-17T00:00:00Z")
-  },
-  {
-    id: 4,
-    postId: 1,
-    fullname: "hehee",
-    avatar: 'https://picsum.photos/100/100',
-    isLike: false,
-    totalLike: 0,
-    content: "Cần học nhé",
-    createDate: new Date("2025-03-17T00:00:00Z")
-  },
-  {
-    id: 5,
-    postId: 1,
-    fullname: "hehee",
-    avatar: 'https://picsum.photos/100/100',
-    isLike: false,
-    totalLike: 0,
-    content: "Cần học nhé",
-    createDate: new Date("2025-03-17T00:00:00Z")
-  },
-  {
-    id: 6,
-    postId: 1,
-    fullname: "hehee",
-    avatar: 'https://picsum.photos/100/100',
-    isLike: false,
-    totalLike: 0,
-    content: "Cần học nhé",
-    createDate: new Date("2025-03-17T00:00:00Z")
-  },
-];
-
 export default function Posts() {
   const [currentIndexes, setCurrentIndexes] = useState<Record<number, number>>({});
   const scrollRefs = useRef<Record<number, FlatList<string> | null>>({});
@@ -202,14 +115,14 @@ export default function Posts() {
   const [isLoading, setLoading] = useState(false);
   const [hasMoreData, setHasMoreData] = useState(true);
 
-  const [commentData, setCommentData] = useState<Comment[]>(comments);
-  const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+  const [selectedPost, setSelectedPost] = useState<PostData>();
 
-  const bottomSheetRef = useRef<RBSheetRef | null>(null); 
+  const bottomSheetRefComment = useRef<RBSheetRef | null>(null); 
+  const bottomSheetRefShare = useRef<RBSheetRef | null>(null); 
+  
 
   const fetchData = () => {
     if (isLoading || !hasMoreData) return;
-
     setLoading(true);
     setTimeout(() => {
       const newData = data.slice((page - 1) * 5, page * 5); // Load 5 bài viết mỗi lần
@@ -249,23 +162,17 @@ export default function Posts() {
     )  
   }
 
-  const handleLikeComment = (item: Comment) => {
-    setCommentData((prevComment) => 
-      prevComment.map((comment) => {
-        if (comment.id === item.id && selectedPostId === comment.postId){
-          const newTotalLike = comment.isLike ? comment.totalLike - 1 : comment.totalLike + 1;
-          const newStateLike = !comment.isLike;
-          return {...comment, totalLike: newTotalLike, isLike: newStateLike};
-        }
-        return comment;
-      })
-    )
+  const handleOpenComment = (post: PostData) => {
+    setSelectedPost(post);
+    if (bottomSheetRefComment.current){
+      bottomSheetRefComment.current.open();
+    }
   }
 
-  const handleOpenComment = (postId: number) => {
-    setSelectedPostId(postId);
-    if (bottomSheetRef.current){
-      bottomSheetRef.current.open();
+  const handleOpenShare = (post: PostData) => {
+    setSelectedPost(post);
+    if (bottomSheetRefShare.current){
+      bottomSheetRefShare.current.open();
     }
   }
 
@@ -276,36 +183,6 @@ export default function Posts() {
       resizeMode="cover"
     />
   ), []);
-
-  const renderCommentItem = useCallback(
-    ({ item }: { item: Comment }) => (
-      <View className="flex-row px-4 py-7">
-        <Avatar.Image size={40} source={{ uri: item.avatar }} />
-        <View className="ml-3 flex-1">
-          <View className="flex-row gap-1">
-            <Text className="font-bold">{item.fullname}</Text>
-            <Text className="text-gray-300">{translateDate(item.createDate)}</Text>
-          </View>
-          <Text className="text-base">{item.content}</Text>
-        </View>
-        <View className="items-center justify-center flex-col">
-          <TouchableOpacity
-            className="flex-col items-center gap-1"
-            onPress={() => handleLikeComment(item)}
-          >
-            <Heart
-              name={item.isLike ? "heart" : "heart-outlined"}
-              size={20}
-              color={item.isLike ? "red" : "gray"}
-              className="pr-1"
-            />
-            <Text className="font-medium text-gray-500 ">{item.totalLike === 0 ? "" : item.totalLike} </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    ),
-    []
-  );
 
   const renderPostItem = useCallback(({ item } : {item: PostData}) => (
     <ScrollView className="bg-white mb-1 ">
@@ -347,12 +224,12 @@ export default function Posts() {
           <Text className="font-bold">{item.totalLike}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity className="flex flex-row items-center gap-1" onPress={() => handleOpenComment(item.id)}>
+        <TouchableOpacity className="flex flex-row items-center gap-1" onPress={() => handleOpenComment(item)}>
           <Comment name="comment" size={20} color="black" />
           <Text className="font-bold">{item.totalCmt}</Text>  
         </TouchableOpacity>
 
-        <TouchableOpacity className="flex flex-row items-center gap-1">
+        <TouchableOpacity className="flex flex-row items-center gap-1" onPress={() => handleOpenShare(item)}>
           <Share name="send" size={22} color="black" />
           <Text className="font-bold">{item.totalShare}</Text>
         </TouchableOpacity>
@@ -367,9 +244,6 @@ export default function Posts() {
     </ScrollView>
   ), [currentIndexes]);
 
-  const filteredComments = selectedPostId
-    ? commentData.filter((comment) => comment.postId === selectedPostId)
-    : [];
 
   return (
    <View>
@@ -389,51 +263,15 @@ export default function Posts() {
       }
     />
 
-    {/*view bottom sheet */}
-    <RBSheet
-      ref={bottomSheetRef}
-      height={500}
-      openDuration={100}
-      closeOnPressBack={true}
-      closeOnPressMask={true}
-      customStyles={{
-          wrapper: {
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            opacity: 1
-          },
-          draggableIcon: {
-            backgroundColor: "#000",
-          },
-          container: {
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-          },
-        }}
-        customModalProps={{
-          animationType: "slide",
-          statusBarTranslucent: true,
-        }}
-        customAvoidingViewProps={{
-          enabled: false,
-        }}
-    >
-      <View className="py-4">
-          <Text className="text-center font-semibold text-xl items-center pb-4 border-b border-gray-100">Bình luận</Text>
-          {filteredComments.length > 0 ? (
-            <FlatList
-              data={filteredComments}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={renderCommentItem} 
-              ListEmptyComponent={
-                <Text className="text-center text-gray-500">Chưa có bình luận nào.</Text>
-              }
-              removeClippedSubviews={true} 
-            />
-          ) : (
-            <Text className="text-center text-gray-500">Chưa có bình luận nào.</Text>
-          )}
-        </View>
-    </RBSheet>
+    {/*view bottom sheet - comment */}
+    {selectedPost && (
+      <CommentBottomSheet ref={bottomSheetRefComment} post={selectedPost!} />
+    )}
+
+    {/*view bottom sheet - share */}
+    {selectedPost && (
+      <ShareBottomSheet ref={bottomSheetRefShare} post={selectedPost}/>
+     )}
    </View>
   );
 }

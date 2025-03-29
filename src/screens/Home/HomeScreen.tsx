@@ -21,7 +21,9 @@ const data = [
   { value: 70, color: "#E3EDFF" },
 ];
 
+
 const HomeScreen = () => {
+
   return (
     <ScrollView className="px-6 pt-20 bg-white">
       {/* header */}
