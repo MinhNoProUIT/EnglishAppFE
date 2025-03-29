@@ -1,4 +1,5 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import { createEntityAdapter } from "@reduxjs/toolkit";
 import React from "react";
 import {
@@ -13,7 +14,15 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
+import { RootStackParamList } from "../../navigations/AppNavigator";
+import { StackNavigationProp } from "@react-navigation/stack";
+
+type ForgotPasswordScreen = StackNavigationProp<
+  RootStackParamList,
+  "ForgotPassword"
+>;
 export default function SighIn() {
+  const navigation = useNavigation<ForgotPasswordScreen>();
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -103,7 +112,10 @@ export default function SighIn() {
                   size={20}
                   color={"black"}
                 ></MaterialIcons>
-                <TextInput style={styles.input} placeholder="Email"></TextInput>
+                <TextInput
+                  style={[styles.input, { marginRight: 10, flex: 1 }]}
+                  placeholder="Email"
+                ></TextInput>
               </View>
               <View style={styles.text_input}>
                 {/*password */}
@@ -113,7 +125,7 @@ export default function SighIn() {
                   color={"black"}
                 ></MaterialIcons>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { marginRight: 10, flex: 1 }]}
                   placeholder="Password"
                 ></TextInput>
               </View>
@@ -132,7 +144,9 @@ export default function SighIn() {
             </TouchableOpacity>
             <View style={styles.view_forgot}>
               <Text style={{ fontSize: 16 }}>Forgot your password?</Text>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("ForgotPassword")}
+              >
                 <Text style={{ fontSize: 16, color: "#2563eb" }}>
                   Reset your password
                 </Text>

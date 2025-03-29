@@ -1,5 +1,5 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { StackNavigationState, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import {
   View,
@@ -89,7 +89,7 @@ export default function SignUp() {
       flex: 1,
       justifyContent: "flex-end",
       alignItems: "center",
-      marginBottom: 50,
+      marginBottom: 15,
     },
     loginText: {
       textAlign: "center",
@@ -108,7 +108,7 @@ export default function SignUp() {
       style={{ flex: 1 }}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 90 }}>
           <View style={styles.container}>
             <Text style={styles.title}>Welcome to EnglishApp</Text>
             <View>
@@ -149,7 +149,7 @@ export default function SignUp() {
                   color={"black"}
                 ></MaterialIcons>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { marginRight: 10, flex: 1 }]}
                   placeholder="Fullname"
                 ></TextInput>
               </View>
@@ -160,7 +160,7 @@ export default function SignUp() {
                   color={"black"}
                 ></MaterialIcons>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { marginRight: 10, flex: 1 }]}
                   placeholder="Email"
                   keyboardType="email-address"
                 ></TextInput>
@@ -172,7 +172,7 @@ export default function SignUp() {
                   color={"black"}
                 ></MaterialIcons>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { marginRight: 10, flex: 1 }]}
                   placeholder="Password"
                 ></TextInput>
               </View>

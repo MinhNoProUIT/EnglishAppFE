@@ -16,7 +16,6 @@ import SignUp from "../screens/Login/SignUp";
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
 import ProfileHeader from "../components/headers/ProfileHeader";
 
-
 export type BottomTabParamList = {
   Homes: undefined;
   Courses: undefined;
@@ -53,7 +52,6 @@ export default function BottomTabs() {
         tabBarActiveTintColor: "rgba(254, 149, 25, 1)",
         tabBarInactiveTintColor: "rgb(0, 0, 0)",
         tabBarStyle: {
-          position: "absolute",
           paddingBottom: 20,
           backgroundColor: "#fff",
           elevation: 5,
@@ -77,7 +75,7 @@ export default function BottomTabs() {
       <Tab.Screen
         name="Courses"
         component={Courses}
-        options={{ title: "Khóa học" }}
+        options={{ title: "Khóa học", headerShown: false }}
       />
       <Tab.Screen
         name="Posts"
