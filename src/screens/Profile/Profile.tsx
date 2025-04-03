@@ -37,7 +37,7 @@ const Profile = () => {
   }, []);
 
   return (
-    <ScrollView className=" pt-3" contentContainerStyle={{ paddingBottom: 90 }}>
+    <ScrollView className=" pt-3">
       <ProfileUser />
       <Achievement />
     </ScrollView>

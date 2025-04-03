@@ -1,40 +1,23 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { View, Text, Image, FlatList, ScrollView, NativeSyntheticEvent, NativeScrollEvent, Dimensions, TouchableOpacity } from "react-native";
-import { ActivityIndicator, Avatar } from "react-native-paper";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { View, Text, Image, FlatList, ScrollView, NativeSyntheticEvent, NativeScrollEvent, Dimensions, TouchableOpacity, Pressable } from "react-native";
+import { ActivityIndicator, Avatar, Button } from "react-native-paper";
 import Heart from '@expo/vector-icons/Entypo';
 import Comment from '@expo/vector-icons/FontAwesome5';
 import Share from '@expo/vector-icons/Feather';
-import RBSheet from 'react-native-raw-bottom-sheet';
-import translateDate from './../../utils/translateDate';
+import ShareBottomSheet from "../../components/bottomSheet/ShareBottomSheet";
+import CommentBottomSheet from "../../components/bottomSheet/CommentBottomSheet";
+import { PostData } from "../../interfaces/PostInterface";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../navigations/AppNavigator";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { BottomTabParamList } from "../../navigations/BottomTabs";
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const { width } = Dimensions.get("window");
 
-interface RBSheetRef {
+export interface RBSheetRef {
   open: () => void;
   close: () => void;
-}
-
-interface PostData {
-  id: number;
-  images: string[];
-  fullname: string;
-  avatar: string;
-  isLike: boolean;
-  totalLike: number;
-  totalCmt: number;
-  totalShare: number;
-  content: string;
-}
-
-interface Comment {
-  id: number;
-  postId: number;
-  fullname: string;
-  avatar: string;
-  isLike: boolean;
-  totalLike: number;
-  content: string;
-  createDate: Date;
 }
 
 const data = [
@@ -42,8 +25,6 @@ const data = [
     id: 1,
     images: [
       'https://picsum.photos/400/400',
-      'https://picsum.photos/100/100',
-      'https://picsum.photos/100/300'
     ],
     fullname: "Dương Lâm",
     avatar: 'https://picsum.photos/100/100',
@@ -130,68 +111,12 @@ const data = [
   },
 ];
 
-const comments = [
-  {
-    id: 1,
-    postId: 1,
-    fullname: "Dương Lâm",
-    avatar: 'https://picsum.photos/100/100',
-    isLike: false,
-    totalLike: 2,
-    content: "Từ vựng này rất hay nha mọi người !!!",
-    createDate: new Date("2025-03-02T00:00:00Z")
-  },
-  {
-    id: 2,
-    postId: 1,
-    fullname: "hehee",
-    avatar: 'https://picsum.photos/100/100',
-    isLike: false,
-    totalLike: 0,
-    content: "Cần học nhé",
-    createDate: new Date("2025-03-10T00:00:00Z")
-  },
-  {
-    id: 3,
-    postId: 1,
-    fullname: "hehee",
-    avatar: 'https://picsum.photos/100/100',
-    isLike: false,
-    totalLike: 0,
-    content: "Cần học nhé",
-    createDate: new Date("2025-03-17T00:00:00Z")
-  },
-  {
-    id: 4,
-    postId: 1,
-    fullname: "hehee",
-    avatar: 'https://picsum.photos/100/100',
-    isLike: false,
-    totalLike: 0,
-    content: "Cần học nhé",
-    createDate: new Date("2025-03-17T00:00:00Z")
-  },
-  {
-    id: 5,
-    postId: 1,
-    fullname: "hehee",
-    avatar: 'https://picsum.photos/100/100',
-    isLike: false,
-    totalLike: 0,
-    content: "Cần học nhé",
-    createDate: new Date("2025-03-17T00:00:00Z")
-  },
-  {
-    id: 6,
-    postId: 1,
-    fullname: "hehee",
-    avatar: 'https://picsum.photos/100/100',
-    isLike: false,
-    totalLike: 0,
-    content: "Cần học nhé",
-    createDate: new Date("2025-03-17T00:00:00Z")
-  },
-];
+type SettingsScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "MyPost"
+>;
+
+type PostsRouteProp = RouteProp<BottomTabParamList, 'Posts'>;
 
 export default function Posts() {
   const [currentIndexes, setCurrentIndexes] = useState<Record<number, number>>({});
@@ -202,14 +127,51 @@ export default function Posts() {
   const [isLoading, setLoading] = useState(false);
   const [hasMoreData, setHasMoreData] = useState(true);
 
-  const [commentData, setCommentData] = useState<Comment[]>(comments);
-  const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+  const [selectedPost, setSelectedPost] = useState<PostData>();
 
-  const bottomSheetRef = useRef<RBSheetRef | null>(null); 
+  const bottomSheetRefComment = useRef<RBSheetRef | null>(null); 
+  const bottomSheetRefShare = useRef<RBSheetRef | null>(null); 
+  
+  const navigation = useNavigation<SettingsScreenNavigationProp>();
 
+  const route = useRoute<PostsRouteProp>();
+  const { userId } = route.params || {};
+  const [user, setUser] = useState<PostData | null>(null);
+
+  const userDetail = useMemo(() => data.find((u) => u.id === userId) || null, [userId, data]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    setUser(userDetail);
+  }, [userDetail]); 
+
+  useEffect(() => {
+    if (user) {
+      navigation.setOptions({
+        headerTitle: () => (
+          <View style={{ alignItems: "center" }}>
+            <Text style={{ fontSize: 18, fontWeight: "bold" }}>Bài đăng</Text>
+            {userId && <Text style={{ fontSize: 14, color: "gray" }}>{user?.fullname}</Text>}
+          </View>
+        ),
+        headerLeft: () => (
+          <TouchableOpacity onPress={() => navigation.pop()}>
+            <Ionicons name="chevron-back-outline" size={24} color="black" />
+          </TouchableOpacity>
+        ),
+      });
+    } 
+  }, [navigation, user]);
+  
+  const navigateToMyPost = () => {
+    navigation.navigate("MyPost");
+  };
+  
   const fetchData = () => {
     if (isLoading || !hasMoreData) return;
-
     setLoading(true);
     setTimeout(() => {
       const newData = data.slice((page - 1) * 5, page * 5); // Load 5 bài viết mỗi lần
@@ -222,10 +184,6 @@ export default function Posts() {
       setLoading(false);
     }, 1000); 
   };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
   
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>, postId: number) => {
     const contentOffsetX = event.nativeEvent.contentOffset.x;
@@ -249,23 +207,17 @@ export default function Posts() {
     )  
   }
 
-  const handleLikeComment = (item: Comment) => {
-    setCommentData((prevComment) => 
-      prevComment.map((comment) => {
-        if (comment.id === item.id && selectedPostId === comment.postId){
-          const newTotalLike = comment.isLike ? comment.totalLike - 1 : comment.totalLike + 1;
-          const newStateLike = !comment.isLike;
-          return {...comment, totalLike: newTotalLike, isLike: newStateLike};
-        }
-        return comment;
-      })
-    )
+  const handleOpenComment = (post: PostData) => {
+    setSelectedPost(post);
+    if (bottomSheetRefComment.current){
+      bottomSheetRefComment.current.open();
+    }
   }
 
-  const handleOpenComment = (postId: number) => {
-    setSelectedPostId(postId);
-    if (bottomSheetRef.current){
-      bottomSheetRef.current.open();
+  const handleOpenShare = (post: PostData) => {
+    setSelectedPost(post);
+    if (bottomSheetRefShare.current){
+      bottomSheetRefShare.current.open();
     }
   }
 
@@ -277,44 +229,15 @@ export default function Posts() {
     />
   ), []);
 
-  const renderCommentItem = useCallback(
-    ({ item }: { item: Comment }) => (
-      <View className="flex-row px-4 py-7">
-        <Avatar.Image size={40} source={{ uri: item.avatar }} />
-        <View className="ml-3 flex-1">
-          <View className="flex-row gap-1">
-            <Text className="font-bold">{item.fullname}</Text>
-            <Text className="text-gray-300">{translateDate(item.createDate)}</Text>
-          </View>
-          <Text className="text-base">{item.content}</Text>
-        </View>
-        <View className="items-center justify-center flex-col">
-          <TouchableOpacity
-            className="flex-col items-center gap-1"
-            onPress={() => handleLikeComment(item)}
-          >
-            <Heart
-              name={item.isLike ? "heart" : "heart-outlined"}
-              size={20}
-              color={item.isLike ? "red" : "gray"}
-              className="pr-1"
-            />
-            <Text className="font-medium text-gray-500 ">{item.totalLike === 0 ? "" : item.totalLike} </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    ),
-    []
-  );
-
   const renderPostItem = useCallback(({ item } : {item: PostData}) => (
     <ScrollView className="bg-white mb-1 ">
       {/* header */}
       <View className="flex-row items-center p-4 border-b border-gray-200">
-        <Avatar.Image size={40} source={{ uri: item.avatar }} />
-        <Text className="ml-2 font-bold">{item.fullname}</Text>
+        <Pressable onPress={() => navigateToMyPost()} className="flex-row items-center">
+            <Avatar.Image size={40} source={{ uri: item.avatar }} />
+            <Text className="ml-2 font-bold">{item.fullname}</Text>
+        </Pressable>
       </View>
-
       {/* list image */}
       <FlatList
         ref={(ref) => (scrollRefs.current[item.id] = ref)}
@@ -347,29 +270,26 @@ export default function Posts() {
           <Text className="font-bold">{item.totalLike}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity className="flex flex-row items-center gap-1" onPress={() => handleOpenComment(item.id)}>
+        <TouchableOpacity className="flex flex-row items-center gap-1" onPress={() => handleOpenComment(item)}>
           <Comment name="comment" size={20} color="black" />
           <Text className="font-bold">{item.totalCmt}</Text>  
         </TouchableOpacity>
 
-        <TouchableOpacity className="flex flex-row items-center gap-1">
+        <TouchableOpacity className="flex flex-row items-center gap-1" onPress={() => handleOpenShare(item)}>
           <Share name="send" size={22} color="black" />
           <Text className="font-bold">{item.totalShare}</Text>
         </TouchableOpacity>
       </View>
-      <View>
+      <Pressable onPress={() => handleOpenComment(item)}>
         <View className="px-4 py-1 mb-4 flex flex-row items-center">
          <Text className="text-base flex-1">
           <Text className="font-bold">{item.fullname}</Text> {item.content}
         </Text>
         </View>
-      </View>
+      </Pressable>
     </ScrollView>
   ), [currentIndexes]);
 
-  const filteredComments = selectedPostId
-    ? commentData.filter((comment) => comment.postId === selectedPostId)
-    : [];
 
   return (
    <View>
@@ -389,51 +309,15 @@ export default function Posts() {
       }
     />
 
-    {/*view bottom sheet */}
-    <RBSheet
-      ref={bottomSheetRef}
-      height={500}
-      openDuration={100}
-      closeOnPressBack={true}
-      closeOnPressMask={true}
-      customStyles={{
-          wrapper: {
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            opacity: 1
-          },
-          draggableIcon: {
-            backgroundColor: "#000",
-          },
-          container: {
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-          },
-        }}
-        customModalProps={{
-          animationType: "slide",
-          statusBarTranslucent: true,
-        }}
-        customAvoidingViewProps={{
-          enabled: false,
-        }}
-    >
-      <View className="py-4">
-          <Text className="text-center font-semibold text-xl items-center pb-4 border-b border-gray-100">Bình luận</Text>
-          {filteredComments.length > 0 ? (
-            <FlatList
-              data={filteredComments}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={renderCommentItem} 
-              ListEmptyComponent={
-                <Text className="text-center text-gray-500">Chưa có bình luận nào.</Text>
-              }
-              removeClippedSubviews={true} 
-            />
-          ) : (
-            <Text className="text-center text-gray-500">Chưa có bình luận nào.</Text>
-          )}
-        </View>
-    </RBSheet>
+    {/*view bottom sheet - comment */}
+    {selectedPost && (
+      <CommentBottomSheet ref={bottomSheetRefComment} post={selectedPost!} />
+    )}
+
+    {/*view bottom sheet - share */}
+    {selectedPost && (
+      <ShareBottomSheet ref={bottomSheetRefShare} post={selectedPost}/>
+     )}
    </View>
   );
 }

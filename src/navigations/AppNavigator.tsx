@@ -25,10 +25,14 @@ import ChangePassword from "../screens/Login/ChangePassword";
 import TermsOfService from "../screens/Profile/TermsOfServiceComponent/TermsOfService";
 import PrivacyPolicy from "../screens/Profile/PrivacyPolicyComponent/PrivacyPolicy";
 import AnotherSetting from "../screens/Profile/AnotherSettingComponent/AnotherSetting";
+
 import AccountCreatedScreen from "../screens/Login/AccountCreated";
 import OnboardingScreen from "../screens/Welcome/OnboardingScreen";
 
+
 //import UserDetails from "../screens/UserDetails";
+import MyPost from './../screens/Post/MyPost';
+
 
 export type RootStackParamList = {
   MainTabs: undefined;
@@ -43,6 +47,8 @@ export type RootStackParamList = {
   Setting: undefined;
   AccountInfomation: undefined;
   Profile: undefined;
+  OnGoingCourses: undefined;
+  CompletedCourses: undefined;
 
   PreviewWord: undefined;
   PairWord: undefined;
@@ -53,6 +59,10 @@ export type RootStackParamList = {
   TermsOfService: undefined;
   PrivacyPolicy: undefined;
   AnotherSetting: undefined;
+
+
+  MyPost: undefined;
+
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -181,6 +191,8 @@ export default function AppNavigator() {
           ),
         }}
       />
+
+      <Stack.Screen name="MyPost" component={MyPost} options={{headerShown:true}}/>
     </Stack.Navigator>
   );
 }
