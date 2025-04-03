@@ -8,6 +8,8 @@ import {
   Animated,
   TouchableHighlight,
   TouchableNativeFeedback,
+  Pressable,
+  Modal,
 } from "react-native";
 import {
   Feather,
@@ -36,19 +38,20 @@ const courses = [
 ];
 
 const Setting = () => {
-  const navigation = useNavigation<SettingsScreenNavigationProp>(); // Hook navigation
+  const navigation = useNavigation<SettingsScreenNavigationProp>();
   const [backgroundColor, setBackgroundColor] = useState("#008CBA");
-
-  // Hiệu ứng thay đổi màu nền khi nhấn
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [scaleAnim] = useState(new Animated.Value(0));
   const onPressIn = () => {
-    setBackgroundColor("#DDDDDD"); // Thay đổi màu khi nhấn
+    setBackgroundColor("#DDDDDD");
   };
 
   const onPressOut = () => {
-    setBackgroundColor("#008CBA"); // Quay lại màu ban đầu
+    setBackgroundColor("#008CBA");
   };
   const navigateToAccInfo = (navigationName: keyof RootStackParamList) => {
-    navigation.navigate("AccountInfomation"); // Điều hướng đến màn hình Setting
+    navigation.navigate("AccountInfomation");
   };
 
   const navigateToTersmofService = () => {
@@ -62,6 +65,27 @@ const Setting = () => {
   const navigatetoAnotherSetting = () => {
     navigation.navigate("AnotherSetting");
   };
+
+  const handleLogout = () => {
+    console.log("Đăng xuất thành công");
+    setShowLogoutModal(false);
+  };
+
+  const handleDelete = () => {
+    console.log("Xóa tài khoản thành công");
+    setShowDeleteModal(false);
+  };
+
+  useEffect(() => {
+    if (showLogoutModal || showDeleteModal) {
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      scaleAnim.setValue(0);
+    }
+  }, [showLogoutModal, showDeleteModal, scaleAnim]);
   return (
     <ScrollView>
       <View style={{ marginLeft: 10, marginRight: 10 }}>
@@ -336,7 +360,7 @@ const Setting = () => {
             </View>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => setShowLogoutModal(true)}>
           <View>
             <View
               style={{
@@ -392,7 +416,7 @@ const Setting = () => {
             </View>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => setShowDeleteModal(true)}>
           <View>
             <View
               style={{
@@ -448,6 +472,164 @@ const Setting = () => {
             </View>
           </View>
         </TouchableOpacity>
+        <Modal
+          transparent={true}
+          visible={showLogoutModal}
+          animationType="fade"
+          onRequestClose={() => setShowLogoutModal(false)}
+        >
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+            }}
+          >
+            <Animated.View
+              style={{
+                width: "70%",
+                backgroundColor: "white",
+                borderRadius: 10,
+                alignItems: "center",
+                transform: [{ scale: scaleAnim }],
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "#3E87F6",
+                  padding: 10,
+                  borderTopRightRadius: 10,
+                  borderTopLeftRadius: 10,
+                  marginBottom: 10,
+                  width: "100%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text
+                  style={{ color: "white", fontWeight: "bold", fontSize: 20 }}
+                >
+                  Đăng xuất
+                </Text>
+              </View>
+              <View style={{ padding: 20, alignItems: "center" }}>
+                <Text style={{ fontSize: 15, marginBottom: 20 }}>
+                  Bạn có chắc chắn muốn đăng xuất?
+                </Text>
+
+                <View style={{ flexDirection: "row", gap: 20 }}>
+                  <Pressable
+                    onPress={() => setShowLogoutModal(false)}
+                    style={{
+                      backgroundColor: "#ccc",
+                      paddingVertical: 10,
+                      paddingHorizontal: 20,
+                      borderRadius: 5,
+                    }}
+                  >
+                    <Text style={{ color: "black", fontWeight: "bold" }}>
+                      Hủy
+                    </Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={handleLogout}
+                    style={{
+                      backgroundColor: "red",
+                      paddingVertical: 10,
+                      paddingHorizontal: 20,
+                      borderRadius: 5,
+                    }}
+                  >
+                    <Text style={{ color: "white", fontWeight: "bold" }}>
+                      Đăng xuất
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
+            </Animated.View>
+          </View>
+        </Modal>
+        <Modal
+          transparent={true}
+          visible={showDeleteModal}
+          animationType="fade"
+          onRequestClose={() => setShowDeleteModal(false)}
+        >
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+            }}
+          >
+            <Animated.View
+              style={{
+                width: "70%",
+                backgroundColor: "white",
+                borderRadius: 10,
+                alignItems: "center",
+                transform: [{ scale: scaleAnim }],
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "#f6d500",
+                  padding: 10,
+                  borderTopRightRadius: 10,
+                  borderTopLeftRadius: 10,
+                  marginBottom: 10,
+                  width: "100%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text
+                  style={{ color: "black", fontWeight: "bold", fontSize: 20 }}
+                >
+                  Xóa tài khoản
+                </Text>
+              </View>
+              <View style={{ padding: 20, alignItems: "center" }}>
+                <Text style={{ fontSize: 15, marginBottom: 20 }}>
+                  Bạn có chắc chắn muốn xóa tài khoản này hay không?
+                </Text>
+
+                <View style={{ flexDirection: "row", gap: 20 }}>
+                  <Pressable
+                    onPress={() => setShowDeleteModal(false)}
+                    style={{
+                      backgroundColor: "#ccc",
+                      paddingVertical: 10,
+                      paddingHorizontal: 20,
+                      borderRadius: 5,
+                    }}
+                  >
+                    <Text style={{ color: "black", fontWeight: "bold" }}>
+                      Hủy
+                    </Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={handleDelete}
+                    style={{
+                      backgroundColor: "#f6d500",
+                      paddingVertical: 10,
+                      paddingHorizontal: 20,
+                      borderRadius: 5,
+                    }}
+                  >
+                    <Text style={{ color: "black", fontWeight: "bold" }}>
+                      Xóa
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
+            </Animated.View>
+          </View>
+        </Modal>
       </View>
     </ScrollView>
   );

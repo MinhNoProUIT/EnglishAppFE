@@ -70,10 +70,10 @@ const AnotherSetting = () => {
           onValueChange={setMusicValue}
           trackHeight={10}
           thumbSize={24}
-          minimumTrackTintColor="#4CAF50"
+          minimumTrackTintColor="#3E87F6"
           maximumTrackTintColor="#E0E0E0"
           thumbStyle={{
-            backgroundColor: "#4CAF50",
+            backgroundColor: "#3E87F6",
             borderRadius: 10,
             borderWidth: 2,
             borderColor: "#fff",
@@ -114,10 +114,10 @@ const AnotherSetting = () => {
           onValueChange={setBackgroundMusicValue}
           trackHeight={10}
           thumbSize={24}
-          minimumTrackTintColor="#4CAF50"
+          minimumTrackTintColor="#3E87F6"
           maximumTrackTintColor="#E0E0E0"
           thumbStyle={{
-            backgroundColor: "#4CAF50",
+            backgroundColor: "#3E87F6",
             borderRadius: 10,
             borderWidth: 2,
             borderColor: "#fff",
@@ -234,8 +234,8 @@ const AnotherSetting = () => {
           }}
         >
           <Switch
-            trackColor={{ false: "#E0E0E0", true: "#4CAF50" }}
-            thumbColor={isEnabled ? "#4CAF50" : "#f4f3f4"}
+            trackColor={{ false: "#E0E0E0", true: "#3E87F6" }}
+            thumbColor={isEnabled ? "#3E87F6" : "#f4f3f4"}
             onValueChange={toggleSwitch}
             value={isEnabled}
           />

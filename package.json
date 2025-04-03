@@ -30,6 +30,8 @@
     "react-i18next": "^15.4.1",
     "react-native": "0.76.7",
     "react-native-app-intro-slider": "^4.0.4",
+    "react-native-card-flip": "^1.0.7",
+    "react-native-gesture-handler": "^2.24.0",
     "react-native-gifted-charts": "^1.4.58",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-linear-gradient": "^2.8.3",

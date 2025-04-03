@@ -68,7 +68,7 @@ const ProfileUser = () => {
       </View>
       <View className="flex">
         <View className="flex-row item-center ">
-          <View className="rounded-full bg-[#FE9519] h-7 w-7  items-center justify-center">
+          <View className="rounded-full bg-[#3E87F6] h-7 w-7  items-center justify-center">
             <Foundation name="crown" size={15} color="white" />
           </View>
           <Text className="text-lg font-bold mb-2 ml-3">Tran Van Minh</Text>
@@ -100,7 +100,7 @@ const ProfileUser = () => {
           flexDirection: "row",
           marginTop: 12,
           borderWidth: 2,
-          borderColor: "#FFA500",
+          borderColor: "#3E87F6",
           borderRadius: 5,
           padding: 15,
           backgroundColor: "rgb(255, 232, 208)",
@@ -110,7 +110,7 @@ const ProfileUser = () => {
           <Text
             style={{
               fontWeight: "bold",
-              color: "#FFA500",
+              color: "#3E87F6",
               fontSize: 18,
             }}
           >
@@ -126,9 +126,9 @@ const ProfileUser = () => {
               width: 100,
               height: 30,
               borderRadius: 5,
-              borderColor: "rgb(255, 145, 0)",
+              borderColor: "#3E87F6",
               borderWidth: 1,
-              backgroundColor: "#FFA500",
+              backgroundColor: "#3E87F6",
               alignItems: "center",
               justifyContent: "center",
             }}

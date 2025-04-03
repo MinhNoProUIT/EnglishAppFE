@@ -33,6 +33,10 @@ import OnboardingScreen from "../screens/Welcome/OnboardingScreen";
 //import UserDetails from "../screens/UserDetails";
 import MyPost from './../screens/Post/MyPost';
 
+import PaymentType from "../screens/Pay/PaymentType";
+//import UserDetails from "../screens/UserDetails";
+import Payment from "../screens/Pay/Payment";
+import PaymentIntroduction from "../screens/Pay/PaymentIntroduction";
 
 export type RootStackParamList = {
   MainTabs: undefined;
@@ -63,6 +67,10 @@ export type RootStackParamList = {
 
   MyPost: undefined;
 
+  PaymentType: undefined;
+  ProfileHeader: undefined;
+  Payment: undefined;
+  PaymentIntroduction: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -177,6 +185,54 @@ export default function AppNavigator() {
       />
 
       <Stack.Screen
+        name="PaymentType"
+        component={PaymentType}
+        options={{
+          headerShown: true,
+          header: ({ navigation }) => (
+            <View style={styles.headerContainer}>
+              <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
+                <Ionicons name="chevron-back-outline" size={24} color="white" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Cửa hàng</Text>
+            </View>
+          ),
+        }}
+      />
+
+      <Stack.Screen
+        name="PaymentIntroduction"
+        component={PaymentIntroduction}
+        options={{
+          headerShown: true,
+          header: ({ navigation }) => (
+            <View style={styles.headerContainer}>
+              <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
+                <Ionicons name="chevron-back-outline" size={24} color="white" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Khóa học cao cấp</Text>
+            </View>
+          ),
+        }}
+      />
+
+      <Stack.Screen
+        name="Payment"
+        component={Payment}
+        options={{
+          headerShown: true,
+          header: ({ navigation }) => (
+            <View style={styles.headerContainer}>
+              <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
+                <Ionicons name="chevron-back-outline" size={24} color="white" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Thanh toán</Text>
+            </View>
+          ),
+        }}
+      />
+
+      <Stack.Screen
         name="AnotherSetting"
         component={AnotherSetting}
         options={{
@@ -201,7 +257,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#3E87F6",
     height: 50,
     paddingHorizontal: 10,
     marginTop: 40,
