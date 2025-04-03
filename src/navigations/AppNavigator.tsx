@@ -22,10 +22,11 @@ import ForgotPassword from "../screens/Login/ForgotPassword";
 import ResetPassword from "../screens/Login/ResetPassword";
 import ChangePassword from "../screens/Login/ChangePassword";
 
-
 import TermsOfService from "../screens/Profile/TermsOfServiceComponent/TermsOfService";
 import PrivacyPolicy from "../screens/Profile/PrivacyPolicyComponent/PrivacyPolicy";
 import AnotherSetting from "../screens/Profile/AnotherSettingComponent/AnotherSetting";
+import AccountCreatedScreen from "../screens/Login/AccountCreated";
+import OnboardingScreen from "../screens/Welcome/OnboardingScreen";
 
 //import UserDetails from "../screens/UserDetails";
 
@@ -35,7 +36,8 @@ export type RootStackParamList = {
   SignUp: undefined;
   SignIn: undefined;
   ForgotPassword: undefined;
-  ChangePassword: undefined;
+  AccountCreatedScreen: undefined;
+  Onboarding: undefined;
   UserDetails: { userId: number };
 
   Setting: undefined;
@@ -51,7 +53,6 @@ export type RootStackParamList = {
   TermsOfService: undefined;
   PrivacyPolicy: undefined;
   AnotherSetting: undefined;
-
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -69,7 +70,11 @@ export default function AppNavigator() {
       <Stack.Screen name="SignUp" component={SignUp} />
       <Stack.Screen name="SignIn" component={SignIn} />
       <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-      <Stack.Screen name="ChangePassword" component={ChangePassword} />
+      <Stack.Screen
+        name="AccountCreatedScreen"
+        component={AccountCreatedScreen}
+      />
+      <Stack.Screen name="Onboarding" component={OnboardingScreen} />
 
       <Stack.Screen
         name="PreviewWord"
@@ -129,7 +134,6 @@ export default function AppNavigator() {
         }}
       />
 
-
       <Stack.Screen
         name="TermsOfService"
         component={TermsOfService}
@@ -177,7 +181,6 @@ export default function AppNavigator() {
           ),
         }}
       />
-
     </Stack.Navigator>
   );
 }
