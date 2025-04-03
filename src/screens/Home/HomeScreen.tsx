@@ -41,7 +41,7 @@ const HomeScreen = () => {
           <Text className="text-lg font-bold mb-6">
             How many hours you studied this week
           </Text>
-          <TouchableOpacity className="bg-[#2563EB] px-4 py-4 rounded-lg w-28">
+          <TouchableOpacity className="bg-[#2563EB] px-4 py-4 items-center rounded-lg w-28">
             <Text className="text-white text-sm font-semibold">
               Let's start
             </Text>
@@ -95,7 +95,7 @@ const HomeScreen = () => {
           <ChangeCircle name="change-circle" size={20} color="black" />
         </TouchableOpacity>
       </View>
-      <View className="relative w-full h-48 rounded-lg overflow-hidden shadow-lg mb-32">
+      <View className="relative w-full h-48 rounded-lg overflow-hidden shadow-lg">
         <ImageBackground
           source={{ uri: "https://picsum.photos/400/300" }}
           className="w-full h-full "

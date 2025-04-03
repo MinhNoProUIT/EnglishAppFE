@@ -20,7 +20,7 @@ export type BottomTabParamList = {
   Homes: undefined;
   Courses: undefined;
   Profile: undefined;
-  Posts: undefined;
+  Posts: { userId: number };
   Exercises: undefined;
   Login: undefined;
 };

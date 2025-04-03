@@ -1,12 +1,17 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { View, Text, Image, FlatList, ScrollView, NativeSyntheticEvent, NativeScrollEvent, Dimensions, TouchableOpacity } from "react-native";
-import { ActivityIndicator, Avatar } from "react-native-paper";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { View, Text, Image, FlatList, ScrollView, NativeSyntheticEvent, NativeScrollEvent, Dimensions, TouchableOpacity, Pressable } from "react-native";
+import { ActivityIndicator, Avatar, Button } from "react-native-paper";
 import Heart from '@expo/vector-icons/Entypo';
 import Comment from '@expo/vector-icons/FontAwesome5';
 import Share from '@expo/vector-icons/Feather';
 import ShareBottomSheet from "../../components/bottomSheet/ShareBottomSheet";
 import CommentBottomSheet from "../../components/bottomSheet/CommentBottomSheet";
 import { PostData } from "../../interfaces/PostInterface";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../navigations/AppNavigator";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { BottomTabParamList } from "../../navigations/BottomTabs";
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const { width } = Dimensions.get("window");
 
@@ -106,6 +111,13 @@ const data = [
   },
 ];
 
+type SettingsScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "MyPost"
+>;
+
+type PostsRouteProp = RouteProp<BottomTabParamList, 'Posts'>;
+
 export default function Posts() {
   const [currentIndexes, setCurrentIndexes] = useState<Record<number, number>>({});
   const scrollRefs = useRef<Record<number, FlatList<string> | null>>({});
@@ -120,7 +132,44 @@ export default function Posts() {
   const bottomSheetRefComment = useRef<RBSheetRef | null>(null); 
   const bottomSheetRefShare = useRef<RBSheetRef | null>(null); 
   
+  const navigation = useNavigation<SettingsScreenNavigationProp>();
 
+  const route = useRoute<PostsRouteProp>();
+  const { userId } = route.params || {};
+  const [user, setUser] = useState<PostData | null>(null);
+
+  const userDetail = useMemo(() => data.find((u) => u.id === userId) || null, [userId, data]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    setUser(userDetail);
+  }, [userDetail]); 
+
+  useEffect(() => {
+    if (user) {
+      navigation.setOptions({
+        headerTitle: () => (
+          <View style={{ alignItems: "center" }}>
+            <Text style={{ fontSize: 18, fontWeight: "bold" }}>Bài đăng</Text>
+            {userId && <Text style={{ fontSize: 14, color: "gray" }}>{user?.fullname}</Text>}
+          </View>
+        ),
+        headerLeft: () => (
+          <TouchableOpacity onPress={() => navigation.pop()}>
+            <Ionicons name="chevron-back-outline" size={24} color="black" />
+          </TouchableOpacity>
+        ),
+      });
+    } 
+  }, [navigation, user]);
+  
+  const navigateToMyPost = () => {
+    navigation.navigate("MyPost");
+  };
+  
   const fetchData = () => {
     if (isLoading || !hasMoreData) return;
     setLoading(true);
@@ -135,10 +184,6 @@ export default function Posts() {
       setLoading(false);
     }, 1000); 
   };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
   
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>, postId: number) => {
     const contentOffsetX = event.nativeEvent.contentOffset.x;
@@ -188,10 +233,11 @@ export default function Posts() {
     <ScrollView className="bg-white mb-1 ">
       {/* header */}
       <View className="flex-row items-center p-4 border-b border-gray-200">
-        <Avatar.Image size={40} source={{ uri: item.avatar }} />
-        <Text className="ml-2 font-bold">{item.fullname}</Text>
+        <Pressable onPress={() => navigateToMyPost()} className="flex-row items-center">
+            <Avatar.Image size={40} source={{ uri: item.avatar }} />
+            <Text className="ml-2 font-bold">{item.fullname}</Text>
+        </Pressable>
       </View>
-
       {/* list image */}
       <FlatList
         ref={(ref) => (scrollRefs.current[item.id] = ref)}
@@ -234,13 +280,13 @@ export default function Posts() {
           <Text className="font-bold">{item.totalShare}</Text>
         </TouchableOpacity>
       </View>
-      <View>
+      <Pressable onPress={() => handleOpenComment(item)}>
         <View className="px-4 py-1 mb-4 flex flex-row items-center">
          <Text className="text-base flex-1">
           <Text className="font-bold">{item.fullname}</Text> {item.content}
         </Text>
         </View>
-      </View>
+      </Pressable>
     </ScrollView>
   ), [currentIndexes]);
 

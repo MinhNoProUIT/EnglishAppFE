@@ -10,7 +10,7 @@ export default forwardRef(function ShareBottomSheet({ post }: { post: PostData }
     const [keyboardHeight, setKeyboardHeight] = useState(0);
     const [sheetHeight, setSheetHeight] = useState(300);
     const initialHeight = 300;
-    const expandedHeight = 500; // Giảm xuống để tránh chiếm quá nhiều không gian
+    const expandedHeight = 500; 
 
     useImperativeHandle(ref, () => ({
         open: () => bottomSheetRefShare.current?.open(),
