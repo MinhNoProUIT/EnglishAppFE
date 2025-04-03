@@ -9,3 +9,10 @@ export interface PostData {
   totalShare: number;
   content: string;
 }
+
+export interface MyPostData {
+    id: number,
+    imageUrl: string,
+    totalLikes: number,
+    totalComments: number
+}

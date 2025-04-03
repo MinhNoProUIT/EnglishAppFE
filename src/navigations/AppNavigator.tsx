@@ -26,6 +26,8 @@ import TermsOfService from "../screens/Profile/TermsOfServiceComponent/TermsOfSe
 import PrivacyPolicy from "../screens/Profile/PrivacyPolicyComponent/PrivacyPolicy";
 import AnotherSetting from "../screens/Profile/AnotherSettingComponent/AnotherSetting";
 //import UserDetails from "../screens/UserDetails";
+import MyPost from './../screens/Post/MyPost';
+
 
 export type RootStackParamList = {
   MainTabs: undefined;
@@ -51,6 +53,8 @@ export type RootStackParamList = {
   TermsOfService: undefined;
   PrivacyPolicy: undefined;
   AnotherSetting: undefined;
+
+  MyPost: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -175,6 +179,7 @@ export default function AppNavigator() {
           ),
         }}
       />
+      <Stack.Screen name="MyPost" component={MyPost} options={{headerShown:true}}/>
     </Stack.Navigator>
   );
 }

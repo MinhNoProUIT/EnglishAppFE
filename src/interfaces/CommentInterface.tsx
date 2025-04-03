@@ -1,7 +1,8 @@
-
 export interface Comment {
   id: number;
   postId: number;
+  parentId: number | null; 
+  rootCommentId: number | null;
   fullname: string;
   avatar: string;
   isLike: boolean;
