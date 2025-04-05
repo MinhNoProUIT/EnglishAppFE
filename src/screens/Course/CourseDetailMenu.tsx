@@ -19,7 +19,7 @@ const CourseDetailMenu: React.FC<CourseMenuProps> = ({ visible, onClose, onLearn
             <View style={styles.menuContainer}>
               {/* Learn */}
               <TouchableOpacity style={styles.option} onPress={onLearn}>
-                <Icon name='playcircleo' size={35} color="green" />
+                <Icon name='playcircleo' size={35} color="#2563EB" />
                 <View style={styles.textContainer}>
                   <Text style={styles.optionText}>Learn</Text>
                   <Text style={styles.subText}>1 new words</Text>
