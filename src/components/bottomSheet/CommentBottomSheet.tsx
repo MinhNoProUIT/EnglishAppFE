@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { FlatList, Keyboard, Platform, Text, TouchableOpacity, View, TouchableWithoutFeedback, TextInput } from 'react-native';
+import { FlatList, Keyboard, Platform, Text, TouchableOpacity, View, TouchableWithoutFeedback, TextInput, Alert } from 'react-native';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { RBSheetRef } from '../../screens/Post/Posts';
 import { PostData } from '../../interfaces/PostInterface';
@@ -20,10 +20,12 @@ export default forwardRef(function ShareBottomSheet({ post }: { post: PostData }
     const flatListRef = useRef<FlatList>(null);
     const [commentData, setCommentData] = useState<Comment[]>(comments);
     const [replyingTo, setReplyingTo] = useState<Comment | null>(null);
+    const [editingComment, setEditingComment] = useState<Comment | null>(null);
     const [replyContent, setReplyContent] = useState('');
     const [keyboardHeight, setKeyboardHeight] = useState(0);
     const [sheetHeight, setSheetHeight] = useState(300);
     const [showMoreComment, setShowMoreComment] = useState<{ [key: number]: boolean }>({});
+    const [hasTagPrefix, setHasTagPrefix] = useState(true);
 
     const parentsComments = commentData.filter(comment => comment.postId === post.id && comment.parentId === null);
 
@@ -87,6 +89,7 @@ export default forwardRef(function ShareBottomSheet({ post }: { post: PostData }
         setTimeout(() => {
             if (textInputRef.current) {
                 textInputRef.current.focus();
+                setHasTagPrefix(true);
             }
 
             if (flatListRef.current) {
@@ -108,12 +111,31 @@ export default forwardRef(function ShareBottomSheet({ post }: { post: PostData }
 
     const handleSendReply = () => {
         if (!replyContent.trim()) return;
+
+        if (editingComment) {
+            // update comment
+            setCommentData(prev => {
+                const index = prev.findIndex(c => c.id === editingComment.id);
+                if (index === -1) return prev;
+
+                const updated = [...prev];
+                updated[index] = { ...updated[index], content: replyContent };
+                updated[index] = { ...updated[index], parentId: hasTagPrefix ? replyingTo?.id ?? null : null, };
+                return updated;
+            });
+
+            setEditingComment(null);
+            setReplyContent('');
+            setHasTagPrefix(false);
+            Keyboard.dismiss();
+            return;
+        }
+
         const newId = Math.max(...commentData.map(c => c.id), 0) + 1;
-        console.log(replyingTo); 
         const newReply: Comment = {
             id: newId, 
             postId: post?.id ?? 0,
-            parentId: replyingTo?.id || null,
+            parentId: hasTagPrefix ? replyingTo?.id ?? null : null,
             rootCommentId: replyingTo?.rootCommentId ?? replyingTo?.id ?? null,
             fullname: "Bạn",
             avatar: 'https://picsum.photos/100/100', 
@@ -123,11 +145,10 @@ export default forwardRef(function ShareBottomSheet({ post }: { post: PostData }
             createDate: new Date(),
         };
 
-        console.log(newReply)
-
         setCommentData([...commentData, newReply]);
         setReplyingTo(null);
         setReplyContent('');
+        setHasTagPrefix(false);
         Keyboard.dismiss();
         
         setTimeout(() => {
@@ -135,6 +156,22 @@ export default forwardRef(function ShareBottomSheet({ post }: { post: PostData }
                 flatListRef.current.scrollToEnd({ animated: true });
             }
         }, 100);
+    };
+
+    const handleChangeReply = (text: string) => {
+        if (replyingTo) {
+            const tagPrefix = `@${replyingTo.fullname} `;
+            if (text.startsWith(tagPrefix)) {
+                const actualReply = text.slice(tagPrefix.length);
+                setReplyContent(actualReply);
+                setHasTagPrefix(true);
+            } else {
+                setReplyContent(text);
+                setHasTagPrefix(false);
+            }
+        } else {
+            setReplyContent(text);
+        }
     };
 
     // bấm 2 lần mới biến mất replyContent -->
@@ -147,6 +184,69 @@ export default forwardRef(function ShareBottomSheet({ post }: { post: PostData }
         }
         Keyboard.dismiss();
     };
+
+    const handleLongPressComment = (comment: Comment) => {
+        if (comment.fullname !== "Bạn") return; // chỉ cho phép thao tác với comment của chính mình
+
+        Alert.alert(
+            "Tùy chọn bình luận",
+            "Bạn muốn thực hiện hành động nào?",
+            [
+                {
+                    text: "Chỉnh sửa",
+                    onPress: () => {
+                        const parent = comment.parentId 
+                            ? commentData.find(c => c.id === comment.parentId)
+                            : null;
+                        setEditingComment(comment);
+                        if (parent) {
+                            setReplyingTo(parent); 
+                            setReplyContent(comment.content);
+                            setHasTagPrefix(true);
+                        } else {
+                            setReplyingTo(null);
+                            setReplyContent(comment.content);
+                        }
+                        setTimeout(() => {
+                            textInputRef.current?.focus();
+                        }, 100);
+                    }
+                },
+                {
+                    text: "Xóa",
+                    style: "destructive",
+                    onPress: () => {
+                        Alert.alert(
+                            "Xác nhận xóa",
+                            "Bạn có chắc muốn xóa bình luận này không?",
+                            [
+                                {
+                                    text: "Hủy",
+                                    style: "cancel"
+                                },
+                                {
+                                    text: "Xóa",
+                                    style: "destructive",
+                                    onPress: () => {
+                                        setCommentData(prev => prev.filter(c => c.id !== comment.id && c.rootCommentId !== comment.id));
+                                        if (editingComment?.id === comment.id) {
+                                            setEditingComment(null);
+                                            setReplyContent('');
+                                        }
+                                    }
+                                }
+                            ]
+                        );
+                    }
+                },
+                {
+                    text: "Đóng",
+                    style: "cancel"
+                }
+            ]
+        );
+    };
+
     
     const toggleShowReplies = (commentId: number) => {
         setShowMoreComment(prev => ({
@@ -167,6 +267,7 @@ export default forwardRef(function ShareBottomSheet({ post }: { post: PostData }
                     onLike={handleLikeComment} 
                     onCloseBottomSheet={() => bottomSheetRefComment.current?.close()}
                     onDismissReply={handleDismissReply}
+                    onLongPress={handleLongPressComment}
                 />
                 {/* display comment child */}
                 {childrenComments.length > 0 && (
@@ -193,6 +294,7 @@ export default forwardRef(function ShareBottomSheet({ post }: { post: PostData }
                                     onLike={handleLikeComment}
                                     onCloseBottomSheet={() => bottomSheetRefComment.current?.close()}
                                     onDismissReply={handleDismissReply}
+                                    onLongPress={handleLongPressComment}
                                 />
                             </View>
                         ))}
@@ -273,11 +375,13 @@ export default forwardRef(function ShareBottomSheet({ post }: { post: PostData }
                     <View className="flex-row items-center mt-2 w-full">
                         <TextInput
                             className="flex-1 rounded-lg"
-                            placeholder={replyingTo ? `@${replyingTo.fullname} ` : "Nhập câu trả lời..."}
-                            value={replyingTo ? `@${replyingTo.fullname} ${replyContent}` : replyContent}
-                            onChangeText={(text) =>
-                                setReplyContent(replyingTo ? text.replace(`@${replyingTo.fullname} `, "") : text)
+                            placeholder={replyingTo && hasTagPrefix ? `@${replyingTo.fullname} ` : "Nhập câu trả lời..."}
+                            value={
+                                replyingTo && hasTagPrefix 
+                                    ? `@${replyingTo.fullname} ${replyContent}` 
+                                    : replyContent
                             }
+                            onChangeText={handleChangeReply}
                             ref={textInputRef}
                             autoFocus={!!replyingTo} 
                             multiline

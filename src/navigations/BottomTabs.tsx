@@ -80,7 +80,6 @@ export default function BottomTabs() {
       <Tab.Screen
         name="Posts"
         component={Posts}
-        options={{ title: "Bài đăng" }}
       />
       <Tab.Screen
         name="Profile"
