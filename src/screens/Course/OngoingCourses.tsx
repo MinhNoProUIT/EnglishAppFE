@@ -100,7 +100,7 @@ export default function OngoingCourses() {
         onClose={() => setDetailMenuVisible(false)}
         onLearn={() => {
           setDetailMenuVisible(false); // Đóng modal trước
-          navigation.navigate("PreviewWord"); // Điều hướng đến RecallWord
+          navigation.navigate("LearnByTranslate"); // Điều hướng đến LearnNewWord
         }}
         onRepeat={() => {
           setDetailMenuVisible(false); // Đóng modal trước
@@ -116,7 +116,7 @@ export default function OngoingCourses() {
         onClose={() => setRepeatModeMenuVisible(false)}
         onPair={() => {
           setRepeatModeMenuVisible(false); // Đóng modal trước
-          navigation.navigate("PairWord"); // Điều hướng đến RecallWord
+          navigation.navigate("PairWord"); // Điều hướng đến PairWord
         }}
         onGuess={() => {
           setRepeatModeMenuVisible(false); // Đóng modal trước
