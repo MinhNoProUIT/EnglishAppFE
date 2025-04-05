@@ -42,7 +42,7 @@ export default function MyPost () {
             headerTitle: item.name,
             headerLeft: () => (
                 <TouchableOpacity onPress={() => navigation.pop()}>
-                    <Ionicons name="chevron-back-outline" size={24} color="black" />
+                    <Ionicons name="chevron-back-outline" size={30} color="black" />
                 </TouchableOpacity>
                 ),
             });
