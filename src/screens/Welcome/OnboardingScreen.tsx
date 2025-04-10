@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,12 +7,12 @@ import {
   Dimensions,
   Image,
 } from "react-native";
-import Swiper from "react-native-swiper";
 import AppIntroSlider from "react-native-app-intro-slider";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface Slide {
   id: number;
@@ -46,61 +46,83 @@ const slides: Slide[] = [
 ];
 
 type LoginScreen = StackNavigationProp<RootStackParamList, "SignIn">;
+
 const OnboardingScreen = () => {
-  const [navigateLogin, setNavigateLogin] = useState<boolean>(false);
   const navigation = useNavigation<LoginScreen>();
 
-  const renderItem = ({ item }: { item: Slide }) => (
-    <View style={styles.container}>
-      <Image source={item.img} style={{ width: 186, height: 240 }}></Image>
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.description}>{item.description}</Text>
-    </View>
-  );
+  const [showSplash, setShowSplash] = useState(true);
+  const [onboarding, setOnboarding] = useState<boolean>(false);
 
-  const onDone = () => {
-    setNavigateLogin(true);
-  };
+  useEffect(() => {
+    AsyncStorage.clear();
 
-  const handleNavigateLogin = () => {
-    if (navigateLogin) {
-      navigation.navigate("SignIn");
-    }
-  };
+    // Giả sử bạn lưu trạng thái "hasSeenSplash" vào AsyncStorage
+    AsyncStorage.getItem("hasSeenSplash").then((value) => {
+      if (value) {
+        // Đã xem splash, chuyển thẳng đến Onboarding
+        setShowSplash(false);
+        setOnboarding(true);
+      } else {
+        // Chưa xem splash, hiển thị trong 2 giây rồi chuyển
+        const timer = setTimeout(() => {
+          setShowSplash(false);
+          setOnboarding(true);
+          AsyncStorage.setItem("hasSeenSplash", "true");
+        }, 2000);
+        return () => clearTimeout(timer);
+      }
+    });
+  }, []);
 
-  const _renderNextButton = () => {
+  if (showSplash) {
     return (
-      <View style={styles.buttonCircle}>
-        <AntDesign
-          name="arrowright"
-          color="rgba(255, 255, 255, .9)"
-          size={24}
+      <View style={styles.splashContainer}>
+        <Image
+          source={require("../../png/ChangePassword.png")}
+          style={styles.logo}
         />
+        <Text style={styles.splashText}>English App</Text>
       </View>
     );
-  };
-  const _renderDoneButton = () => {
-    return (
-      <View style={styles.buttonCircle}>
-        <AntDesign
-          name="check"
-          color="rgba(255, 255, 255, 0.9)"
-          size={24}
-          onPress={handleNavigateLogin}
-        />
-      </View>
-    );
-  };
+  }
+
+  // Render Onboarding nếu đã chuyển đổi
   return (
-    <AppIntroSlider
-      renderItem={renderItem}
-      data={slides}
-      onDone={onDone}
-      renderNextButton={_renderNextButton}
-      renderDoneButton={_renderDoneButton}
-      dotStyle={{ backgroundColor: "gray" }}
-      activeDotStyle={{ backgroundColor: "blue" }}
-    />
+    <>
+      {onboarding && (
+        <AppIntroSlider
+          renderItem={({ item }: { item: Slide }) => (
+            <View style={styles.container}>
+              <Image source={item.img} style={{ width: 186, height: 240 }} />
+              <Text style={styles.title}>{item.title}</Text>
+              <Text style={styles.description}>{item.description}</Text>
+            </View>
+          )}
+          data={slides}
+          onDone={() => navigation.navigate("SignIn")}
+          renderNextButton={() => (
+            <View style={styles.buttonCircle}>
+              <AntDesign
+                name="arrowright"
+                color="rgba(255, 255, 255, .9)"
+                size={24}
+              />
+            </View>
+          )}
+          renderDoneButton={() => (
+            <View style={styles.buttonCircle}>
+              <AntDesign
+                name="check"
+                color="rgba(255, 255, 255, 0.9)"
+                size={24}
+              />
+            </View>
+          )}
+          dotStyle={{ backgroundColor: "gray" }}
+          activeDotStyle={{ backgroundColor: "blue" }}
+        />
+      )}
+    </>
   );
 };
 
@@ -129,7 +151,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666",
     textAlign: "center",
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
+  },
+  splashContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#007bff",
+  },
+  logo: { width: 186, height: 240 },
+  splashText: {
+    fontSize: 24,
+    color: "white",
+    fontWeight: "bold",
+    marginTop: 10,
   },
 });
 

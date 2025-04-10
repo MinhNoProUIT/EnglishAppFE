@@ -29,10 +29,10 @@ import AnotherSetting from "../screens/Profile/AnotherSettingComponent/AnotherSe
 import AccountCreatedScreen from "../screens/Login/AccountCreated";
 import OnboardingScreen from "../screens/Welcome/OnboardingScreen";
 
-
 //import UserDetails from "../screens/UserDetails";
-import MyPost from './../screens/Post/MyPost';
-
+import MyPost from "./../screens/Post/MyPost";
+import VerificationCodeScreen from "../screens/Login/Verify";
+import VerifyEmailScreen from "../screens/Login/VerifyEmail";
 
 export type RootStackParamList = {
   MainTabs: undefined;
@@ -41,7 +41,8 @@ export type RootStackParamList = {
   SignIn: undefined;
   ForgotPassword: undefined;
   AccountCreatedScreen: undefined;
-  Onboarding: undefined;
+  VerificationCodeScreen: undefined;
+  VerifyEmailScreen: undefined;
   UserDetails: { userId: number };
 
   Setting: undefined;
@@ -60,9 +61,7 @@ export type RootStackParamList = {
   PrivacyPolicy: undefined;
   AnotherSetting: undefined;
 
-
   MyPost: undefined;
-
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -84,7 +83,11 @@ export default function AppNavigator() {
         name="AccountCreatedScreen"
         component={AccountCreatedScreen}
       />
-      <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+      <Stack.Screen
+        name="VerificationCodeScreen"
+        component={VerificationCodeScreen}
+      />
+      <Stack.Screen name="VerifyEmailScreen" component={VerifyEmailScreen} />
 
       <Stack.Screen
         name="PreviewWord"
@@ -192,7 +195,11 @@ export default function AppNavigator() {
         }}
       />
 
-      <Stack.Screen name="MyPost" component={MyPost} options={{headerShown:true}}/>
+      <Stack.Screen
+        name="MyPost"
+        component={MyPost}
+        options={{ headerShown: true }}
+      />
     </Stack.Navigator>
   );
 }
