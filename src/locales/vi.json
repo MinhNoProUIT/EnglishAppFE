@@ -5,5 +5,7 @@
   "POST": "Bài đăng",
   "SETTING": "Cài đặt",
   "HELLO": "Xin chào",
-  "SHARE": "Chia sẻ ngay"
+  "SHARE": "Chia sẻ ngay",
+  "PRIVACY_POLICY": "Chính sách bảo mật",
+  "TEST": "SpeakUp rất coi trọng quyền riêng tư của bạn. SpeakUp cam kết bảo vệ quyền riêng tư của bạn và chính sách quyền riêng tư này bao gồm các hoạt động thu thập, sử dụng và tiết lộ dữ liệu của chúng tôi."
 }

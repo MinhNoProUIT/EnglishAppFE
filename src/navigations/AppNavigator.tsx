@@ -6,6 +6,9 @@ import BottomTabs from "./BottomTabs";
 import SignUp from "../screens/Login/SignUp";
 import SignIn from "../screens/Login/SignIn";
 
+import LearnByFlashcard from "../screens/Exercise/LearnByFlashcard";
+import LearnByListenAndGuess from "../screens/Exercise/LearnByListenAndGuess";
+import LearnByTranslate from "../screens/Exercise/LearnByTranslate";
 import PreviewWord from "../screens/Exercise/PreviewWord";
 import PairWord from "../screens/Exercise/PairWord";
 import GuessWord from "../screens/Exercise/GuessWord";
@@ -17,6 +20,7 @@ import Profile from "../screens/Profile/Profile";
 import AccountInfomation from "../screens/Profile/AccInfoComponent/AccountInfomation";
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 import ForgotPassword from "../screens/Login/ForgotPassword";
 import ResetPassword from "../screens/Login/ResetPassword";
@@ -30,9 +34,17 @@ import AccountCreatedScreen from "../screens/Login/AccountCreated";
 import OnboardingScreen from "../screens/Welcome/OnboardingScreen";
 
 //import UserDetails from "../screens/UserDetails";
+
 import MyPost from "./../screens/Post/MyPost";
 import VerificationCodeScreen from "../screens/Login/Verify";
 import VerifyEmailScreen from "../screens/Login/VerifyEmail";
+
+
+import PaymentType from "../screens/Pay/PaymentType";
+//import UserDetails from "../screens/UserDetails";
+import Payment from "../screens/Pay/Payment";
+import PaymentIntroduction from "../screens/Pay/PaymentIntroduction";
+
 
 export type RootStackParamList = {
   MainTabs: undefined;
@@ -51,6 +63,9 @@ export type RootStackParamList = {
   OnGoingCourses: undefined;
   CompletedCourses: undefined;
 
+  LearnByFlashcard: undefined;
+  LearnByListenAndGuess: undefined;
+  LearnByTranslate: undefined;
   PreviewWord: undefined;
   PairWord: undefined;
   GuessWord: undefined;
@@ -62,6 +77,13 @@ export type RootStackParamList = {
   AnotherSetting: undefined;
 
   MyPost: undefined;
+
+
+  PaymentType: undefined;
+  ProfileHeader: undefined;
+  Payment: undefined;
+  PaymentIntroduction: undefined;
+
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -90,6 +112,18 @@ export default function AppNavigator() {
       <Stack.Screen name="VerifyEmailScreen" component={VerifyEmailScreen} />
 
       <Stack.Screen
+        name="LearnByFlashcard"
+        component={LearnByFlashcard}
+      />
+      <Stack.Screen
+        name="LearnByListenAndGuess"
+        component={LearnByListenAndGuess}
+      />
+      <Stack.Screen
+        name="LearnByTranslate"
+        component={LearnByTranslate}
+      />
+      <Stack.Screen
         name="PreviewWord"
         component={PreviewWord}
         options={{ title: "Preview it", headerShown: true }}
@@ -97,22 +131,62 @@ export default function AppNavigator() {
       <Stack.Screen
         name="PairWord"
         component={PairWord}
-        options={{ title: "Pair it", headerShown: true }}
+        options={{
+          headerShown: true,
+          header: ({ navigation }) => (
+            <View style={styles.exerciseHeader}>
+              <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
+                <AntDesign name="arrowleft" size={24} color="white" />
+              </TouchableOpacity>
+              <Text style={styles.exerciseHeaderTitle}>Pair it</Text>
+            </View>
+          ),
+        }}
       />
       <Stack.Screen
         name="GuessWord"
         component={GuessWord}
-        options={{ title: "Guess it", headerShown: true }}
+        options={{
+          headerShown: true,
+          header: ({ navigation }) => (
+            <View style={styles.exerciseHeader}>
+              <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
+                <AntDesign name="arrowleft" size={24} color="white" />
+              </TouchableOpacity>
+              <Text style={styles.exerciseHeaderTitle}>Guess it</Text>
+            </View>
+          ),
+        }}
       />
       <Stack.Screen
         name="RecallWord"
         component={RecallWord}
-        options={{ title: "Recall it", headerShown: true }}
+        options={{
+          headerShown: true,
+          header: ({ navigation }) => (
+            <View style={styles.exerciseHeader}>
+              <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
+                <AntDesign name="arrowleft" size={24} color="white" />
+              </TouchableOpacity>
+              <Text style={styles.exerciseHeaderTitle}>Recall it</Text>
+            </View>
+          ),
+        }}
       />
       <Stack.Screen
         name="WordsList"
         component={WordsList}
-        options={{ title: "Vocabulary", headerShown: true }}
+        options={{
+          headerShown: true,
+          header: ({ navigation }) => (
+            <View style={styles.exerciseHeader}>
+              <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
+                <AntDesign name="arrowleft" size={24} color="white" />
+              </TouchableOpacity>
+              <Text style={styles.exerciseHeaderTitle}>Vocabulary</Text>
+            </View>
+          ),
+        }}
       />
 
       <Stack.Screen
@@ -180,6 +254,54 @@ export default function AppNavigator() {
       />
 
       <Stack.Screen
+        name="PaymentType"
+        component={PaymentType}
+        options={{
+          headerShown: true,
+          header: ({ navigation }) => (
+            <View style={styles.headerContainer}>
+              <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
+                <Ionicons name="chevron-back-outline" size={24} color="white" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Cửa hàng</Text>
+            </View>
+          ),
+        }}
+      />
+
+      <Stack.Screen
+        name="PaymentIntroduction"
+        component={PaymentIntroduction}
+        options={{
+          headerShown: true,
+          header: ({ navigation }) => (
+            <View style={styles.headerContainer}>
+              <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
+                <Ionicons name="chevron-back-outline" size={24} color="white" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Khóa học cao cấp</Text>
+            </View>
+          ),
+        }}
+      />
+
+      <Stack.Screen
+        name="Payment"
+        component={Payment}
+        options={{
+          headerShown: true,
+          header: ({ navigation }) => (
+            <View style={styles.headerContainer}>
+              <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
+                <Ionicons name="chevron-back-outline" size={24} color="white" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Thanh toán</Text>
+            </View>
+          ),
+        }}
+      />
+
+      <Stack.Screen
         name="AnotherSetting"
         component={AnotherSetting}
         options={{
@@ -208,7 +330,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#3E87F6",
     height: 50,
     paddingHorizontal: 10,
     marginTop: 40,
@@ -221,5 +343,20 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "bold",
     marginRight: 20,
+  },
+  
+  exerciseHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FF991F",
+    height: 90,
+    paddingHorizontal: 25,
+    paddingTop: 30,
+  },
+  exerciseHeaderTitle: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: 600,
+    marginLeft: 20,
   },
 });

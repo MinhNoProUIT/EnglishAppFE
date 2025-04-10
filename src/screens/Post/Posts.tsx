@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, Image, FlatList, ScrollView, NativeSyntheticEvent, NativeScrollEvent, Dimensions, TouchableOpacity, Pressable } from "react-native";
-import { ActivityIndicator, Avatar, Button } from "react-native-paper";
+import { ActivityIndicator, Avatar } from "react-native-paper";
 import Heart from '@expo/vector-icons/Entypo';
 import Comment from '@expo/vector-icons/FontAwesome5';
 import Share from '@expo/vector-icons/Feather';
@@ -11,7 +11,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { BottomTabParamList } from "../../navigations/BottomTabs";
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Ionicons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
@@ -147,24 +147,6 @@ export default function Posts() {
   useEffect(() => {
     setUser(userDetail);
   }, [userDetail]); 
-
-  useEffect(() => {
-    if (user) {
-      navigation.setOptions({
-        headerTitle: () => (
-          <View style={{ alignItems: "center" }}>
-            <Text style={{ fontSize: 18, fontWeight: "bold" }}>Bài đăng</Text>
-            {userId && <Text style={{ fontSize: 14, color: "gray" }}>{user?.fullname}</Text>}
-          </View>
-        ),
-        headerLeft: () => (
-          <TouchableOpacity onPress={() => navigation.pop()}>
-            <Ionicons name="chevron-back-outline" size={24} color="black" />
-          </TouchableOpacity>
-        ),
-      });
-    } 
-  }, [navigation, user]);
   
   const navigateToMyPost = () => {
     navigation.navigate("MyPost");
@@ -290,9 +272,33 @@ export default function Posts() {
     </ScrollView>
   ), [currentIndexes]);
 
+  useEffect(() => {
+    navigation.setOptions({
+      headerTitle: () => (
+        <View style={{ alignItems: "center" }}>
+          <Text style={{ fontSize: 18, fontWeight: "bold" }}>Bài đăng</Text>
+          {userId && user && (
+            <Text style={{ fontSize: 14, color: "gray" }}>{user.fullname}</Text>
+          )}
+        </View>
+      ),
+      headerLeft: () =>
+        userId ? (
+          <TouchableOpacity onPress={() => navigation.pop()} className="pl-4">
+            <Ionicons name="chevron-back-outline" size={30} color="black" />
+          </TouchableOpacity>
+        ) : null,
+      headerRight: () => (
+        <TouchableOpacity onPress={() => navigateToMyPost()} className="pr-4">
+          <Ionicons name="person-circle-outline" size={30} color="black" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [user, userId]);
 
   return (
    <View>
+      {/* list post */}
      <FlatList
       data={postData}
       keyExtractor={(item) => item.id.toString()}

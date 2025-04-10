@@ -5,5 +5,7 @@
   "POST": "Post",
   "SETTING": "Setting",
   "HELLO": "Hello",
-  "SHARE": "Share"
+  "SHARE": "Share",
+  "PRIVACY_POLICY": "Privacy Policy",
+  "TEST": "SpeakUp takes your privacy very seriously. SpeakUp is committed tosafeguarding your privacy, and this privacy policy contains our datacollection, use, and disclosure practices."
 }

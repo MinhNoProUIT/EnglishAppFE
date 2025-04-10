@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Icon from '@expo/vector-icons/SimpleLineIcons';
 import {
     View,
@@ -8,6 +8,7 @@ import {
     TouchableOpacity,
     FlatList,
 } from "react-native";
+import PreviewCourseMenu from "./PreviewCourseMenu";
 
 const courses = [
     { id: '1', title: 'In Court', topic: 'Business', isActive: 'true', level: 'A1 - A2', detail: 'Lorem Ipsum is simply dummy test of the prin...', image: 'https://picsum.photos/200/300' },
@@ -16,6 +17,7 @@ const courses = [
     { id: '4', title: 'Weather', topic: 'People-lifestyle', isActive: 'false', level: 'A1 - A2', detail: 'Lorem Ipsum is simply dummy test of the prin...', image: 'https://picsum.photos/200/130' },
 ];
 export default function LockedCourses() {
+    const [previewCourseMenuVisible, setpreviewCourseMenuVisible] = useState(false);
     return (
         <View style={{ flex: 1 }}>
             {/* list courses */}
@@ -37,7 +39,8 @@ export default function LockedCourses() {
                                 </Text>
                             </View>
                             {item.isActive == 'true' ?
-                                <TouchableOpacity style={[styles.button, { backgroundColor: '#2563EB' }]}>
+                                <TouchableOpacity style={[styles.button, { backgroundColor: '#2563EB' }]}
+                                    onPress={() => setpreviewCourseMenuVisible(true)}>
                                     <Icon name="arrow-right" size={15} color='white' />
                                 </TouchableOpacity>
                                 :
@@ -58,6 +61,11 @@ export default function LockedCourses() {
                         </View>
                     </View>
                 )}
+            />
+            {/* modals */}
+            <PreviewCourseMenu
+              visible={previewCourseMenuVisible}
+              onClose={() => setpreviewCourseMenuVisible(false)}
             />
         </View>
     );

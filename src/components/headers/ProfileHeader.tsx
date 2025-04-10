@@ -5,10 +5,19 @@ import { Ionicons } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useNavigation } from "@react-navigation/native";
+import { RootStackParamList } from "../../navigations/AppNavigator";
+import { StackNavigationProp } from "@react-navigation/stack";
+
+type ProfileHeadersScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "ProfileHeader"
+>;
 
 export default function ProfileHeader() {
-  const navigation = useNavigation();
-
+  const navigation = useNavigation<ProfileHeadersScreenNavigationProp>(); // Hook navigation
+  const navigateToPaymentIntroduction = () => {
+    navigation.navigate("PaymentIntroduction"); // Điều hướng đến màn hình Setting
+  };
   return (
     <View style={styles.headerContainer}>
       <View style={{ flexDirection: "row", gap: 10, marginLeft: 20 }}>
@@ -21,7 +30,7 @@ export default function ProfileHeader() {
       </View>
       <Text style={styles.headerTitle}>Cá nhân</Text>
       <View style={{ flexDirection: "row", gap: 10, marginRight: 20 }}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={navigateToPaymentIntroduction}>
           <AntDesign name="shoppingcart" size={24} style={styles.icon} />
         </TouchableOpacity>
         <TouchableOpacity>
@@ -62,7 +71,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#3E87F6",
     height: 80,
   },
   headerTitle: {

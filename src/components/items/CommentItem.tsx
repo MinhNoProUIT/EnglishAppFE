@@ -15,6 +15,7 @@ type CommentItemProps = {
     onLike: (comment: Comment) => void;
     onCloseBottomSheet: () => void;
     onDismissReply: () => void; 
+    onLongPress: (comment: Comment) => void;
 };
 
 type SettingsScreenNavigationProp = StackNavigationProp<
@@ -22,7 +23,7 @@ type SettingsScreenNavigationProp = StackNavigationProp<
   "MyPost"
 >;
 
-export default function CommentItem({ comment, comments, onReply, onLike, onCloseBottomSheet, onDismissReply } : CommentItemProps) {
+export default function CommentItem({ comment, comments, onReply, onLike, onCloseBottomSheet, onDismissReply, onLongPress } : CommentItemProps) {
     const parentComment = comments.find(c => c.id === comment.parentId);
     const navigation = useNavigation<SettingsScreenNavigationProp>();
 
@@ -31,10 +32,12 @@ export default function CommentItem({ comment, comments, onReply, onLike, onClos
     };
 
     return (
-       <TouchableWithoutFeedback onPress={() => { 
-            Keyboard.dismiss();
-            onDismissReply();
-        }} 
+       <TouchableWithoutFeedback 
+            onPress={() => { 
+                Keyboard.dismiss();
+                onDismissReply();
+            }} 
+            onLongPress={() => onLongPress(comment)}
        >
          <View className="flex-row px-4 py-4">
             <Avatar.Image size={35} source={{ uri: comment.avatar }} />
