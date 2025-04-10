@@ -33,14 +33,18 @@ import AnotherSetting from "../screens/Profile/AnotherSettingComponent/AnotherSe
 import AccountCreatedScreen from "../screens/Login/AccountCreated";
 import OnboardingScreen from "../screens/Welcome/OnboardingScreen";
 
-
 //import UserDetails from "../screens/UserDetails";
-import MyPost from './../screens/Post/MyPost';
+
+import MyPost from "./../screens/Post/MyPost";
+import VerificationCodeScreen from "../screens/Login/Verify";
+import VerifyEmailScreen from "../screens/Login/VerifyEmail";
+
 
 import PaymentType from "../screens/Pay/PaymentType";
 //import UserDetails from "../screens/UserDetails";
 import Payment from "../screens/Pay/Payment";
 import PaymentIntroduction from "../screens/Pay/PaymentIntroduction";
+
 
 export type RootStackParamList = {
   MainTabs: undefined;
@@ -49,7 +53,8 @@ export type RootStackParamList = {
   SignIn: undefined;
   ForgotPassword: undefined;
   AccountCreatedScreen: undefined;
-  Onboarding: undefined;
+  VerificationCodeScreen: undefined;
+  VerifyEmailScreen: undefined;
   UserDetails: { userId: number };
 
   Setting: undefined;
@@ -71,13 +76,14 @@ export type RootStackParamList = {
   PrivacyPolicy: undefined;
   AnotherSetting: undefined;
 
-
   MyPost: undefined;
+
 
   PaymentType: undefined;
   ProfileHeader: undefined;
   Payment: undefined;
   PaymentIntroduction: undefined;
+
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -99,7 +105,11 @@ export default function AppNavigator() {
         name="AccountCreatedScreen"
         component={AccountCreatedScreen}
       />
-      <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+      <Stack.Screen
+        name="VerificationCodeScreen"
+        component={VerificationCodeScreen}
+      />
+      <Stack.Screen name="VerifyEmailScreen" component={VerifyEmailScreen} />
 
       <Stack.Screen
         name="LearnByFlashcard"
@@ -307,7 +317,11 @@ export default function AppNavigator() {
         }}
       />
 
-      <Stack.Screen name="MyPost" component={MyPost} options={{headerShown:true}}/>
+      <Stack.Screen
+        name="MyPost"
+        component={MyPost}
+        options={{ headerShown: true }}
+      />
     </Stack.Navigator>
   );
 }

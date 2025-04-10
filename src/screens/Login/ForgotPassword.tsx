@@ -21,7 +21,7 @@ import { useNavigation } from "@react-navigation/native";
 
 type ResetPasswordScreen = StackNavigationProp<
   RootStackParamList,
-  "Onboarding"
+  "VerifyEmailScreen"
 >;
 export default function ForgotPassword() {
   const navigation = useNavigation<ResetPasswordScreen>();
@@ -137,7 +137,7 @@ export default function ForgotPassword() {
             <View style={styles.view_end}>
               <TouchableOpacity
                 style={styles.button}
-                onPress={() => navigation.navigate("Onboarding")}
+                onPress={() => navigation.navigate("VerifyEmailScreen")}
               >
                 <Text style={styles.buttonText}>Send</Text>
               </TouchableOpacity>
