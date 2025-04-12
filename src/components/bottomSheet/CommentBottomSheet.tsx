@@ -1,18 +1,20 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { FlatList, Keyboard, Platform, Text, TouchableOpacity, View, TouchableWithoutFeedback, TextInput, Alert } from 'react-native';
+import { FlatList, Keyboard, Platform, Text, TouchableOpacity, View, TouchableWithoutFeedback, TextInput, Alert, SafeAreaView } from 'react-native';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { RBSheetRef } from '../../screens/Post/Posts';
 import { PostData } from '../../interfaces/PostInterface';
 import { Comment } from '../../interfaces/CommentInterface';
 import CommentItem from '../items/CommentItem';
 import Feather from '@expo/vector-icons/Feather';
+import CommentItemShimmer from '../skeleton/CommentItem';
 
 const comments: Comment[] = [
   { id: 1, postId: 1, parentId: null, rootCommentId: null, fullname: "Dương Lâm", avatar: 'https://picsum.photos/100/100', isLike: false, totalLike: 2, content: "Từ vựng này rất hay nha mọi người !!!", createDate: new Date("2025-03-02T00:00:00Z") },
   { id: 2, postId: 1, parentId: 1, rootCommentId: 1, fullname: "Người A", avatar: 'https://picsum.photos/100/100', isLike: false, totalLike: 0, content: "Chuẩn luôn bạn! Từ vựng này rất hay nha mọi người !!! Chuẩn luôn bạn! Từ vựng này rất hay nha mọi người !!!", createDate: new Date("2025-03-10T00:00:00Z") },
   { id: 5, postId: 1, parentId: 1, rootCommentId: 1, fullname: "Người D", avatar: 'https://picsum.photos/100/100', isLike: false, totalLike: 0, content: "Chuẩn luôn bạn!", createDate: new Date("2025-03-10T00:00:00Z") },
   { id: 3, postId: 1, parentId: null, rootCommentId: null, fullname: "Người B", avatar: 'https://picsum.photos/100/100', isLike: false, totalLike: 0, content: "Mọi người thấy bài viết này hữu ích không?", createDate: new Date("2025-03-17T00:00:00Z") },
-  { id: 4, postId: 1, parentId: 3, rootCommentId: 3, fullname: "Người C", avatar: 'https://picsum.photos/100/100', isLike: false, totalLike: 0, content: "Mình thấy rất hay.", createDate: new Date("2025-03-17T00:00:00Z") }
+  { id: 4, postId: 1, parentId: 3, rootCommentId: 3, fullname: "Người C", avatar: 'https://picsum.photos/100/100', isLike: false, totalLike: 0, content: "Mình thấy rất hay.", createDate: new Date("2025-03-17T00:00:00Z") },
+  { id: 5, postId: 2, parentId: null, rootCommentId: null, fullname: "Người C", avatar: 'https://picsum.photos/100/100', isLike: false, totalLike: 0, content: "Mình thấy rất hay.", createDate: new Date("2025-03-17T00:00:00Z") }
 ];
 
 export default forwardRef(function ShareBottomSheet({ post }: { post: PostData }, ref) {
@@ -26,8 +28,9 @@ export default forwardRef(function ShareBottomSheet({ post }: { post: PostData }
     const [sheetHeight, setSheetHeight] = useState(300);
     const [showMoreComment, setShowMoreComment] = useState<{ [key: number]: boolean }>({});
     const [hasTagPrefix, setHasTagPrefix] = useState(true);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
-    const parentsComments = commentData.filter(comment => comment.postId === post.id && comment.parentId === null);
+    const parentsComments = commentData.filter(comment => comment.postId === post.id && comment.parentId === null && comment.rootCommentId === null);
 
     const initialHeight = 500;
     const expandedHeight = 700;
@@ -66,6 +69,14 @@ export default forwardRef(function ShareBottomSheet({ post }: { post: PostData }
         open: () => bottomSheetRefComment.current?.open(),
         close: () => bottomSheetRefComment.current?.close(),
     }));
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 3000); // 5 giây
+
+        return () => clearTimeout(timer); 
+    }, []);
 
     const handleLikeComment = (item: Comment) => {
         setCommentData(prevComment => {
@@ -173,12 +184,10 @@ export default forwardRef(function ShareBottomSheet({ post }: { post: PostData }
             setReplyContent(text);
         }
     };
-
     // bấm 2 lần mới biến mất replyContent -->
     const handleDismissReply = () => {
         setReplyingTo(null);
         setReplyContent('');
-    
         if (textInputRef.current) {
             textInputRef.current.blur(); 
         }
@@ -187,7 +196,6 @@ export default forwardRef(function ShareBottomSheet({ post }: { post: PostData }
 
     const handleLongPressComment = (comment: Comment) => {
         if (comment.fullname !== "Bạn") return; // chỉ cho phép thao tác với comment của chính mình
-
         Alert.alert(
             "Tùy chọn bình luận",
             "Bạn muốn thực hiện hành động nào?",
@@ -228,7 +236,21 @@ export default forwardRef(function ShareBottomSheet({ post }: { post: PostData }
                                     text: "Xóa",
                                     style: "destructive",
                                     onPress: () => {
-                                        setCommentData(prev => prev.filter(c => c.id !== comment.id && c.rootCommentId !== comment.id));
+                                        setCommentData(prev => {
+                                            const updatedComments = prev.map(c => {
+                                                if (c.rootCommentId === comment.id) {
+                                                    return {
+                                                        ...c,
+                                                        parentId: null,
+                                                        rootCommentId: null, 
+                                                    };
+                                                }
+                                                return c;
+                                            });
+
+                                            return updatedComments.filter(c => c.id !== comment.id);
+                                        });
+
                                         if (editingComment?.id === comment.id) {
                                             setEditingComment(null);
                                             setReplyContent('');
@@ -247,7 +269,6 @@ export default forwardRef(function ShareBottomSheet({ post }: { post: PostData }
         );
     };
 
-    
     const toggleShowReplies = (commentId: number) => {
         setShowMoreComment(prev => ({
             ...prev,
@@ -256,10 +277,26 @@ export default forwardRef(function ShareBottomSheet({ post }: { post: PostData }
     };
 
     const renderComments = (comment: Comment) => {
-        const childrenComments = commentData.filter(c => c.rootCommentId === comment.id);  
+        const childrenComments = commentData.filter(c => c.rootCommentId === comment.id);
+
+        if (isLoading) {
+            return (
+                <View className="mb-4">
+                    <CommentItemShimmer />
+                {/* {childrenComments.length > 0 && (
+                    <View className="ml-10 border-l border-gray-200 mt-2 pl-4">
+                    {childrenComments.map((_, index) => (
+                        <CommentItemShimmer key={index} />
+                    ))}
+                    </View>
+                )} */}
+                </View>
+            );
+        }
+
+        // Nếu đã load xong thì render comment thực
         return (
-            <View>
-                {/* display comment parents */}
+            <View className="mb-4">
                 <CommentItem 
                     comment={comment} 
                     comments={parentsComments}
@@ -269,20 +306,19 @@ export default forwardRef(function ShareBottomSheet({ post }: { post: PostData }
                     onDismissReply={handleDismissReply}
                     onLongPress={handleLongPressComment}
                 />
-                {/* display comment child */}
+
                 {childrenComments.length > 0 && (
-                    <View className="ml-20 pb-4"  style={{ alignSelf: "flex-start" }}>
+                    <View className="ml-20 pb-4" style={{ alignSelf: "flex-start" }}>
                         <TouchableOpacity onPress={() => toggleShowReplies(comment.id)}>
-                        <Text className="text-gray-600"> 
-                            {showMoreComment[comment.id] 
-                            ? "Ẩn câu trả lời" 
-                            : `Xem thêm ${childrenComments.length} câu trả lời`}
-                        </Text>
+                            <Text className="text-gray-600">
+                                {showMoreComment[comment.id] 
+                                    ? "Ẩn câu trả lời" 
+                                    : `Xem thêm ${childrenComments.length} câu trả lời`}
+                            </Text>
                         </TouchableOpacity>
                     </View>
                 )}
 
-                {/* show more */}
                 {showMoreComment[comment.id] && (
                     <View className="ml-10 border-l border-gray-200">
                         {childrenComments.map(child => (
@@ -304,7 +340,7 @@ export default forwardRef(function ShareBottomSheet({ post }: { post: PostData }
         );
     };
 
-    const getItemLayout = (_ : any, index : any) => ({
+    const getItemLayout = (data : any, index : any) => ({
         length: 100, 
         offset: 100 * index,
         index,
@@ -350,24 +386,24 @@ export default forwardRef(function ShareBottomSheet({ post }: { post: PostData }
                 
                 {/* Đây là phần chính - một TouchableWithoutFeedback duy nhất bao quanh phần body */}
                 <TouchableWithoutFeedback onPress={handleDismissReply}>
-                    <View className="flex-1">
+                    <SafeAreaView style={{ flex: 1 }}>
                         {parentsComments.length > 0 ? (
                             <FlatList
-                                ref={flatListRef}
-                                data={parentsComments}
-                                keyExtractor={(item) => item.id.toString()}
-                                renderItem={({item}) => renderComments(item)}
-                                ListEmptyComponent={
-                                    <Text className="text-center text-gray-500">Chưa có bình luận nào.</Text>
-                                }
-                                removeClippedSubviews={false}
-                                getItemLayout={getItemLayout}
-                                contentContainerStyle={{ paddingBottom: replyingTo ? 60 : 0 }}
+                            ref={flatListRef}
+                            data={parentsComments}
+                            keyExtractor={(item) => item.id.toString()}
+                            renderItem={({ item }) => renderComments(item)}
+                            ListEmptyComponent={
+                                <Text className="text-center text-gray-500">Chưa có bình luận nào.</Text>
+                            }
+                            removeClippedSubviews={false}
+                            getItemLayout={getItemLayout}
+                            contentContainerStyle={{ paddingBottom: replyingTo ? 60 : 0 }}
                             />
                         ) : (
                             <Text className="text-center text-gray-500">Chưa có bình luận nào.</Text>
                         )}
-                    </View>
+                    </SafeAreaView>
                 </TouchableWithoutFeedback>
                 
                 {/* Tách phần input ra khỏi TouchableWithoutFeedback */}
