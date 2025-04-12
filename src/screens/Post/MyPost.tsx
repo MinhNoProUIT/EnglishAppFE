@@ -93,7 +93,8 @@ export default function MyPost () {
                 </View>
             </View>
 
-            {/* list post */}
+        {/* list post */}
+        {posts.length > 0 ? (
             <FlatList
                 data={posts}
                 renderItem={renderPostItem}
@@ -104,6 +105,11 @@ export default function MyPost () {
                 contentContainerStyle={{ paddingBottom: 20 }}
                 className="w-full"
             />
+            ) : (
+                <View className="items-center justify-center mt-20">
+                    <Text className="text-gray-500 text-base">This user hasn't posted anything yet.</Text>
+                </View>
+            )}
         </View>
     );
 };
