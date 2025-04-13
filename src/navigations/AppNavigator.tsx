@@ -6,14 +6,9 @@ import BottomTabs from "./BottomTabs";
 import SignUp from "../screens/Login/SignUp";
 import SignIn from "../screens/Login/SignIn";
 
-import LearnByFlashcard from "../screens/Exercise/LearnByFlashcard";
-import LearnByListenAndGuess from "../screens/Exercise/LearnByListenAndGuess";
-import LearnByTranslate from "../screens/Exercise/LearnByTranslate";
-import PreviewWord from "../screens/Exercise/PreviewWord";
-import PairWord from "../screens/Exercise/PairWord";
-import GuessWord from "../screens/Exercise/GuessWord";
-import RecallWord from "../screens/Exercise/RecallWord";
+import LearnScreen from "../screens/Exercise/LearnScreen";
 import WordsList from "../screens/Exercise/WordsList";
+import { WordType } from "../types/WordType";
 
 import Setting from "../screens/Profile/SettingComponent/Setting";
 import Profile from "../screens/Profile/Profile";
@@ -60,16 +55,9 @@ export type RootStackParamList = {
   Setting: undefined;
   AccountInfomation: undefined;
   Profile: undefined;
-  OnGoingCourses: undefined;
-  CompletedCourses: undefined;
 
-  LearnByFlashcard: undefined;
-  LearnByListenAndGuess: undefined;
-  LearnByTranslate: undefined;
-  PreviewWord: undefined;
-  PairWord: undefined;
-  GuessWord: undefined;
-  RecallWord: undefined;
+  Courses: undefined;
+  LearnScreen: { words: WordType[], firstStep: number };
   WordsList: undefined;
 
   TermsOfService: undefined;
@@ -112,66 +100,8 @@ export default function AppNavigator() {
       <Stack.Screen name="VerifyEmailScreen" component={VerifyEmailScreen} />
 
       <Stack.Screen
-        name="LearnByFlashcard"
-        component={LearnByFlashcard}
-      />
-      <Stack.Screen
-        name="LearnByListenAndGuess"
-        component={LearnByListenAndGuess}
-      />
-      <Stack.Screen
-        name="LearnByTranslate"
-        component={LearnByTranslate}
-      />
-      <Stack.Screen
-        name="PreviewWord"
-        component={PreviewWord}
-        options={{ title: "Preview it", headerShown: true }}
-      />
-      <Stack.Screen
-        name="PairWord"
-        component={PairWord}
-        options={{
-          headerShown: true,
-          header: ({ navigation }) => (
-            <View style={styles.exerciseHeader}>
-              <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
-                <AntDesign name="arrowleft" size={24} color="white" />
-              </TouchableOpacity>
-              <Text style={styles.exerciseHeaderTitle}>Pair it</Text>
-            </View>
-          ),
-        }}
-      />
-      <Stack.Screen
-        name="GuessWord"
-        component={GuessWord}
-        options={{
-          headerShown: true,
-          header: ({ navigation }) => (
-            <View style={styles.exerciseHeader}>
-              <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
-                <AntDesign name="arrowleft" size={24} color="white" />
-              </TouchableOpacity>
-              <Text style={styles.exerciseHeaderTitle}>Guess it</Text>
-            </View>
-          ),
-        }}
-      />
-      <Stack.Screen
-        name="RecallWord"
-        component={RecallWord}
-        options={{
-          headerShown: true,
-          header: ({ navigation }) => (
-            <View style={styles.exerciseHeader}>
-              <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
-                <AntDesign name="arrowleft" size={24} color="white" />
-              </TouchableOpacity>
-              <Text style={styles.exerciseHeaderTitle}>Recall it</Text>
-            </View>
-          ),
-        }}
+        name="LearnScreen"
+        component={LearnScreen}
       />
       <Stack.Screen
         name="WordsList"
