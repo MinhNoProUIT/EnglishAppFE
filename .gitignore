@@ -34,3 +34,7 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# VS Code / JetBrains
+.idea/
+.vs/
