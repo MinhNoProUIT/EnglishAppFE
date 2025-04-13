@@ -1,59 +1,22 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import {
     View,
     Text,
     TextInput,
     StyleSheet,
     TouchableOpacity,
-    Image,
-    Dimensions,
 } from "react-native";
-import { ProgressBar } from 'react-native-paper';
-import Icon from '@expo/vector-icons/AntDesign';
-import Icon2 from '@expo/vector-icons/Ionicons';
-import Icon3 from '@expo/vector-icons/MaterialCommunityIcons';
-import { useNavigation } from "@react-navigation/native";
-import LinearGradient from "react-native-linear-gradient";
+import AnswerCheckMenu from "./AnswerCheckMenu";
+import { WordType } from "../../types/WordType";
 
-const { width } = Dimensions.get("window");
-
-const words = [
-    {
-        id: "1",
-        eng: 'student',
-        vie: 'học sinh, sinh viên',
-        transcription: "'stu:dnt",
-        type: 'n',
-        example: 'His younger sister is a student at that university.',
-        image: "https://picsum.photos/200/300",
-    },
-    {
-        id: "2",
-        eng: 'teacher',
-        vie: 'giáo viên',
-        transcription: "'tēCHər",
-        type: 'n',
-        example: 'His mother is a teacher at that university.',
-        image: "https://picsum.photos/200/100",
-    },
-    {
-        id: "3",
-        eng: 'school',
-        vie: 'trường học',
-        transcription: "sko͞ol",
-        type: 'n',
-        example: 'Students go to school',
-        image: "https://picsum.photos/200/400",
-    },
-];
-
-export default function LearnByTranslate() {
+export default function LearnByTranslate({ words, onNext }: { words: WordType[], onNext: () => void }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [userInput, setUserInput] = useState("");
     const [isCorrect, setIsCorrect] = useState(false);
-    const navigation = useNavigation();
+    const [showCheck, setShowCheck] = useState(false);
 
     const currentWord = words[currentIndex];
+    const wordLength = currentWord.eng.length;
 
     const checkAnswer = () => {
         if (userInput.trim().toLowerCase() === currentWord.eng.toLowerCase()) {
@@ -61,6 +24,7 @@ export default function LearnByTranslate() {
         } else {
             setIsCorrect(false);
         }
+        setShowCheck(true);
     };
 
     const renderInputBoxes = () => {
@@ -72,6 +36,8 @@ export default function LearnByTranslate() {
     };
 
     const nextWord = () => {
+        setShowCheck(false);
+        onNext();
         if (currentIndex < words.length - 1) {
             setCurrentIndex(currentIndex + 1);
             setUserInput("");
@@ -81,18 +47,6 @@ export default function LearnByTranslate() {
 
     return (
         <View style={styles.container}>
-            {/* status */}
-            <View style={styles.progressBarContainer}>
-                <TouchableOpacity>
-                    <Icon name='close' size={24} onPress={() => navigation.goBack()} />
-                </TouchableOpacity>
-                <ProgressBar
-                    progress={(currentIndex + 1) / words.length}
-                    color="#2563EB"
-                    style={styles.progressBar}
-                />
-            </View>
-
             <View style={styles.mainContentContainer}>
                 {/* title */}
                 <Text style={styles.title}>Điền từ</Text>
@@ -105,19 +59,28 @@ export default function LearnByTranslate() {
                 <View style={styles.inputContainer}>{renderInputBoxes()}</View>
 
                 <TextInput
-                    style={[styles.hiddenInput, { width: (currentWord.eng.length * 28) }]}
+                    style={[styles.hiddenInput, { width: wordLength * 28 }]}
                     autoCapitalize='none'
                     autoCorrect={false}
-                    maxLength={currentWord.eng.length}
+                    caretHidden={true}
+                    maxLength={wordLength}
                     value={userInput}
                     onChangeText={setUserInput} />
             </View>
 
             {/* continue button */}
-            <TouchableOpacity style={[styles.checkButton, !userInput && styles.buttonDisabled]} onPress={checkAnswer} disabled={!userInput}>
-                <Text style={[styles.checkButtonText, !userInput && styles.buttonDisabledText]}>Kiểm tra</Text>
+            <TouchableOpacity style={[styles.checkButton, (userInput.length < wordLength) && styles.buttonDisabled]} 
+                onPress={checkAnswer} disabled={userInput.length < wordLength}>
+                <Text style={[styles.checkButtonText, (userInput.length < wordLength) && styles.buttonDisabledText]}>Kiểm tra</Text>
             </TouchableOpacity>
 
+            {/* modal */}
+            <AnswerCheckMenu
+                visible={showCheck}
+                isCorrect={isCorrect}
+                correctAnswer={currentWord}
+                onNext={nextWord}
+            />
         </View>
     );
 };
@@ -126,41 +89,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#f5f5f5",
-        paddingVertical: 20,
+        paddingBottom: 20,
     },
-    // progress bar
-    progressBarContainer: {
-        flexDirection: 'row',
-        height: 30,
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        margin: 20,
-    },
-    progressBar: {
-        height: 20,
-        width: 340,
-        borderRadius: 10,
-    },
-
-    //circle buttons
-    buttonContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 30,
-        gap: 20,
-    },
-    circleButton: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        borderColor: "#dedede",
-        borderWidth: 1,
-        borderRadius: 50,
-        height: 55,
-        width: 55,
-        borderBottomWidth: 4,
-    },
-
     // content
     mainContentContainer: {
         marginTop: 25,
@@ -218,7 +148,7 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         backgroundColor: '#2563EB',
         position: 'absolute',
-        bottom: 25,
+        bottom: 35,
     },
     checkButtonText: {
         color: 'white',
