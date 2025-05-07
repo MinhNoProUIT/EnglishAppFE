@@ -4,7 +4,6 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Courses from "../screens/Course/Courses";
 import Profile from "../screens/Profile/Profile";
 import Posts from "../screens/Post/Posts";
-import Exercises from "../screens/Exercise/Exercises";
 
 import { Ionicons } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -66,11 +65,6 @@ export default function BottomTabs() {
         name="Homes"
         component={HomeScreen}
         options={{ title: "Trang chủ", headerShown: false }}
-      />
-      <Tab.Screen
-        name="Exercises"
-        component={Exercises}
-        options={{ title: "Bài tập" }}
       />
       <Tab.Screen
         name="Courses"
