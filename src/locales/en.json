@@ -7,5 +7,12 @@
   "HELLO": "Hello",
   "SHARE": "Share",
   "PRIVACY_POLICY": "Privacy Policy",
-  "TEST": "SpeakUp takes your privacy very seriously. SpeakUp is committed tosafeguarding your privacy, and this privacy policy contains our datacollection, use, and disclosure practices."
+  "TEST": "SpeakUp takes your privacy very seriously. SpeakUp is committed tosafeguarding your privacy, and this privacy policy contains our datacollection, use, and disclosure practices.",
+  "CANCEL": "Cancel",
+  "Post": "Post",
+  "TITLE_MODAL_POST": "Create new post",
+  "PLACEHOLDER_TITLE_POST": "Enter new title",
+  "CHOOSE_IMAGE_OPTION": "Choose image option",
+  "FROM_LIBRARY": "From library",
+  "FROM_CAMERA": "From camera"
 }
