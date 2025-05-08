@@ -5,8 +5,9 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigations/AppNavigator";
-import { MyPostData } from "../../interfaces/PostInterface";
+import { MyPostData, PostCreate, PostData } from "../../interfaces/PostInterface";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import PostModal from "../../components/modals/PostModal";
 
 const item = {
     id: 1,
@@ -26,16 +27,30 @@ const mockPosts = Array(30).fill(0).map((_, index) => ({
 
 
 export default function MyPost () {
-    const [posts, setPosts] = useState(mockPosts);
+    const addButton = { id: -1, isAddButton: true } as MyPostData;
+    const [posts, setPosts] = useState([addButton, ...mockPosts]);
+
     const [numColumns, setNumColumns] = useState(3);
     const screenWidth = Dimensions.get('window').width;
     const imageSize = (screenWidth - ((numColumns - 1) * 2)) / numColumns; 
 
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const [modalVisible, setModalVisible] = useState(false);
 
     const handleNavigatePost = (item : MyPostData) => {
         navigation.navigate("MainTabs", { screen: "Posts", params: { userId: 1 } });
     }
+
+    const handleSubmitPost = (data: PostCreate) => {
+        const newPost: MyPostData = {
+            id: Date.now(), // Hoặc uuid nếu cần
+            imageUrl: data.images?.[0] ?? '', // Lấy ảnh đầu tiên làm thumbnail
+        };
+
+        // Giữ nút addButton đầu tiên
+        setPosts((prev) => [addButton, newPost, ...prev.slice(1)]);
+    };
+
 
     useEffect(() => {
         navigation.setOptions({
@@ -48,24 +63,44 @@ export default function MyPost () {
             });
     }, [navigation]);
 
-    const renderPostItem = ({ item } : {item: MyPostData}) => (
-        <TouchableOpacity 
-            style={{
-                width: imageSize,
-                height: imageSize,
-                marginBottom: 2,
-            }}
-            onPress={() => handleNavigatePost(item)}
-        >
-            <Image
-                source={{ uri: item.imageUrl }}
+    const renderPostItem = ({ item }: { item: MyPostData }) => {
+        if ((item as any).isAddButton) {
+            return (
+                <TouchableOpacity
+                    style={{
+                        width: imageSize,
+                        height: imageSize,
+                        marginBottom: 2,
+                        backgroundColor: '#ddd',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                    onPress={() => setModalVisible(true)} 
+                >
+                    <Ionicons name="add" size={40} color="black" />
+                </TouchableOpacity>
+            );
+        }
+
+        return (
+            <TouchableOpacity
                 style={{
-                    width: '100%',
-                    height: '100%',
+                    width: imageSize,
+                    height: imageSize,
+                    marginBottom: 2,
                 }}
-            />
-        </TouchableOpacity>
-    );
+                onPress={() => handleNavigatePost(item)}
+            >
+                <Image
+                    source={{ uri: item.imageUrl }}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                    }}
+                />
+            </TouchableOpacity>
+        );
+    };
 
     return (
         <View className="bg-white w-full h-full flex-col pb-4">
@@ -93,23 +128,28 @@ export default function MyPost () {
                 </View>
             </View>
 
-        {/* list post */}
-        {posts.length > 0 ? (
-            <FlatList
-                data={posts}
-                renderItem={renderPostItem}
-                keyExtractor={item => item.id.toString()}
-                numColumns={numColumns}
-                showsVerticalScrollIndicator={false}
-                columnWrapperStyle={{ gap: 2 }}
-                contentContainerStyle={{ paddingBottom: 20 }}
-                className="w-full"
-            />
+            {/* list post */}
+            {posts.length > 0 ? (
+                <FlatList
+                    data={posts}
+                    renderItem={renderPostItem}
+                    keyExtractor={item => item.id.toString()}
+                    numColumns={numColumns}
+                    showsVerticalScrollIndicator={false}
+                    columnWrapperStyle={{ gap: 2 }}
+                    contentContainerStyle={{ paddingBottom: 20 }}
+                    className="w-full"
+                />
             ) : (
                 <View className="items-center justify-center mt-20">
                     <Text className="text-gray-500 text-base">This user hasn't posted anything yet.</Text>
                 </View>
             )}
+                <PostModal
+                    visible={modalVisible}
+                    onClose={() => setModalVisible(false)}
+                    onSubmit={handleSubmitPost}
+                />
         </View>
     );
 };
