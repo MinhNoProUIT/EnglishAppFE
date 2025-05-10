@@ -1,0 +1,49 @@
+// components/GroupListHeader.tsx
+import { View, TouchableOpacity, Text, Platform } from "react-native";
+import { FontAwesome6, Ionicons } from "@expo/vector-icons";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useNavigation } from "@react-navigation/native";
+import { RootStackParamList } from "../../navigations/AppNavigator";
+import GroupModal from "../modals/GroupModal";
+import { useState } from "react";
+import { CreateGroupProps } from "../../interfaces/GroupInterface";
+
+type Props = {
+  onCreateGroup: (group: CreateGroupProps) => void;
+};
+
+export default function GroupListHeader({ onCreateGroup }: Props) {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const handleOpenModal = () => {
+    setModalVisible(true);
+  };
+
+  const handleCreateGroup = (group: CreateGroupProps) => {
+    onCreateGroup(group);
+    setModalVisible(false);
+  };
+  return (
+    <View className="flex-row w-full pt-4 h-20 bg-white items-center justify-between px-4 border-b border-gray-100">
+      <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Ionicons name="chevron-back-outline" size={24} color="black" />
+      </TouchableOpacity>
+      <Text className="font-bold text-2xl">Group</Text>
+      <TouchableOpacity
+        onPress={handleOpenModal}
+        className="flex-row bg-[#FE9519] rounded-full w-8 h-8 items-center justify-center"
+      >
+        <FontAwesome6 name="plus" size={18} color="white" />
+      </TouchableOpacity>
+
+      <GroupModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onSubmit={handleCreateGroup}
+      />
+    </View>
+  );
+}

@@ -39,6 +39,8 @@ import PaymentType from "../screens/Pay/PaymentType";
 //import UserDetails from "../screens/UserDetails";
 import Payment from "../screens/Pay/Payment";
 import PaymentIntroduction from "../screens/Pay/PaymentIntroduction";
+import GroupList from "../screens/Group/GroupList";
+import Chat from "../screens/Group/Chat";
 
 
 export type RootStackParamList = {
@@ -66,6 +68,8 @@ export type RootStackParamList = {
 
   MyPost: undefined;
 
+  Group: undefined;
+  Chat: { groupId: string};
 
   PaymentType: undefined;
   ProfileHeader: undefined;
@@ -251,6 +255,16 @@ export default function AppNavigator() {
         name="MyPost"
         component={MyPost}
         options={{ headerShown: true }}
+      />
+      <Stack.Screen
+        name="Group"
+        component={GroupList}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Chat"
+        component={Chat}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
