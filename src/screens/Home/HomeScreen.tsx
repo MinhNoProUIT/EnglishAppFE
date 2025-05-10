@@ -15,6 +15,9 @@ import CarouselRecentLearning from "../../components/items/CarouselRecentLearnin
 import { ScrollView } from "react-native";
 import ChangeCircle from "@expo/vector-icons/MaterialIcons";
 import Check from "@expo/vector-icons/FontAwesome";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../navigations/AppNavigator";
 
 const data = [
   { value: 30, color: "#2563EB" },
@@ -23,13 +26,20 @@ const data = [
 
 
 const HomeScreen = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const handleNavigateGroup = () => {
+    navigation.navigate("Group");
+  }
 
   return (
     <ScrollView className="px-6 pt-20 bg-white">
       {/* header */}
       <View className="flex-row items-center justify-between mb-1">
         <Text className="text-2xl font-bold">Hi, Maya</Text>
-        <TouchableOpacity className="bg-[#2563EB] rounded-lg h-9 w-9 items-center justify-center">
+        <TouchableOpacity 
+          onPress={handleNavigateGroup}
+          className="bg-[#2563EB] rounded-lg h-9 w-9 items-center justify-center">
           <Ionicons name="chatbubble-ellipses" size={20} color="white" />
         </TouchableOpacity>
       </View>
