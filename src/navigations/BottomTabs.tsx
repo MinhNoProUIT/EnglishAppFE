@@ -2,6 +2,7 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Courses from "../screens/Course/Courses";
+import Quizzes from "../screens/Quiz/Quizzes";
 import Profile from "../screens/Profile/Profile";
 import Posts from "../screens/Post/Posts";
 
@@ -18,6 +19,7 @@ import ProfileHeader from "../components/headers/ProfileHeader";
 export type BottomTabParamList = {
   Homes: undefined;
   Courses: undefined;
+  Quizzes: undefined;
   Profile: undefined;
   Posts: { userId: number };
   Exercises: undefined;
@@ -36,6 +38,8 @@ export default function BottomTabs() {
           if (route.name === "Homes")
             iconName = focused ? "home" : "home-outline";
           else if (route.name === "Courses")
+            iconName = focused ? "book" : "book-outline";
+          else if (route.name === "Quizzes")
             iconName = focused ? "book" : "book-outline";
           else if (route.name === "Profile")
             iconName = focused ? "settings" : "settings-outline";
@@ -70,6 +74,11 @@ export default function BottomTabs() {
         name="Courses"
         component={Courses}
         options={{ title: "Khóa học", headerShown: false }}
+      />
+      <Tab.Screen
+        name="Quizzes"
+        component={Quizzes}
+        options={{ title: "Quiz", headerShown: false }}
       />
       <Tab.Screen
         name="Posts"

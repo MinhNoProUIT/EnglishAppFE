@@ -34,7 +34,7 @@ export default function LockedCourses() {
                                 <Text style={styles.title}>
                                     {item.title}
                                 </Text>
-                                <Text style={styles.detail}>
+                                <Text style={styles.detail} numberOfLines={2}>
                                     {item.detail}
                                 </Text>
                             </View>
