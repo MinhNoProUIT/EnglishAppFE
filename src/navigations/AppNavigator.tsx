@@ -9,6 +9,12 @@ import SignIn from "../screens/Login/SignIn";
 import LearnScreen from "../screens/Exercise/LearnScreen";
 import WordsList from "../screens/Exercise/WordsList";
 import { WordType } from "../types/WordType";
+import { QuizResultType, QuizType } from "../types/QuizType";
+import CreateEditQuiz from "../screens/Quiz/CreateEditQuiz";
+import PreviewQuiz from "../screens/Quiz/PreviewQuiz";
+import DoQuiz from "../screens/Quiz/DoQuiz";
+import FinishQuiz from "../screens/Quiz/FinishQuiz";
+import ReviewFinishQuizResult from "../screens/Quiz/ReviewFinishQuiz";
 
 import Setting from "../screens/Profile/SettingComponent/Setting";
 import Profile from "../screens/Profile/Profile";
@@ -61,6 +67,11 @@ export type RootStackParamList = {
   Courses: undefined;
   LearnScreen: { words: WordType[], firstStep: number };
   WordsList: undefined;
+  CreateEditQuiz: { quizToEdit?: QuizType } | undefined;
+  PreviewQuiz: { data: QuizType };
+  DoQuiz: { data: QuizType };
+  FinishQuiz: { resultData: QuizResultType };
+  ReviewFinishQuizResult: { resultData: QuizResultType };
 
   TermsOfService: undefined;
   PrivacyPolicy: undefined;
@@ -121,6 +132,26 @@ export default function AppNavigator() {
             </View>
           ),
         }}
+      />
+      <Stack.Screen
+        name="CreateEditQuiz"
+        component={CreateEditQuiz}
+      />
+      <Stack.Screen
+        name="PreviewQuiz"
+        component={PreviewQuiz}
+      />
+      <Stack.Screen
+        name="DoQuiz"
+        component={DoQuiz}
+      />
+      <Stack.Screen
+        name="FinishQuiz"
+        component={FinishQuiz}
+      />
+      <Stack.Screen
+        name="ReviewFinishQuizResult"
+        component={ReviewFinishQuizResult}
       />
 
       <Stack.Screen
@@ -288,7 +319,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginRight: 20,
   },
-  
+
   exerciseHeader: {
     flexDirection: "row",
     alignItems: "center",

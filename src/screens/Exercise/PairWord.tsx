@@ -80,7 +80,8 @@ export default function PairWord({ words, onNext }: { words: WordType[], onNext:
                 {/* eng */}
                 <View style={styles.cardColumn}>
                     {shuffledEngWords.map((word) => {
-                        if (hiddenIds.includes(word.id)) return <View style={{ height: '19%' }} />
+                        if (hiddenIds.includes(word.id))
+                            return <View key={word.id} style={{ height: '19%' }} />
                         return (
                             <TouchableOpacity
                                 key={word.id}
@@ -104,7 +105,8 @@ export default function PairWord({ words, onNext }: { words: WordType[], onNext:
                 {/* viet */}
                 <View style={styles.cardColumn}>
                     {shuffledVieWords.map((word) => {
-                        if (hiddenIds.includes(word.id)) return <View style={{ height: '19%' }} />
+                        if (hiddenIds.includes(word.id)) 
+                            return <View key={word.id} style={{ height: '19%' }} />
                         return (
                             <TouchableOpacity
                                 key={word.id}
