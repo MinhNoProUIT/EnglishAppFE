@@ -11,7 +11,15 @@ import Icon from '@expo/vector-icons/Ionicons';
 import AnswerCheckMenu from "./AnswerCheckMenu";
 import { WordType } from "../../types/WordType";
 
-export default function LearnByListenAndGuess({ words, onNext }: { words: WordType[], onNext: () => void }) {
+export default function LearnByListenAndGuess({ 
+    words, 
+    onNext, 
+    onWrongAnswer 
+}: { 
+    words: WordType[], 
+    onNext: () => void, 
+    onWrongAnswer: (word: WordType) => void 
+}) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [userInput, setUserInput] = useState("");
     const [isCorrect, setIsCorrect] = useState(false);
@@ -23,6 +31,7 @@ export default function LearnByListenAndGuess({ words, onNext }: { words: WordTy
         if (userInput.toLowerCase() === currentWord.eng.toLowerCase()) {
             setIsCorrect(true);
         } else {
+            onWrongAnswer(currentWord);
             setIsCorrect(false);
         }
         setShowCheck(true);

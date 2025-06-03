@@ -2,7 +2,13 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { WordType } from "../../types/WordType";
 
-export default function PairWord({ words, onNext }: { words: WordType[], onNext: () => void }) {
+export default function PairWord({
+    words,
+    onNext,
+}: {
+    words: WordType[],
+    onNext: () => void,
+}) {
     const [shuffledEngWords, setShuffledEngWords] = useState<WordType[]>([]);
     const [shuffledVieWords, setShuffledVieWords] = useState<WordType[]>([]);
     const [hiddenIds, setHiddenIds] = useState<string[]>([]);

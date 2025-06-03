@@ -6,4 +6,5 @@ export type WordType = {
     type: string,
     example: string,
     image: string,
+    level: number,
   };

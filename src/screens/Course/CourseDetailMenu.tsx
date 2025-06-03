@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   },
   menuContainer: {
     backgroundColor: "#fff",
-    width: 250,
+    width: 275,
     borderRadius: 20,
     elevation: 10,
   },
