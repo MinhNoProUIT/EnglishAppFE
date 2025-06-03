@@ -14,36 +14,111 @@ import {
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { CourseType } from "../../types/CourseType";
+import { WordType } from "../../types/WordType";
 
-const words = [
+const words: WordType[] = [
   {
-    id: "1",
-    eng: 'student',
-    vie: 'học sinh, sinh viên',
-    transcription: "'stu:dnt",
-    type: 'n',
-    example: 'His younger sister is a student at that university.',
-    image: "https://picsum.photos/200/300",
+    "id": "1",
+    "eng": "student",
+    "vie": "học sinh, sinh viên",
+    "transcription": "'stuː.dənt",
+    "type": "n",
+    "example": "His younger sister is a student at that university.",
+    "image": "https://picsum.photos/200/300?random=1",
+    "level": 3
   },
   {
-    id: "2",
-    eng: 'teacher',
-    vie: 'giáo viên',
-    transcription: "'tēCHər",
-    type: 'n',
-    example: 'His mother is a teacher at that university.',
-    image: "https://picsum.photos/200/100",
+    "id": "2",
+    "eng": "book",
+    "vie": "sách",
+    "transcription": "bʊk",
+    "type": "n",
+    "example": "She borrowed a book from the library.",
+    "image": "https://picsum.photos/200/300?random=2",
+    "level": 3
   },
   {
-    id: "3",
-    eng: 'school',
-    vie: 'trường học',
-    transcription: "sko͞ol",
-    type: 'n',
-    example: 'Students go to school',
-    image: "https://picsum.photos/200/400",
+    "id": "3",
+    "eng": "quickly",
+    "vie": "nhanh chóng",
+    "transcription": "'kwɪk.li",
+    "type": "adv",
+    "example": "He ran quickly to catch the bus.",
+    "image": "https://picsum.photos/200/300?random=3",
+    "level": 2
   },
-];
+  {
+    "id": "4",
+    "eng": "beautiful",
+    "vie": "xinh đẹp",
+    "transcription": "'bjuː.tɪ.fəl",
+    "type": "adj",
+    "example": "That flower is really beautiful.",
+    "image": "https://picsum.photos/200/300?random=4",
+    "level": 2
+  },
+  {
+    "id": "5",
+    "eng": "engineer",
+    "vie": "kỹ sư",
+    "transcription": ".en.dʒɪˈnɪər",
+    "type": "n",
+    "example": "My uncle is a software engineer.",
+    "image": "https://picsum.photos/200/300?random=5",
+    "level": 3
+  },
+  {
+    "id": "6",
+    "eng": "independence",
+    "vie": "sự độc lập",
+    "transcription": ".ɪn.dɪˈpen.dəns",
+    "type": "n",
+    "example": "The country gained independence in 1945.",
+    "image": "https://picsum.photos/200/300?random=6",
+    "level": 4
+  },
+  {
+    "id": "7",
+    "eng": "challenge",
+    "vie": "thử thách",
+    "transcription": "'tʃæl.ɪndʒ",
+    "type": "n",
+    "example": "Learning a new language is a challenge.",
+    "image": "https://picsum.photos/200/300?random=7",
+    "level": 3
+  },
+  {
+    "id": "8",
+    "eng": "implement",
+    "vie": "thực hiện, triển khai",
+    "transcription": "'ɪm.plɪ.ment",
+    "type": "v",
+    "example": "The company plans to implement new strategies next month.",
+    "image": "https://picsum.photos/200/300?random=8",
+    "level": 4
+  },
+  {
+    "id": "9",
+    "eng": "sustainable",
+    "vie": "bền vững",
+    "transcription": "səˈsteɪ.nə.bəl",
+    "type": "adj",
+    "example": "We must develop sustainable energy sources.",
+    "image": "https://picsum.photos/200/300?random=9",
+    "level": 3
+  },
+  {
+    "id": "10",
+    "eng": "generate",
+    "vie": "tạo ra, sinh ra",
+    "transcription": "'dʒen.ə.reɪt",
+    "type": "v",
+    "example": "Solar panels generate electricity from sunlight.",
+    "image": "https://picsum.photos/200/300?random=10",
+    "level": 3
+  }
+]
+
 
 const courses: CourseType[] = [
   {
@@ -162,15 +237,15 @@ export default function OngoingCourses() {
         onClose={() => setDetailMenuVisible(false)}
         onLearn={() => {
           setDetailMenuVisible(false); // Đóng modal trước
-          navigation.navigate("LearnScreen", { words: selectedCourse.vocabulary, firstStep: 0 }); // Điều hướng đến LearnScreen
+          navigation.navigate("LearnScreen", { words: selectedCourse.vocabulary }); // Điều hướng đến LearnScreen
         }}
         onRepeat={() => {
           setDetailMenuVisible(false); // Đóng modal trước
-          navigation.navigate("LearnScreen", { words: selectedCourse.vocabulary, firstStep: 1 }); // Điều hướng đến LearnScreen, bỏ qua bước flashcard
+          navigation.navigate("PracticeScreen", { words: selectedCourse.vocabulary }); // Điều hướng đến PracticeScreen
         }}
         onReview={() => {
           setDetailMenuVisible(false); // Đóng modal trước
-          navigation.navigate("WordsList"); // Điều hướng đến WordsList
+          navigation.navigate("WordsList", { words: selectedCourse.vocabulary }); // Điều hướng đến WordsList
         }}
         selectedCourse={selectedCourse}
       />
