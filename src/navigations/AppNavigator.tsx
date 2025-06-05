@@ -41,14 +41,13 @@ import MyPost from "./../screens/Post/MyPost";
 import VerificationCodeScreen from "../screens/Login/Verify";
 import VerifyEmailScreen from "../screens/Login/VerifyEmail";
 
-
 import PaymentType from "../screens/Pay/PaymentType";
 //import UserDetails from "../screens/UserDetails";
 import Payment from "../screens/Pay/Payment";
 import PaymentIntroduction from "../screens/Pay/PaymentIntroduction";
 import GroupList from "../screens/Group/GroupList";
 import Chat from "../screens/Group/Chat";
-
+import PaymentSuccessful from "../screens/Pay/PaymentSuccessful";
 
 export type RootStackParamList = {
   MainTabs: undefined;
@@ -69,6 +68,7 @@ export type RootStackParamList = {
   LearnScreen: { words: WordType[] };
   PracticeScreen: { words: WordType[] };
   WordsList: { words: WordType[] };
+
   CreateEditQuiz: { quizToEdit?: QuizType } | undefined;
   PreviewQuiz: { data: QuizType };
   DoQuiz: { data: QuizType };
@@ -82,13 +82,14 @@ export type RootStackParamList = {
   MyPost: undefined;
 
   Group: undefined;
-  Chat: { groupId: string};
+  Chat: { groupId: string };
 
   PaymentType: undefined;
   ProfileHeader: undefined;
   Payment: undefined;
   PaymentIntroduction: undefined;
 
+  PaymentSuccessful: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -116,14 +117,8 @@ export default function AppNavigator() {
       />
       <Stack.Screen name="VerifyEmailScreen" component={VerifyEmailScreen} />
 
-      <Stack.Screen
-        name="LearnScreen"
-        component={LearnScreen}
-      />
-      <Stack.Screen
-        name="PracticeScreen"
-        component={PracticeScreen}
-      />
+      <Stack.Screen name="LearnScreen" component={LearnScreen} />
+      <Stack.Screen name="PracticeScreen" component={PracticeScreen} />
       <Stack.Screen
         name="WordsList"
         component={WordsList}
@@ -139,22 +134,10 @@ export default function AppNavigator() {
           ),
         }}
       />
-      <Stack.Screen
-        name="CreateEditQuiz"
-        component={CreateEditQuiz}
-      />
-      <Stack.Screen
-        name="PreviewQuiz"
-        component={PreviewQuiz}
-      />
-      <Stack.Screen
-        name="DoQuiz"
-        component={DoQuiz}
-      />
-      <Stack.Screen
-        name="FinishQuiz"
-        component={FinishQuiz}
-      />
+      <Stack.Screen name="CreateEditQuiz" component={CreateEditQuiz} />
+      <Stack.Screen name="PreviewQuiz" component={PreviewQuiz} />
+      <Stack.Screen name="DoQuiz" component={DoQuiz} />
+      <Stack.Screen name="FinishQuiz" component={FinishQuiz} />
       <Stack.Screen
         name="ReviewFinishQuizResult"
         component={ReviewFinishQuizResult}
@@ -301,6 +284,12 @@ export default function AppNavigator() {
       <Stack.Screen
         name="Chat"
         component={Chat}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name="PaymentSuccessful"
+        component={PaymentSuccessful}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
