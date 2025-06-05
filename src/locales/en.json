@@ -14,5 +14,9 @@
   "PLACEHOLDER_TITLE_POST": "Enter new title",
   "CHOOSE_IMAGE_OPTION": "Choose image option",
   "FROM_LIBRARY": "From library",
-  "FROM_CAMERA": "From camera"
+  "FROM_CAMERA": "From camera",
+  "VIETNAM": "Vietnamese",
+  "ENGLISH": "English",
+  "NNHT": "Show Language",
+  "ANOTHER_SETTING": "Another Setting"
 }

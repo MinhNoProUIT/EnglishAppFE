@@ -25,6 +25,7 @@ import * as Progress from "react-native-progress";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../../navigations/AppNavigator";
+import { useTranslation } from "react-i18next";
 
 import Octicons from "@expo/vector-icons/Octicons";
 
@@ -43,6 +44,8 @@ const Setting = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [scaleAnim] = useState(new Animated.Value(0));
+  const { t } = useTranslation();
+
   const onPressIn = () => {
     setBackgroundColor("#DDDDDD");
   };
@@ -347,7 +350,7 @@ const Setting = () => {
 
                   <Text style={{ fontWeight: "bold", fontSize: 18 }}>
                     {" "}
-                    Cài đặt khác
+                    {t("ANOTHER_SETTING")}
                   </Text>
                 </View>
 

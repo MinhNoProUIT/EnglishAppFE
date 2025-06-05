@@ -20,7 +20,7 @@ const PaymentType = () => {
   const [selectedPlan, setSelectedPlan] = useState("1week");
   const navigation = useNavigation<PaymentTypeScreenNavigationProp>();
   const navigateToPayment = () => {
-    navigation.navigate("Payment");
+    navigation.navigate("PaymentSuccessful");
   };
   const plans = [
     {

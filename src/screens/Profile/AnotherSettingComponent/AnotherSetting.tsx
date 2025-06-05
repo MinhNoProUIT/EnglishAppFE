@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,10 @@ import {
 } from "react-native";
 import { Slider } from "@react-native-assets/slider";
 import Entypo from "@expo/vector-icons/Entypo";
+import { useTranslation } from "react-i18next";
+import { changeLanguage } from "../../../locales";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 const languageOptions = [
   {
     name: "Tiếng Việt",
@@ -24,18 +28,47 @@ const languageOptions = [
   },
 ];
 
+const storeLanguage = async (languageName: string) => {
+  try {
+    await AsyncStorage.setItem("@language", languageName);
+  } catch (e) {
+    console.error("Error saving language", e);
+  }
+};
+
 const AnotherSetting = () => {
   const [backgroundMusicValue, setBackgroundMusicValue] = useState(50);
   const [musicValue, setMusicValue] = useState(50);
-  const [selectedLanguage, setSelectedLanguage] = useState("Tiếng Việt");
+  const [selectedLanguage, setSelectedLanguage] = useState("English");
   const [showLanguageList, setShowLanguageList] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
+
+  const { t } = useTranslation();
+
+  const getLanguage = async () => {
+    try {
+      const savedLanguage = await AsyncStorage.getItem("@language");
+      if (savedLanguage !== null) {
+        setSelectedLanguage(savedLanguage); // Set lại ngôn ngữ từ AsyncStorage
+        changeLanguage(savedLanguage === "Tiếng Việt" ? "vi" : "en");
+      }
+    } catch (e) {
+      console.error("Error loading language", e);
+    }
+  };
+
+  useEffect(() => {
+    getLanguage();
+  }, []);
 
   const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
 
   const handleSelectLanguage = (language: any) => {
     setSelectedLanguage(language.name);
     setShowLanguageList(false);
+    storeLanguage(language.name);
+
+    changeLanguage(language.code === "VN" ? "vi" : "en");
   };
   return (
     <View style={{ padding: 10 }}>
@@ -148,7 +181,7 @@ const AnotherSetting = () => {
           }}
         >
           {" "}
-          Ngôn ngữ hiển thị
+          {t("NNHT")}
         </Text>
         <TouchableOpacity
           style={{ width: 150 }}
