@@ -7,6 +7,7 @@ import SignUp from "../screens/Login/SignUp";
 import SignIn from "../screens/Login/SignIn";
 
 import LearnScreen from "../screens/Exercise/LearnScreen";
+import PracticeScreen from "../screens/Exercise/PracticeScreen";
 import WordsList from "../screens/Exercise/WordsList";
 import { WordType } from "../types/WordType";
 import { QuizResultType, QuizType } from "../types/QuizType";
@@ -65,8 +66,9 @@ export type RootStackParamList = {
   Profile: undefined;
 
   Courses: undefined;
-  LearnScreen: { words: WordType[], firstStep: number };
-  WordsList: undefined;
+  LearnScreen: { words: WordType[] };
+  PracticeScreen: { words: WordType[] };
+  WordsList: { words: WordType[] };
   CreateEditQuiz: { quizToEdit?: QuizType } | undefined;
   PreviewQuiz: { data: QuizType };
   DoQuiz: { data: QuizType };
@@ -117,6 +119,10 @@ export default function AppNavigator() {
       <Stack.Screen
         name="LearnScreen"
         component={LearnScreen}
+      />
+      <Stack.Screen
+        name="PracticeScreen"
+        component={PracticeScreen}
       />
       <Stack.Screen
         name="WordsList"

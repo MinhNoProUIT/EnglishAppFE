@@ -9,7 +9,15 @@ import {
 import AnswerCheckMenu from "./AnswerCheckMenu";
 import { WordType } from "../../types/WordType";
 
-export default function LearnByTranslate({ words, onNext }: { words: WordType[], onNext: () => void }) {
+export default function LearnByTranslate({ 
+    words, 
+    onNext, 
+    onWrongAnswer 
+}: { 
+    words: WordType[], 
+    onNext: () => void, 
+    onWrongAnswer: (word: WordType) => void 
+}) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [userInput, setUserInput] = useState("");
     const [isCorrect, setIsCorrect] = useState(false);
@@ -22,6 +30,7 @@ export default function LearnByTranslate({ words, onNext }: { words: WordType[],
         if (userInput.trim().toLowerCase() === currentWord.eng.toLowerCase()) {
             setIsCorrect(true);
         } else {
+            onWrongAnswer(currentWord);
             setIsCorrect(false);
         }
         setShowCheck(true);
