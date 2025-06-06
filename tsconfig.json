@@ -5,7 +5,8 @@
     "allowJs": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "jsx": "react-native"
   },
   "include": ["src", "types", "nativewind-env.d.ts"]
 }

@@ -99,7 +99,16 @@ const OnboardingScreen = () => {
             </View>
           )}
           data={slides}
-          onDone={() => navigation.navigate("SignIn")}
+          onDone={() => {
+            navigation.navigate("SignIn");
+            AsyncStorage.setItem("isFirstLaunch", "true");
+
+            // Reset stack để không quay lại onboarding
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "SignIn" }],
+            });
+          }}
           renderNextButton={() => (
             <View style={styles.buttonCircle}>
               <AntDesign

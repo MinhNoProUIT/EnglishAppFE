@@ -1,41 +1,83 @@
 import React, { useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import { store } from "./src/redux/store";
-import UsersList from "./src/screens/UserList";
-import { SafeAreaView } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import "./global.css";
 import { NavigationContainer } from "@react-navigation/native";
-import AppNavigator from "./src/navigations/AppNavigator";
+import AppNavigator, {
+  RootStackParamList,
+} from "./src/navigations/AppNavigator";
 import "./src/locales/index";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { changeLanguage } from "./src/locales";
+import { validateToken, refreshAccessToken } from "./src/utils/authUtils";
 
 export default function App() {
   const [language, setLanguage] = useState("");
+  const [initialRoute, setInitialRoute] = useState<
+    keyof RootStackParamList | null
+  >(null);
 
-  // Lấy ngôn ngữ từ AsyncStorage khi ứng dụng bắt đầu
   const getLanguage = async () => {
     try {
       const savedLanguage = await AsyncStorage.getItem("@language");
       if (savedLanguage !== null) {
-        setLanguage(savedLanguage); // Cập nhật ngôn ngữ từ AsyncStorage
+        setLanguage(savedLanguage);
         changeLanguage(savedLanguage === "Tiếng Việt" ? "vi" : "en");
       } else {
-        // Nếu không có ngôn ngữ lưu trữ, bạn có thể đặt mặc định là Tiếng Việt hoặc ngôn ngữ khác
         setLanguage("Tiếng Việt");
       }
     } catch (e) {
-      console.error("Error loading language", e);
+      console.error("Lỗi tải ngôn ngữ:", e);
     }
   };
 
+  const initApp = async () => {
+    const isFirstLaunch = await AsyncStorage.getItem("isFirstLaunch");
+    if (isFirstLaunch === null) {
+      await AsyncStorage.setItem("isFirstLaunch", "false");
+      return setInitialRoute("Onboarding");
+    }
+
+    const accessToken = await AsyncStorage.getItem("authToken");
+    const refreshToken = await AsyncStorage.getItem("refreshToken");
+
+    if (accessToken) {
+      const isValid = await validateToken(accessToken);
+      if (isValid) {
+        return setInitialRoute("MainTabs");
+      }
+    }
+
+    if (refreshToken) {
+      const newTokens = await refreshAccessToken(refreshToken);
+      if (newTokens) {
+        await AsyncStorage.setItem("authToken", newTokens.accessToken);
+        await AsyncStorage.setItem("refreshToken", newTokens.refreshToken);
+        return setInitialRoute("MainTabs");
+      }
+    }
+
+    setInitialRoute("SignIn");
+  };
+
   useEffect(() => {
-    getLanguage(); // Kiểm tra và lấy ngôn ngữ khi ứng dụng khởi động
+    getLanguage();
+    initApp();
   }, []);
+
+  if (!initialRoute) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
     <Provider store={store}>
       <NavigationContainer>
-        <AppNavigator />
+        <AppNavigator initialRoute={initialRoute} />
       </NavigationContainer>
     </Provider>
   );

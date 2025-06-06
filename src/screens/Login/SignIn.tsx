@@ -1,7 +1,7 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { createEntityAdapter } from "@reduxjs/toolkit";
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -13,16 +13,35 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from "react-native";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { useLoginMutation } from "../../services/AuthService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-type ForgotPasswordScreen = StackNavigationProp<
-  RootStackParamList,
-  "ForgotPassword"
->;
+type MainTabsScreen = StackNavigationProp<RootStackParamList, "MainTabs">;
 export default function SighIn() {
-  const navigation = useNavigation<ForgotPasswordScreen>();
+  const navigation = useNavigation<MainTabsScreen>();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [login] = useLoginMutation();
+  const handleLogin = async () => {
+    try {
+      const response = await login({ email, password }).unwrap();
+      console.log(response.accessToken); // gọi API login
+      await AsyncStorage.setItem("authToken", response.accessToken); // lưu token
+      navigation.navigate("MainTabs"); // 👈 chuyển sang trang Main (hoặc tên bạn đặt)
+    } catch (err: any) {
+      Alert.alert(
+        "Đăng nhập thất bại",
+        err?.data?.error || "Sai thông tin đăng nhập"
+      );
+      console.log("lỗi"); // gọi API login
+    }
+  };
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -115,7 +134,11 @@ export default function SighIn() {
                 <TextInput
                   style={[styles.input, { marginRight: 10, flex: 1 }]}
                   placeholder="Email"
-                ></TextInput>
+                  value={email}
+                  onChangeText={setEmail}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                />
               </View>
               <View style={styles.text_input}>
                 {/*password */}
@@ -127,10 +150,13 @@ export default function SighIn() {
                 <TextInput
                   style={[styles.input, { marginRight: 10, flex: 1 }]}
                   placeholder="Password"
-                ></TextInput>
+                  secureTextEntry
+                  value={password}
+                  onChangeText={setPassword}
+                />
               </View>
             </View>
-            <TouchableOpacity style={styles.button_login}>
+            <TouchableOpacity style={styles.button_login} onPress={handleLogin}>
               <Text
                 style={{
                   fontSize: 16,
