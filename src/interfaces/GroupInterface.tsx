@@ -22,6 +22,7 @@ export interface Group {
   name: string;
   image_url: string;
   created_by: string;
+  user_ids: [string];
   count_member: number;
   created_date: Date;
 }
