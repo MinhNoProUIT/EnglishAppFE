@@ -60,8 +60,7 @@ const mockUsers = Array.from({ length: 30 }, (_, index) => {
 interface GroupModalProps {
   visible: boolean;
   onClose: () => void;
-  onSubmit: (group: CreateGroupProps
-  ) => void;
+  onSubmit: (formData: FormData) => void;
 }
 
 export default function CreateGroupModal({
@@ -72,6 +71,7 @@ export default function CreateGroupModal({
   const { t } = useTranslation();
   const [groupName, setGroupName] = useState("");
   const [avatar, setAvatar] = useState<string | null>(null);
+  const [countNumber, setCountNumber] = useState(1);
   const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
   const [msgError, setMsgError] = useState("");
 
@@ -132,7 +132,25 @@ export default function CreateGroupModal({
       setMsgError("Hãy chọn ít nhất một thành viên.");
       return;
     }
-    onSubmit({ name: groupName, avatar, members: selectedMembers, createdAt: new Date() });
+
+    const formData = new FormData();
+    if (avatar) {
+      const filename = avatar.split("/").pop();
+      const match = /\.(\w+)$/.exec(filename ?? "");
+      const type = match ? `image/${match[1]}` : `image`;
+
+      formData.append("image_url", {
+        uri: avatar,
+        name: filename,
+        type,
+      } as any);
+
+      formData.append("name", groupName);
+      formData.append("created_by", "81f5c7d9-0cc5-4b40-b801-5ffdc3279d16"); // Replace with actual user ID
+      formData.append("count_member", countNumber.toString());
+      formData.append("user_ids", JSON.stringify(selectedMembers));
+    }
+    onSubmit(formData);
     setGroupName("");
     setAvatar("");
     setSelectedMembers([]);
