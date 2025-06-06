@@ -1,56 +1,70 @@
-import { View, FlatList } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { View, FlatList, Text } from "react-native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import GroupListHeader from "../../components/headers/GroupListHeader";
 import GroupItem from "../../components/items/GroupItem";
-import { useState } from "react";
-import { CreateGroupProps } from "../../interfaces/GroupInterface";
-
-export const groups = [
-  {
-    id: "1",
-    name: "Lớp A",
-    avatar: "https://i.pravatar.cc/100?u=lop-a",
-    lastMessage: "Mai học lúc 7h nha!",
-    lastMessageTime: "10:15",
-    unseenCount: 2,
-  },
-  {
-    id: "2",
-    name: "Công ty B",
-    avatar: "https://i.pravatar.cc/100?u=congty-b",
-    lastMessage: "Tài liệu họp đã gửi.",
-    lastMessageTime: "09:40",
-    unseenCount: 0,
-  },
-  {
-    id: "3",
-    name: "Gia đình C",
-    avatar: "https://i.pravatar.cc/100?u=giadinh-c",
-    lastMessage: "Tối ăn gì?",
-    lastMessageTime: "08:20",
-    unseenCount: 5,
-  },
-];
+import { useCallback, useState } from "react";
+import { useCreateGroupMutation } from "../../services/groupService";
+import { useGetAllGroupByUserQuery } from "../../services/groupMemberService";
+import { ActivityIndicator } from "react-native";
 
 export default function GroupList() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const [groupList, setGroupList] = useState(groups);
+  const userId = "81f5c7d9-0cc5-4b40-b801-5ffdc3279d16"; // Replace with actual user ID
+  const { data: groups, isLoading, error, refetch } = useGetAllGroupByUserQuery(userId);
 
-  const handleAddGroup = (group: CreateGroupProps) => {
-    const newGroup = {
-      id: Date.now().toString(),
-      name: group.name,
-      avatar: group.avatar || "https://i.pravatar.cc/100?u=default",
-      lastMessage: "",
-      lastMessageTime: group.createdAt.toString(),
-      unseenCount: 0,
-    };
-    setGroupList((prev) => [newGroup, ...prev]);
+  const [groupList, setGroupList] = useState(groups);
+  const [createGroup] = useCreateGroupMutation();
+
+  useFocusEffect(
+    useCallback(() => {
+      if (userId) {
+        refetch();
+      }
+    }, [userId, refetch])
+  );
+
+  const handleAddGroup = async (group: FormData) => {
+    try {
+
+      // const res = await fetch("https://englishapp-uit.onrender.com/api/groups/create", {
+      //   method: "POST",
+      //   body: group,
+      // });
+      // const json = await res.json();
+      // console.log(json);
+      
+      // const response = await createGroup(group).unwrap();
+
+      // const newGroup = {
+      //   id: response.id,
+      //   group_name: response.name,
+      //   group_image_url: response.image_url,
+      //   last_username: "", 
+      //   last_message: "",  
+      //   last_time_message: new Date(),
+      // };
+      // setGroupList((prev) => [newGroup, ...(prev ?? [])]);
+    } catch (error) {
+      console.error("Error creating group:", error);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color="#007bff" />
+        <Text className="mt-2 text-gray-600">Loading groups...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return <Text>Error: {JSON.stringify(error)}</Text>;
+  }
 
   return (
     <View className="flex-1 bg-white p-4">
@@ -61,11 +75,11 @@ export default function GroupList() {
         renderItem={({ item }) => (
           <GroupItem
             id={item.id}
-            name={item.name}
-            avatar={item.avatar}
-            lastMessage={item.lastMessage}
-            lastMessageTime={item.lastMessageTime}
-            unseenCount={item.unseenCount}
+            group_name={item.group_name}
+            group_image_url={item.group_image_url}
+            last_username={item.last_username}
+            last_message={item.last_message}
+            last_time_message={item.last_time_message}
             onPress={() =>
               navigation.navigate("Chat", {
                 groupId: item.id,
@@ -73,6 +87,13 @@ export default function GroupList() {
             }
           />
         )}
+        ListEmptyComponent={
+          <View className="items-center justify-center mt-20">
+            <Text className="text-gray-500 text-center">
+            You don't have any groups yet. Create one to get started!
+            </Text>
+          </View>
+        }
       />
     </View>
   );

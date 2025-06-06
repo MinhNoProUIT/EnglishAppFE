@@ -6,10 +6,9 @@ import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import GroupModal from "../modals/GroupModal";
 import { useState } from "react";
-import { CreateGroupProps } from "../../interfaces/GroupInterface";
 
 type Props = {
-  onCreateGroup: (group: CreateGroupProps) => void;
+  onCreateGroup: (formData: FormData) => void;
 };
 
 export default function GroupListHeader({ onCreateGroup }: Props) {
@@ -22,12 +21,12 @@ export default function GroupListHeader({ onCreateGroup }: Props) {
     setModalVisible(true);
   };
 
-  const handleCreateGroup = (group: CreateGroupProps) => {
+  const handleCreateGroup = (group: FormData) => {
     onCreateGroup(group);
     setModalVisible(false);
   };
   return (
-    <View className="flex-row w-full pt-4 h-20 bg-white items-center justify-between px-4 border-b border-gray-100">
+    <View className="flex-row w-full pt-8 h-28 bg-white items-center justify-between px-4 border-b border-gray-100">
       <TouchableOpacity onPress={() => navigation.goBack()}>
         <Ionicons name="chevron-back-outline" size={24} color="black" />
       </TouchableOpacity>
