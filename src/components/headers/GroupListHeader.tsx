@@ -7,11 +7,11 @@ import { RootStackParamList } from "../../navigations/AppNavigator";
 import GroupModal from "../modals/GroupModal";
 import { useState } from "react";
 
-type Props = {
-  onCreateGroup: (formData: FormData) => void;
+type GroupListHeaderProps = {
+  refetch: () => void;
 };
 
-export default function GroupListHeader({ onCreateGroup }: Props) {
+export default function GroupListHeader({ refetch }: GroupListHeaderProps) {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
@@ -21,10 +21,6 @@ export default function GroupListHeader({ onCreateGroup }: Props) {
     setModalVisible(true);
   };
 
-  const handleCreateGroup = (group: FormData) => {
-    onCreateGroup(group);
-    setModalVisible(false);
-  };
   return (
     <View className="flex-row w-full pt-8 h-28 bg-white items-center justify-between px-4 border-b border-gray-100">
       <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -41,7 +37,7 @@ export default function GroupListHeader({ onCreateGroup }: Props) {
       <GroupModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
-        onSubmit={handleCreateGroup}
+        refetchGroups={refetch} 
       />
     </View>
   );

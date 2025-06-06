@@ -53,18 +53,18 @@ export default function ChatActionSlider({
           onPress={() => onAction("view-members")}
           className="mb-4"
         >
-          <Text className="text-base">View all members</Text>
+          <Text className="text-base">Xem tất cả thành viên</Text>
         </TouchableOpacity>
         {isUserAdmin ? (
           <TouchableOpacity
             onPress={() => onAction("disband")}
             className="mb-4"
           >
-            <Text className="text-base text-red-500">Disband group</Text>
+            <Text className="text-base text-red-500">Giải tán nhóm</Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity onPress={() => onAction("leave")} className="mb-4">
-            <Text className="text-base text-red-500">Leave group</Text>
+            <Text className="text-base text-red-500">Rời nhóm</Text>
           </TouchableOpacity>
         )}
       </View>

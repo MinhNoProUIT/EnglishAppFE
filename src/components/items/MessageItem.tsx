@@ -2,6 +2,7 @@ import { View, Text, Image } from "react-native";
 import { MessageItemProps } from "../../interfaces/MessageInterface";
 import formatTimeMessage from "../../utils/formatTimeMessage";
 
+
 export default function MessageItem({
   id,
   sender_id,
@@ -9,8 +10,17 @@ export default function MessageItem({
   sender_image_url,
   content,
   created_date,
+  loading = false
 }: MessageItemProps) {
   const isOwnMessage = sender_id === "81f5c7d9-0cc5-4b40-b801-5ffdc3279d16"; // Replace with actual user ID
+
+  if (loading) {
+    return (
+      <View className="py-4 items-center justify-center">
+        <Text className="text-gray-400">Đang tải tin nhắn...</Text>
+      </View>
+    );
+  }
 
   return (
     <View className={`mb-3 px-2 ${isOwnMessage ? "items-end" : "items-start"}`}>

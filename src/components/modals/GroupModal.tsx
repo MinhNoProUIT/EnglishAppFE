@@ -13,7 +13,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import UserItem from "../items/UserRecommendItem";
 import { User } from "./../../interfaces/UserInterface";
-import { CreateGroupProps } from "../../interfaces/GroupInterface";
+import { useCreateGroupMutation } from "../../services/groupService";
+import { ActivityIndicator } from "react-native";
 
 const mockUsers = Array.from({ length: 30 }, (_, index) => {
   const id = index + 1;
@@ -60,19 +61,20 @@ const mockUsers = Array.from({ length: 30 }, (_, index) => {
 interface GroupModalProps {
   visible: boolean;
   onClose: () => void;
-  onSubmit: (formData: FormData) => void;
+  refetchGroups: () => void;
 }
 
 export default function CreateGroupModal({
   visible,
   onClose,
-  onSubmit,
+  refetchGroups,
 }: GroupModalProps) {
   const { t } = useTranslation();
   const [groupName, setGroupName] = useState("");
   const [avatar, setAvatar] = useState<string | null>(null);
   const [countNumber, setCountNumber] = useState(1);
   const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
+
   const [msgError, setMsgError] = useState("");
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -82,6 +84,8 @@ export default function CreateGroupModal({
 
   const [page, setPage] = useState(1);
   const [displayedUsers, setDisplayedUsers] = useState<User[]>([]);
+
+  const [createGroup, { isLoading }] = useCreateGroupMutation();
 
   useEffect(() => {
     if (visible) {
@@ -113,51 +117,46 @@ export default function CreateGroupModal({
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
       allowsEditing: true,
       quality: 1,
     });
-
     if (!result.canceled) {
       setAvatar(result.assets[0].uri);
     }
   };
 
-  const handleCreateGroup = () => {
-    if (!groupName) {
-      setMsgError("Tên nhóm không được để trống.");
-      return;
-    }
-    if (selectedMembers.length === 0) {
-      setMsgError("Hãy chọn ít nhất một thành viên.");
+  const handleCreateGroup = async () => {
+    if (!groupName || selectedMembers.length === 0) {
+      setMsgError("Vui lòng nhập tên nhóm và chọn thành viên.");
       return;
     }
 
     const formData = new FormData();
-    if (avatar) {
-      const filename = avatar.split("/").pop();
-      const match = /\.(\w+)$/.exec(filename ?? "");
-      const type = match ? `image/${match[1]}` : `image`;
-
-      formData.append("image_url", {
-        uri: avatar,
-        name: filename,
-        type,
-      } as any);
-
-      formData.append("name", groupName);
-      formData.append("created_by", "81f5c7d9-0cc5-4b40-b801-5ffdc3279d16"); // Replace with actual user ID
-      formData.append("count_member", countNumber.toString());
-      formData.append("user_ids", JSON.stringify(selectedMembers));
+    formData.append("name", groupName);
+    formData.append("created_by", "81f5c7d9-0cc5-4b40-b801-5ffdc3279d16"); // Replace with actual user ID
+    formData.append("count_member", countNumber.toString());
+    if (selectedMembers.length === 0) {
+      formData.append("user_ids", ""); // hoặc bỏ luôn nếu backend cho phép
     }
-    onSubmit(formData);
-    setGroupName("");
-    setAvatar("");
-    setSelectedMembers([]);
-    setSearchTerm("");
-    setMsgError("");
-    setDisplayedUsers([]);
-    onClose();
+    if (avatar) {
+      const fileName = avatar.split("/").pop() || "image.jpg";
+      const match = /\.(\w+)$/.exec(fileName);
+      const fileType = match ? `image/${match[1]}` : `image`;
+      formData.append("image", {
+        uri: avatar,
+        name: fileName,
+        type: fileType,
+      } as any);
+    }
+    try {
+      await createGroup(formData).unwrap();
+      refetchGroups();
+      handleCancel();
+    } catch (err) {
+      console.error("Lỗi tạo nhóm:", err);
+      setMsgError("Tạo nhóm thất bại, vui lòng thử lại.");
+    }
   };
 
   const handleCancel = () => {
@@ -172,8 +171,8 @@ export default function CreateGroupModal({
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
-      <View className="flex-1 justify-center items-center bg-black/30">
-        <View className="bg-white w-11/12 h-full mt-8 rounded-xl p-4">
+      <View className="flex-1 justify-center items-center bg-black/30 px-4">
+        <View className="bg-white w-full max-w-md max-h-[80%] rounded-xl p-4">
           <Text className="text-xl font-bold mb-4">Create group</Text>
 
           <TouchableOpacity onPress={pickImage} className="items-center mb-3">
@@ -222,7 +221,7 @@ export default function CreateGroupModal({
               onEndReached={loadMoreUsers}
               onEndReachedThreshold={0.5}
               showsVerticalScrollIndicator={false}
-              style={{ maxHeight: 440 }}
+              style={{ maxHeight: 300 }} // hoặc 400 tùy màn hình
             />
           </View>
 
@@ -232,16 +231,22 @@ export default function CreateGroupModal({
 
           <View className="flex-row justify-between gap-3 mt-3">
             <TouchableOpacity
-              className="flex-1 bg-red-500 py-2 rounded-lg items-center"
+              className="flex-1 border border-[#FE9519] py-3 rounded-lg items-center"
               onPress={handleCancel}
             >
-              <Text className="text-white font-bold">Cancel</Text>
+              <Text className="text-[#FE9519] font-bold">Cancel</Text>
             </TouchableOpacity>
+
             <TouchableOpacity
-              className="flex-1 bg-green-500 py-2 rounded-lg items-center"
+              className="flex-1 bg-[#FE9519] py-3 rounded-lg items-center"
               onPress={handleCreateGroup}
+              disabled={isLoading}
             >
-              <Text className="text-white font-bold">Create</Text>
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text className="text-white font-bold">Create</Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>
