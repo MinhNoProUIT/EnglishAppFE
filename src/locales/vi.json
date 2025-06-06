@@ -11,8 +11,12 @@
   "CANCEL": "Hủy",
   "Post": "Đăng bài",
   "TITLE_MODAL_POST": "Tạo bài đăng mới",
-  "PLACEHOLDER_TITLE_POST": "Nhập tiêu đề mới",  
+  "PLACEHOLDER_TITLE_POST": "Nhập tiêu đề mới",
   "CHOOSE_IMAGE_OPTION": "Chọn tùy chọn hình ảnh",
   "FROM_LIBRARY": "Từ thư viện",
-  "FROM_CAMERA": "Từ camera"
+  "FROM_CAMERA": "Từ camera",
+  "VIETNAM": "Tiếng Việt",
+  "ENGLISH": "Tiếng Anh",
+  "NNHT": "Ngôn ngữ hiển thị",
+  "ANOTHER_SETTING": "Cài đặt khác"
 }

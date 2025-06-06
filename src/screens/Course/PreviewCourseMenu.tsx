@@ -13,7 +13,7 @@ const course =
     name: "In Court",
     level: "A1 - A2",
     numberOfWords: "30",
-    description: "Describe some thing about this course. People will learn words about some topic from this course.",
+    description: "Describe some thing about this course. People will learn words about some People will learn words about some People will learn words about some topic from this course.",
     image: "https://picsum.photos/200/300",
 };
 
@@ -46,7 +46,7 @@ const PreviewCourseMenu: React.FC<CourseMenuProps> = ({ visible, onClose, }) => 
                                         </View>
                                     </View>
                                 </View>
-                                <Text style={styles.description}>
+                                <Text style={styles.description} numberOfLines={3}>
                                     {course.description}
                                 </Text>
                             </View>

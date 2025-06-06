@@ -7,8 +7,15 @@ import SignUp from "../screens/Login/SignUp";
 import SignIn from "../screens/Login/SignIn";
 
 import LearnScreen from "../screens/Exercise/LearnScreen";
+import PracticeScreen from "../screens/Exercise/PracticeScreen";
 import WordsList from "../screens/Exercise/WordsList";
 import { WordType } from "../types/WordType";
+import { QuizResultType, QuizType } from "../types/QuizType";
+import CreateEditQuiz from "../screens/Quiz/CreateEditQuiz";
+import PreviewQuiz from "../screens/Quiz/PreviewQuiz";
+import DoQuiz from "../screens/Quiz/DoQuiz";
+import FinishQuiz from "../screens/Quiz/FinishQuiz";
+import ReviewFinishQuizResult from "../screens/Quiz/ReviewFinishQuiz";
 
 import Setting from "../screens/Profile/SettingComponent/Setting";
 import Profile from "../screens/Profile/Profile";
@@ -34,14 +41,13 @@ import MyPost from "./../screens/Post/MyPost";
 import VerificationCodeScreen from "../screens/Login/Verify";
 import VerifyEmailScreen from "../screens/Login/VerifyEmail";
 
-
 import PaymentType from "../screens/Pay/PaymentType";
 //import UserDetails from "../screens/UserDetails";
 import Payment from "../screens/Pay/Payment";
 import PaymentIntroduction from "../screens/Pay/PaymentIntroduction";
 import GroupList from "../screens/Group/GroupList";
 import Chat from "../screens/Group/Chat";
-
+import PaymentSuccessful from "../screens/Pay/PaymentSuccessful";
 
 export type RootStackParamList = {
   MainTabs: undefined;
@@ -59,8 +65,15 @@ export type RootStackParamList = {
   Profile: undefined;
 
   Courses: undefined;
-  LearnScreen: { words: WordType[], firstStep: number };
-  WordsList: undefined;
+  LearnScreen: { words: WordType[] };
+  PracticeScreen: { words: WordType[] };
+  WordsList: { words: WordType[] };
+
+  CreateEditQuiz: { quizToEdit?: QuizType } | undefined;
+  PreviewQuiz: { data: QuizType };
+  DoQuiz: { data: QuizType };
+  FinishQuiz: { resultData: QuizResultType };
+  ReviewFinishQuizResult: { resultData: QuizResultType };
 
   TermsOfService: undefined;
   PrivacyPolicy: undefined;
@@ -69,13 +82,14 @@ export type RootStackParamList = {
   MyPost: undefined;
 
   Group: undefined;
-  Chat: { groupId: string};
+  Chat: { groupId: string };
 
   PaymentType: undefined;
   ProfileHeader: undefined;
   Payment: undefined;
   PaymentIntroduction: undefined;
 
+  PaymentSuccessful: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -103,10 +117,8 @@ export default function AppNavigator() {
       />
       <Stack.Screen name="VerifyEmailScreen" component={VerifyEmailScreen} />
 
-      <Stack.Screen
-        name="LearnScreen"
-        component={LearnScreen}
-      />
+      <Stack.Screen name="LearnScreen" component={LearnScreen} />
+      <Stack.Screen name="PracticeScreen" component={PracticeScreen} />
       <Stack.Screen
         name="WordsList"
         component={WordsList}
@@ -121,6 +133,14 @@ export default function AppNavigator() {
             </View>
           ),
         }}
+      />
+      <Stack.Screen name="CreateEditQuiz" component={CreateEditQuiz} />
+      <Stack.Screen name="PreviewQuiz" component={PreviewQuiz} />
+      <Stack.Screen name="DoQuiz" component={DoQuiz} />
+      <Stack.Screen name="FinishQuiz" component={FinishQuiz} />
+      <Stack.Screen
+        name="ReviewFinishQuizResult"
+        component={ReviewFinishQuizResult}
       />
 
       <Stack.Screen
@@ -266,6 +286,12 @@ export default function AppNavigator() {
         component={Chat}
         options={{ headerShown: false }}
       />
+
+      <Stack.Screen
+        name="PaymentSuccessful"
+        component={PaymentSuccessful}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 }
@@ -288,7 +314,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginRight: 20,
   },
-  
+
   exerciseHeader: {
     flexDirection: "row",
     alignItems: "center",

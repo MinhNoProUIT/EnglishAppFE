@@ -20,17 +20,16 @@ type LearnScreenNavigationProp = StackNavigationProp<
 
 type LearnScreenRouteParams = {
     words: WordType[];
-    firstStep: number;
 };
 
 export default function LearnScreen() {
     const navigation = useNavigation<LearnScreenNavigationProp>();
     const route = useRoute<RouteProp<{ params: LearnScreenRouteParams }, 'params'>>();
-    const { words, firstStep } = route.params;
+    const { words } = route.params;
     const [currentPage, setCurrentPage] = useState(0);
     const [isFinish, setIsFinish] = useState(false);
-    const totalPages = words.length * (4 - firstStep);
-    const currentStep = (currentPage - currentPage % words.length) / words.length + firstStep;
+    const totalPages = words.length * 4;
+    const currentStep = (currentPage - currentPage % words.length) / words.length;
 
     const handleGoBack = () => {
         navigation.goBack();
@@ -50,11 +49,22 @@ export default function LearnScreen() {
             case 0:
                 return <LearnByFlashcard words={words} onNext={handleNext} />;
             case 1:
-                return <LearnByTranslate words={words} onNext={handleNext} />;
+                return <LearnByTranslate
+                    words={words}
+                    onNext={handleNext}
+                    onWrongAnswer={() => { }}
+                />;
             case 2:
-                return <LearnByListenAndGuess words={words} onNext={handleNext} />;
+                return <LearnByListenAndGuess
+                    words={words}
+                    onNext={handleNext}
+                    onWrongAnswer={() => { }}
+                />;
             case 3:
-                return <PairWord words={words} onNext={handleNext} />
+                return <PairWord
+                    words={words}
+                    onNext={handleNext}
+                />;
             default:
                 return null;
         }

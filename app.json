@@ -42,5 +42,9 @@
         }
       ]
     ]
+    "jsEngine": "hermes",
+    "experiments": {
+      "reactNativeExperimentalImportSupport": false
+    }
   }
 }

@@ -7,6 +7,7 @@ import {
   Image,
   ScrollView,
   Animated,
+  StyleSheet,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Foundation from "@expo/vector-icons/Foundation";
@@ -16,15 +17,68 @@ import * as Progress from "react-native-progress";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../../navigations/AppNavigator";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 type ProfilesScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   "Profile"
 >;
 
+const days = [
+  { label: "T2", key: "mon" },
+  { label: "T3", key: "tue" },
+  { label: "T4", key: "wed" },
+  { label: "T5", key: "thu" },
+  { label: "T6", key: "fri" },
+  { label: "T7", key: "sat" },
+  { label: "CN", key: "sun" },
+];
+
+// Helper để lấy thứ trong tuần của JS (0 = CN, 1 = T2, ...)
+const getTodayKey = () => {
+  const jsDay = new Date().getDay(); // 0 - CN, 1 - T2 ...
+  // map JS day sang key của days:
+  switch (jsDay) {
+    case 0:
+      return "sun";
+    case 1:
+      return "mon";
+    case 2:
+      return "tue";
+    case 3:
+      return "wed";
+    case 4:
+      return "thu";
+    case 5:
+      return "fri";
+    case 6:
+      return "sat";
+    default:
+      return undefined;
+  }
+};
+
 const ProfileUser = () => {
   const navigation = useNavigation<ProfilesScreenNavigationProp>(); // Hook navigation
   const scale = new Animated.Value(0.8);
   const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+
+  const [checkedDays, setCheckedDays] = useState<{ [key: string]: boolean }>(
+    {}
+  );
+
+  const todayKey = getTodayKey();
+
+  const onCheckIn = () => {
+    if (!todayKey) {
+      // Xử lý trường hợp không xác định được ngày, hoặc return
+      return;
+    }
+    if (!checkedDays[todayKey]) {
+      setCheckedDays((prev) => ({ ...prev, [todayKey]: true }));
+    }
+  };
+
   useEffect(() => {
     // Tạo hiệu ứng lặp đi lặp lại
     Animated.loop(
@@ -92,6 +146,92 @@ const ProfileUser = () => {
           </Text>
         </View>
       </View>
+      <View
+        style={{
+          borderColor: "#3E87F6",
+          borderWidth: 2,
+          borderRadius: 5,
+          padding: 20,
+          marginTop: 12,
+          backgroundColor: "rgb(255, 232, 208)",
+        }}
+      >
+        <View style={styles.container}>
+          <View style={styles.daysRow}>
+            {days.map((day) => {
+              const checked = !!checkedDays[day.key];
+              return (
+                <View
+                  key={day.key}
+                  style={[
+                    styles.circle,
+                    checked ? styles.checkedCircle : styles.uncheckedCircle,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.dayText,
+                      checked ? styles.checkedText : styles.uncheckedText,
+                    ]}
+                  >
+                    {day.label}
+                  </Text>
+                </View>
+              );
+            })}
+          </View>
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <FontAwesome6 name="gift" size={30} color="#3E87F6" />
+            <View
+              style={{
+                marginLeft: 10,
+                flexDirection: "column",
+                justifyContent: "center",
+              }}
+            >
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  color: "black",
+                  fontSize: 10,
+                }}
+              >
+                Điểm danh mỗi ngày
+              </Text>
+              <View
+                style={{ flexDirection: "row", gap: 5, alignItems: "center" }}
+              >
+                <FontAwesome5 name="coins" size={15} color="rgb(243,207,0)" />
+                <Text
+                  style={{
+                    fontWeight: "bold",
+                    color: "#3E87F6",
+                    fontSize: 10,
+                  }}
+                >
+                  5
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={onCheckIn}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.buttonText}>Nhận</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
 
       <View
         style={{
@@ -146,5 +286,58 @@ const ProfileUser = () => {
     </View>
   );
 };
+
+const CIRCLE_SIZE = 30;
+
+const styles = StyleSheet.create({
+  container: {
+    alignItems: "center",
+  },
+  daysRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    maxWidth: 350,
+    marginBottom: 10,
+  },
+  circle: {
+    width: CIRCLE_SIZE,
+    height: CIRCLE_SIZE,
+    borderRadius: CIRCLE_SIZE / 2,
+    borderWidth: 2,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  checkedCircle: {
+    backgroundColor: "#3E87F6", // xanh
+    borderColor: "#3E87F6",
+  },
+  uncheckedCircle: {
+    backgroundColor: "white",
+    borderColor: "#3E87F6",
+  },
+  dayText: {
+    fontWeight: "bold",
+  },
+  checkedText: {
+    color: "white",
+  },
+  uncheckedText: {
+    color: "#3E87F6",
+  },
+  button: {
+    backgroundColor: "#3E87F6",
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    width: 70,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 12,
+  },
+});
 
 export default ProfileUser;

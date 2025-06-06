@@ -2,7 +2,13 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { WordType } from "../../types/WordType";
 
-export default function PairWord({ words, onNext }: { words: WordType[], onNext: () => void }) {
+export default function PairWord({
+    words,
+    onNext,
+}: {
+    words: WordType[],
+    onNext: () => void,
+}) {
     const [shuffledEngWords, setShuffledEngWords] = useState<WordType[]>([]);
     const [shuffledVieWords, setShuffledVieWords] = useState<WordType[]>([]);
     const [hiddenIds, setHiddenIds] = useState<string[]>([]);
@@ -80,7 +86,8 @@ export default function PairWord({ words, onNext }: { words: WordType[], onNext:
                 {/* eng */}
                 <View style={styles.cardColumn}>
                     {shuffledEngWords.map((word) => {
-                        if (hiddenIds.includes(word.id)) return <View style={{ height: '19%' }} />
+                        if (hiddenIds.includes(word.id))
+                            return <View key={word.id} style={{ height: '19%' }} />
                         return (
                             <TouchableOpacity
                                 key={word.id}
@@ -104,7 +111,8 @@ export default function PairWord({ words, onNext }: { words: WordType[], onNext:
                 {/* viet */}
                 <View style={styles.cardColumn}>
                     {shuffledVieWords.map((word) => {
-                        if (hiddenIds.includes(word.id)) return <View style={{ height: '19%' }} />
+                        if (hiddenIds.includes(word.id)) 
+                            return <View key={word.id} style={{ height: '19%' }} />
                         return (
                             <TouchableOpacity
                                 key={word.id}

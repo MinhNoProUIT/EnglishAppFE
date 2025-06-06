@@ -14,8 +14,9 @@ import {
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import { CourseType } from "../../types/CourseType";
+import { WordType } from "../../types/WordType";
 
-const words = [
+const words: WordType[] = [
   {
     id: "1",
     eng: 'student',
@@ -24,6 +25,7 @@ const words = [
     type: 'n',
     example: 'His younger sister is a student at that university.',
     image: "https://picsum.photos/200/300",
+    level: 1,
   },
   {
     id: "2",
@@ -33,6 +35,7 @@ const words = [
     type: 'n',
     example: 'His mother is a teacher at that university.',
     image: "https://picsum.photos/200/100",
+    level: 2,
   },
   {
     id: "3",
@@ -42,6 +45,7 @@ const words = [
     type: 'n',
     example: 'Students go to school',
     image: "https://picsum.photos/200/400",
+    level: 3,
   },
 ];
 
@@ -197,14 +201,14 @@ export default function CompletedCourses() {
       <CourseDetailMenu
         visible={detailMenuVisible}
         onClose={() => setDetailMenuVisible(false)}
-        onLearn={() => {}}
+        onLearn={() => { }}
         onRepeat={() => {
           setDetailMenuVisible(false); // Đóng modal trước
-          navigation.navigate("LearnScreen", { words: selectedCourse.vocabulary, firstStep: 1 }); // Điều hướng đến LearnScreen, bỏ qua bước flashcard
+          navigation.navigate("PracticeScreen", { words: selectedCourse.vocabulary }); // Điều hướng đến PracticeScreen
         }}
         onReview={() => {
           setDetailMenuVisible(false); // Đóng modal trước
-          navigation.navigate("WordsList"); // Điều hướng đến WordsList
+          navigation.navigate("WordsList", { words: selectedCourse.vocabulary }); // Điều hướng đến WordsList
         }}
         selectedCourse={selectedCourse}
       />
