@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -18,10 +18,27 @@ import { formatCurrency } from "../../utils/formatCurrentcy";
 import QRCode from "react-native-qrcode-svg";
 import Feather from "@expo/vector-icons/Feather";
 import Entypo from "@expo/vector-icons/Entypo";
+import { useGetAllPaymentQuery } from "../../services/paymentService";
+import { IGetAllPayment } from "../../models/Payment";
 
 const screenHeight = Dimensions.get("window").height;
 
 const PaymentSuccessful = () => {
+  const {
+    data: paymentResponse,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useGetAllPaymentQuery();
+
+  const paymentData = (paymentResponse?.Data as IGetAllPayment[]) || [];
+
+  useEffect(() => {
+    if (paymentResponse) {
+      console.log("📦 paymentResponse:", paymentResponse);
+      console.log("✅ paymentData:", paymentData);
+    }
+  }, [paymentResponse]);
   return (
     <View
       style={{
