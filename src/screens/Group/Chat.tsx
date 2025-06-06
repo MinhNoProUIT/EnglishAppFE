@@ -28,6 +28,8 @@ export default function Chat() {
     refetch: refetchMessages,
   } = useGetAllMessagesQuery(groupId);
 
+  console.log(fetchedMessages);
+
   const {
     data: fetchedDetails,
     isLoading: detailsLoading,

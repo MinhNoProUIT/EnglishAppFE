@@ -18,6 +18,8 @@ import {
   useChangeGroupNameMutation,
   useGetDetailsGroupQuery,
 } from "../../services/groupService";
+import { useGetAllMembersQuery } from "../../services/groupMemberService";
+import MemberModal from "../modals/MemberModal";
 
 type Props = {
   groupId: string;
@@ -36,12 +38,15 @@ export default function ChatHeader({
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [isSliderVisible, setSliderVisible] = useState(false);
+  const [isMemberModalVisible, setMemberModalVisible] = useState(false);
 
-  const [changeGroupName, { isLoading: isLoadingChangeName  }] =
+  const [changeGroupName, { isLoading: isLoadingChangeName }] =
     useChangeGroupNameMutation();
   const [changeGroupImage, { isLoading: isLoadingChangeImage }] =
     useChangeGroupImageMutation();
   const { data: groupDetails, refetch } = useGetDetailsGroupQuery(groupId);
+  const { data: members, isLoading: isLoadingMembers } =
+    useGetAllMembersQuery(groupId, {skip: !isMemberModalVisible});
 
   const handleAction = (type: string) => {
     setSliderVisible(false);
@@ -66,6 +71,8 @@ export default function ChatHeader({
         break;
     }
   };
+
+  console.log('Modal visible:', isMemberModalVisible)
 
   const uploadGroupAvatar = async (uri: string) => {
     try {
@@ -188,7 +195,9 @@ export default function ChatHeader({
     );
   };
 
-  const handleViewMembers = () => {};
+  const handleViewMembers = () => {
+    setMemberModalVisible(true);
+  };
 
   const handleLeaveGroup = () => {
     Alert.alert("Xác nhận rời nhóm", "Bạn có chắc chắn muốn rời nhóm?", [
@@ -256,12 +265,17 @@ export default function ChatHeader({
         <Ionicons name="ellipsis-vertical" size={24} color="black" />
       </TouchableOpacity>
 
+      <MemberModal
+        visible={isMemberModalVisible}
+        onClose={() => setMemberModalVisible(false)}
+        members={members}
+      />
       <ChatActionSlider
         isVisible={isSliderVisible}
         onClose={() => setSliderVisible(false)}
         onAction={handleAction}
         created_by={created_by}
-      />
+      /> 
     </View>
   );
 }

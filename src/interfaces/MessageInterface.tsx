@@ -5,6 +5,7 @@ export interface MessageItemProps {
   sender_image_url: string;
   content: string;
   created_date: string; 
+  loading?: boolean;
 }
 
 export interface SendMessageProps {
