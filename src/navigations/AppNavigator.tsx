@@ -90,16 +90,23 @@ export type RootStackParamList = {
   PaymentIntroduction: undefined;
 
   PaymentSuccessful: undefined;
+
+  Onboarding: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-export default function AppNavigator() {
+interface Props {
+  initialRoute: keyof RootStackParamList;
+}
+
+export default function AppNavigator({ initialRoute = "SignIn" }: Props) {
   return (
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
       }}
+      initialRouteName={initialRoute}
     >
       <Stack.Screen name="MainTabs" component={BottomTabs} />
 
@@ -111,6 +118,7 @@ export default function AppNavigator() {
         name="AccountCreatedScreen"
         component={AccountCreatedScreen}
       />
+      <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       <Stack.Screen
         name="VerificationCodeScreen"
         component={VerificationCodeScreen}

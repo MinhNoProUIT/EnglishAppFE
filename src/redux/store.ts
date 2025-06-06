@@ -1,5 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { userApi } from "../services/userService";
+import { authApi } from "../services/AuthService";
+
 import { groupApi } from "../services/groupService";
 import { groupMemberApi } from "../services/groupMemberService";
 import { messageApi } from "../services/messageService";
@@ -7,6 +9,10 @@ import { messageApi } from "../services/messageService";
 export const store = configureStore({
   reducer: {
     [userApi.reducerPath]: userApi.reducer,
+    [authApi.reducerPath]: authApi.reducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(userApi.middleware, authApi.middleware),
     [groupApi.reducerPath]: groupApi.reducer,
     [groupMemberApi.reducerPath]: groupMemberApi.reducer,
     [messageApi.reducerPath]: messageApi.reducer,
