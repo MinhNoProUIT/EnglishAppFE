@@ -28,6 +28,7 @@ import { RootStackParamList } from "../../../navigations/AppNavigator";
 import { useTranslation } from "react-i18next";
 
 import Octicons from "@expo/vector-icons/Octicons";
+import { logout } from "../../../utils/authUtils";
 
 type SettingsScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -69,7 +70,9 @@ const Setting = () => {
     navigation.navigate("AnotherSetting");
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logout(navigation);
+
     console.log("Đăng xuất thành công");
     setShowLogoutModal(false);
   };

@@ -32,7 +32,8 @@ export default function SighIn() {
     try {
       const response = await login({ email, password }).unwrap();
       console.log(response.accessToken); // gọi API login
-      await AsyncStorage.setItem("authToken", response.accessToken); // lưu token
+      await AsyncStorage.setItem("authToken", response.accessToken);
+      await AsyncStorage.getItem("refreshToken");
       navigation.navigate("MainTabs"); // 👈 chuyển sang trang Main (hoặc tên bạn đặt)
     } catch (err: any) {
       Alert.alert(
@@ -232,7 +233,10 @@ export default function SighIn() {
             >
               <View style={styles.view_end}>
                 <Text style={{ fontSize: 16 }}>Are you not registered?</Text>
-                <TouchableOpacity style={{ marginLeft: 8 }}>
+                <TouchableOpacity
+                  style={{ marginLeft: 8 }}
+                  onPress={() => navigation.navigate("SignUp")}
+                >
                   <Text style={{ fontSize: 16, color: "#2563eb" }}>
                     Register
                   </Text>

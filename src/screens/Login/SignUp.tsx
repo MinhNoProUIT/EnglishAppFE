@@ -1,6 +1,6 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -12,14 +12,56 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Platform,
+  Alert,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigations/AppNavigator";
+import { useTranslation } from "react-i18next";
+import { useRegisterMutation } from "../../services/AuthService";
+import emailValidator from "email-validator";
 
 type SignInScreen = StackNavigationProp<RootStackParamList, "SignIn">;
 
 export default function SignUp() {
+  const { t } = useTranslation();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [username, setUsername] = useState("");
   const navigation = useNavigation<SignInScreen>();
+  const [SignUp] = useRegisterMutation();
+  const handleSignUp = async () => {
+    if (password !== confirmPassword) {
+      Alert.alert("Lỗi", "Mật khẩu và xác nhận mật khẩu không khớp.");
+      return;
+    }
+
+    if (!emailValidator.validate(email)) {
+      Alert.alert("Lỗi", "Địa chỉ email không hợp lệ.");
+      return;
+    }
+
+    if (password.length < 7) {
+      Alert.alert("Lỗi", "Mật khẩu phải có ít nhất 7 ký tự.");
+      return;
+    }
+    try {
+      await SignUp({
+        username,
+        email,
+        password,
+        confirmPassword,
+      });
+
+      Alert.alert("Đăng ký thành công", "Tài khoản của bạn đã được tạo!");
+      navigation.navigate("SignIn");
+    } catch (err: any) {
+      Alert.alert(
+        "Đăng ký thất bại",
+        err?.data?.error || "Sai thông tin đăng ký"
+      );
+    }
+  };
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -31,7 +73,7 @@ export default function SignUp() {
       fontSize: 24,
       fontWeight: "bold",
       textAlign: "center",
-      marginTop: 20,
+      marginTop: 40,
       marginBottom: 20,
     },
     socialButton: {
@@ -67,33 +109,36 @@ export default function SignUp() {
       paddingLeft: 18,
       paddingRight: 24,
       marginHorizontal: 12,
-      marginTop: 12.5,
+      marginTop: 16,
     },
     button_create: {
       borderRadius: 8,
       backgroundColor: "#007bff",
-      marginTop: 10,
+      marginTop: 20,
       marginHorizontal: 12,
       paddingHorizontal: 26,
       paddingVertical: 12,
       alignItems: "center",
     },
-    text_button_create: { textAlign: "center", fontSize: 18, color: "white" },
+    text_button_create: {
+      textAlign: "center",
+      fontSize: 18,
+      color: "white",
+    },
     policyText: {
       textAlign: "center",
       padding: 16,
-      marginHorizontal: 10,
+      marginHorizontal: 20,
       fontSize: 16,
     },
     bottomContainer: {
-      flex: 1,
+      flex: 0,
       justifyContent: "flex-end",
       alignItems: "center",
-      marginBottom: 15,
     },
     loginText: {
       textAlign: "center",
-      fontSize: 14,
+      fontSize: 16,
       color: "#000",
     },
     loginLink: {
@@ -108,7 +153,7 @@ export default function SignUp() {
       style={{ flex: 1 }}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 90 }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <View style={styles.container}>
             <Text style={styles.title}>Welcome to EnglishApp</Text>
             <View>
@@ -125,20 +170,7 @@ export default function SignUp() {
                 <Text style={styles.socialText}>Sign up with Google</Text>
               </TouchableOpacity>
             </View>
-            <View>
-              <TouchableOpacity style={styles.socialButton}>
-                <View
-                  style={{ alignItems: "center", justifyContent: "center" }}
-                >
-                  <Ionicons
-                    name="logo-facebook"
-                    size={20}
-                    color={"#1877F2"}
-                  ></Ionicons>
-                </View>
-                <Text style={styles.socialText}>Sign up with Facebook</Text>
-              </TouchableOpacity>
-            </View>
+
             <Text style={styles.orText}>OR</Text>
 
             <View>
@@ -150,7 +182,9 @@ export default function SignUp() {
                 ></MaterialIcons>
                 <TextInput
                   style={[styles.input, { marginRight: 10, flex: 1 }]}
-                  placeholder="Fullname"
+                  placeholder={t("USERNAME")}
+                  value={username}
+                  onChangeText={setUsername}
                 ></TextInput>
               </View>
               <View style={styles.text_input}>
@@ -161,8 +195,10 @@ export default function SignUp() {
                 ></MaterialIcons>
                 <TextInput
                   style={[styles.input, { marginRight: 10, flex: 1 }]}
-                  placeholder="Email"
+                  placeholder={t("EMAIL")}
                   keyboardType="email-address"
+                  value={email}
+                  onChangeText={setEmail}
                 ></TextInput>
               </View>
               <View style={styles.text_input}>
@@ -173,10 +209,30 @@ export default function SignUp() {
                 ></MaterialIcons>
                 <TextInput
                   style={[styles.input, { marginRight: 10, flex: 1 }]}
-                  placeholder="Password"
+                  placeholder={t("PASSWORD")}
+                  secureTextEntry
+                  value={password}
+                  onChangeText={setPassword}
                 ></TextInput>
               </View>
-              <TouchableOpacity style={styles.button_create}>
+              <View style={styles.text_input}>
+                <MaterialIcons
+                  name="lock"
+                  size={20}
+                  color={"black"}
+                ></MaterialIcons>
+                <TextInput
+                  style={[styles.input, { marginRight: 10, flex: 1 }]}
+                  placeholder={t("CONFIRM_PASSWORD")}
+                  secureTextEntry
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                ></TextInput>
+              </View>
+              <TouchableOpacity
+                style={styles.button_create}
+                onPress={handleSignUp}
+              >
                 <Text style={styles.text_button_create}>Create an account</Text>
               </TouchableOpacity>
             </View>

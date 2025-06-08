@@ -18,5 +18,9 @@
   "VIETNAM": "Vietnamese",
   "ENGLISH": "English",
   "NNHT": "Show Language",
-  "ANOTHER_SETTING": "Another Setting"
+  "ANOTHER_SETTING": "Another Setting",
+  "USERNAME": "Username",
+  "EMAIL": "Email",
+  "PASSWORD": "Password",
+  "CONFIRM_PASSWORD": "Confirm password"
 }
