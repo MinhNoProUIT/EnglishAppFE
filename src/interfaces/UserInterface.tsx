@@ -1,5 +1,5 @@
 export interface UserItemProps {
-  id: number;
+  id: string;
   name: string;
   avatar: string;
   selected: boolean;
@@ -7,7 +7,11 @@ export interface UserItemProps {
 }
 
 export interface User {
-  id: number;
-  name: string;
-  avatar: string;
+  id: string;
+  username: string;
+  image_url: string;
+}
+
+export interface GetAllUsersResponse {
+  users: User[];
 }

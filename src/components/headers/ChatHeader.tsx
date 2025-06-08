@@ -7,10 +7,10 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigations/AppNavigator";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ChatActionSlider from "../sliders/ChatActionSlider";
 import * as ImagePicker from "expo-image-picker";
 import {
@@ -18,8 +18,15 @@ import {
   useChangeGroupNameMutation,
   useGetDetailsGroupQuery,
 } from "../../services/groupService";
-import { useGetAllMembersQuery } from "../../services/groupMemberService";
+import {
+  useDishBandGroupMutation,
+  useGetAllMembersQuery,
+  useLeaveGroupMutation,
+  useKickMemberFromGroupMutation,
+} from "../../services/groupMemberService";
 import MemberModal from "../modals/MemberModal";
+import SelectMembersModal from "../modals/AddMemberModal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type Props = {
   groupId: string;
@@ -39,14 +46,25 @@ export default function ChatHeader({
 
   const [isSliderVisible, setSliderVisible] = useState(false);
   const [isMemberModalVisible, setMemberModalVisible] = useState(false);
+  const [addMemberModalVisible, setAddMemberModalVisible] = useState(false);
+  const [selectMemberMode, setSelectMemberMode] = useState<
+    "add" | "kick" | null
+  >(null);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+      AsyncStorage.getItem("userId").then(setUserId);
+    }, []);
 
   const [changeGroupName, { isLoading: isLoadingChangeName }] =
     useChangeGroupNameMutation();
   const [changeGroupImage, { isLoading: isLoadingChangeImage }] =
     useChangeGroupImageMutation();
+  const [dishBandGroup] = useDishBandGroupMutation();
+  const [leaveGroup] = useLeaveGroupMutation();
   const { data: groupDetails, refetch } = useGetDetailsGroupQuery(groupId);
-  const { data: members, isLoading: isLoadingMembers } =
-    useGetAllMembersQuery(groupId, {skip: !isMemberModalVisible});
+  const { data: members, refetch: refetchMembers } =
+    useGetAllMembersQuery(groupId);
 
   const handleAction = (type: string) => {
     setSliderVisible(false);
@@ -63,6 +81,9 @@ export default function ChatHeader({
       case "view-members":
         handleViewMembers();
         break;
+      case "kick":
+        handleKickMembers();
+        break;
       case "leave":
         handleLeaveGroup();
         break;
@@ -71,8 +92,6 @@ export default function ChatHeader({
         break;
     }
   };
-
-  console.log('Modal visible:', isMemberModalVisible)
 
   const uploadGroupAvatar = async (uri: string) => {
     try {
@@ -158,7 +177,8 @@ export default function ChatHeader({
   };
 
   const handleAddMember = () => {
-    Alert.alert("Thêm thành viên", "Tính năng này đang được phát triển.");
+    setSelectMemberMode("add");
+    setAddMemberModalVisible(true);
   };
 
   const handleChangeGroupName = () => {
@@ -197,6 +217,14 @@ export default function ChatHeader({
 
   const handleViewMembers = () => {
     setMemberModalVisible(true);
+    if (isMemberModalVisible && addMemberModalVisible) {
+      console.log("Cả hai modal đều visible - có thể bị che khuất");
+    }
+  };
+
+  const handleKickMembers = () => {
+    setSelectMemberMode("kick");
+    setAddMemberModalVisible(true);
   };
 
   const handleLeaveGroup = () => {
@@ -206,76 +234,128 @@ export default function ChatHeader({
         text: "Rời nhóm",
         style: "destructive",
         onPress: () => {
-          console.log("Đã rời nhóm");
-          // Thực hiện điều hướng hoặc gọi API tại đây
+          confirmLeaveGroup();
         },
       },
     ]);
   };
 
-  const handleDisbandGroup = () => {
+  const handleDisbandGroup = async () => {
     Alert.alert("Giải tán nhóm", "Bạn có chắc chắn muốn giải tán nhóm này?", [
       { text: "Hủy", style: "cancel" },
       {
         text: "Giải tán",
         style: "destructive",
         onPress: () => {
-          console.log("Đã giải tán nhóm");
-          // Gọi API giải tán nhóm tại đây và điều hướng
-          navigation.goBack();
+          confirmDisbandGroup();
         },
       },
     ]);
   };
 
+  const confirmDisbandGroup = async () => {
+    try {
+      await dishBandGroup({ group_id: groupId });
+      Alert.alert("Thành công", "Nhóm đã được giải tán.", [
+        {
+          text: "OK",
+          onPress: () => navigation.goBack(),
+        },
+      ]);
+    } catch (error) {
+      console.error("Lỗi khi giải tán nhóm:", error);
+      Alert.alert("Lỗi", "Không thể giải tán nhóm. Vui lòng thử lại sau.");
+    }
+  };
+
+  const confirmLeaveGroup = async () => {
+    try {
+      if (userId){
+        await leaveGroup({ group_id: groupId, user_id: userId });
+      }
+      Alert.alert("Thành công", "Rời nhóm thành công", [
+        {
+          text: "OK",
+          onPress: () => navigation.goBack(),
+        },
+      ]);
+    } catch (error) {
+      console.error("Lỗi khi rời nhóm:", error);
+      Alert.alert("Lỗi", "Không thể rời nhóm. Vui lòng thử lại sau.");
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      refetchMembers();
+    }, [refetchMembers])
+  );
+
   return (
-    <View className="flex-row w-full pt-10 h-28 bg-white items-center justify-between px-4 border-b border-gray-100">
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Ionicons name="chevron-back-outline" size={28} color="black" />
-      </TouchableOpacity>
+    <>
+      {isMemberModalVisible && (
+        <MemberModal
+          visible={isMemberModalVisible}
+          onClose={() => setMemberModalVisible(false)}
+          members={members}
+        />
+      )}
+      {addMemberModalVisible && !isMemberModalVisible && (
+        <SelectMembersModal
+          visible={addMemberModalVisible}
+          onClose={() => {
+            setAddMemberModalVisible(false);
+            setSelectMemberMode(null); // Reset mode
+          }}
+          groupId={groupId}
+          members={members}
+          mode={selectMemberMode}
+        />
+      )}
+      {isSliderVisible && !isMemberModalVisible && !addMemberModalVisible && (
+        <ChatActionSlider
+          isVisible={isSliderVisible}
+          onClose={() => setSliderVisible(false)}
+          onAction={handleAction}
+          created_by={created_by}
+        />
+      )}
+      <View className="flex-row w-full pt-10 h-28 bg-white items-center justify-between px-4 border-b border-gray-100">
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="chevron-back-outline" size={28} color="black" />
+        </TouchableOpacity>
 
-      <View className="flex-1 flex-row items-center justify-center">
-        {isLoadingChangeImage ? (
-          <ActivityIndicator
-            size="small"
-            color="#FE9519"
-            className="w-8 h-8 mr-2"
-          />
-        ) : (
-          <Image
-            source={{
-              uri:
-                groupDetails?.image_url ||
-                "https://example.com/default-group-avatar.png",
-            }}
-            className="w-8 h-8 rounded-full mr-2"
-          />
-        )}
+        <View className="flex-1 flex-row items-center justify-center">
+          {isLoadingChangeImage ? (
+            <ActivityIndicator
+              size="small"
+              color="#FE9519"
+              className="w-8 h-8 mr-2"
+            />
+          ) : (
+            <Image
+              source={{
+                uri:
+                  groupDetails?.image_url ||
+                  "https://example.com/default-group-avatar.png",
+              }}
+              className="w-8 h-8 rounded-full mr-2"
+            />
+          )}
 
-        {isLoadingChangeName ? (
-          <Text className="text-gray-500 italic">Đang cập nhật...</Text>
-        ) : (
-          <Text className="font-bold text-lg">
-            {groupDetails?.name ?? "Tên nhóm"}
-          </Text>
-        )}
+          {isLoadingChangeName ? (
+            <Text className="text-gray-500 italic">Đang cập nhật...</Text>
+          ) : (
+            <Text className="font-bold text-lg">
+              {groupDetails?.name ?? "Tên nhóm"}
+            </Text>
+          )}
+        </View>
+
+        <TouchableOpacity onPress={() => setSliderVisible(true)}>
+          <Ionicons name="ellipsis-vertical" size={24} color="black" />
+        </TouchableOpacity>
       </View>
-
-      <TouchableOpacity onPress={() => setSliderVisible(true)}>
-        <Ionicons name="ellipsis-vertical" size={24} color="black" />
-      </TouchableOpacity>
-
-      <MemberModal
-        visible={isMemberModalVisible}
-        onClose={() => setMemberModalVisible(false)}
-        members={members}
-      />
-      <ChatActionSlider
-        isVisible={isSliderVisible}
-        onClose={() => setSliderVisible(false)}
-        onAction={handleAction}
-        created_by={created_by}
-      /> 
-    </View>
+    </>
   );
 }

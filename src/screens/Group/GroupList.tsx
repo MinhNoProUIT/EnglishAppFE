@@ -4,21 +4,27 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import GroupListHeader from "../../components/headers/GroupListHeader";
 import GroupItem from "../../components/items/GroupItem";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useGetAllGroupByUserQuery } from "../../services/groupMemberService";
 import { ActivityIndicator } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function GroupList() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const userId = "81f5c7d9-0cc5-4b40-b801-5ffdc3279d16"; // Replace with actual user ID
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    AsyncStorage.getItem("userId").then(setUserId);
+  }, []);
+
   const {
     data: groups,
     isLoading,
     error,
     refetch,
-  } = useGetAllGroupByUserQuery(userId);
+  } = useGetAllGroupByUserQuery(userId!);
 
   useFocusEffect(
     useCallback(() => {
@@ -36,7 +42,7 @@ export default function GroupList() {
   }
 
   if (error) {
-    return <Text>Error: {JSON.stringify(error)}</Text>;
+    return <Text className="flex-1 justify-center items-center mt-20">Error: {JSON.stringify(error)}</Text>;
   }
 
   return (

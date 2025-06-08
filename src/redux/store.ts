@@ -6,6 +6,7 @@ import { groupApi } from "../services/groupService";
 import { groupMemberApi } from "../services/groupMemberService";
 import { messageApi } from "../services/messageService";
 import { paymentApi } from "../services/paymentService";
+import { postApi } from "../services/postService";
 
 export const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ export const store = configureStore({
     [groupMemberApi.reducerPath]: groupMemberApi.reducer,
     [messageApi.reducerPath]: messageApi.reducer,
     [paymentApi.reducerPath]: paymentApi.reducer,
+    [postApi.reducerPath]: postApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -23,7 +25,8 @@ export const store = configureStore({
       groupApi.middleware,
       groupMemberApi.middleware,
       messageApi.middleware,
-      paymentApi.middleware
+      paymentApi.middleware,
+      postApi.middleware
     ),
 });
 
