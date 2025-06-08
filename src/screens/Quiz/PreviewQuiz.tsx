@@ -1,26 +1,44 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, FlatList } from "react-native";
 import { RadioButton } from "react-native-paper";
 import { AntDesign, FontAwesome, SimpleLineIcons } from "@expo/vector-icons";
-import { QuizType } from "../../types/QuizType";
-import { useNavigation, RouteProp, useRoute } from "@react-navigation/native";
+import { useNavigation, RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { useGetAllQuizQuestionsQuery } from "../../services/quizQuestionService";
+import { useDeleteQuizMutation } from "../../services/quizService";
+import { QuizQuestion } from "../../interfaces/QuizInterface";
 
 type PreviewQuizScreenNavigationProp = StackNavigationProp<
     RootStackParamList,
     "PreviewQuiz"
 >;
 
-type PreviewQuizScreenRouteParams = {
-    data: QuizType
-};
-
 export default function PreviewQuiz() {
     const navigation = useNavigation<PreviewQuizScreenNavigationProp>();
-    const route = useRoute<RouteProp<{ params: PreviewQuizScreenRouteParams }, 'params'>>();
-    const { data } = route.params;
+    const route = useRoute<RouteProp<RootStackParamList, "PreviewQuiz">>();
+    const { quizToPreview } = route.params;
+    const {
+        data: fetchedData,
+        refetch,
+    } = useGetAllQuizQuestionsQuery(quizToPreview.id);
 
+    const [data, setData] = useState<QuizQuestion[]>([]);
+    const [deleteQuiz] = useDeleteQuizMutation();
+
+    useEffect(() => {
+        if (fetchedData) {
+            setData(fetchedData);
+        }
+        else console.log("khong lay duoc cau hoi")
+    }, [fetchedData]);
+
+    useFocusEffect(
+        useCallback(() => {
+            refetch();
+        }, [refetch])
+    );
+    
     return (
         <View style={styles.container}>
             {/* header */}
@@ -28,18 +46,26 @@ export default function PreviewQuiz() {
                 <TouchableOpacity style={styles.closeIcon} onPress={() => navigation.goBack()}>
                     <AntDesign name='close' size={24} />
                 </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.editButton}
-                    onPress={() => navigation.navigate("CreateEditQuiz", { quizToEdit: data })}>
-                    <SimpleLineIcons name="pencil" size={20} color="#FF991F" />
-                </TouchableOpacity>
+                <View style={styles.editButtonContainer}>
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate("CreateEditQuiz", { quizToEdit: quizToPreview, quizQuestionsToEdit: data })}>
+                        <SimpleLineIcons name="pencil" size={20} color="#FF991F" />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={() => {
+                            deleteQuiz(quizToPreview.id);
+                            navigation.goBack()
+                        }}>
+                        <AntDesign name="delete" size={22} color="red" />
+                    </TouchableOpacity>
+                </View>
             </View>
 
             <View style={styles.detail}>
-                <Text style={styles.title}>{data.title}</Text>
+                <Text style={styles.title}>{quizToPreview.title}</Text>
                 <View style={styles.numOfQues}>
                     <Text style={styles.numOfQuesText}>
-                        {data.questions.length} questions
+                        {data.length} questions
                     </Text>
                 </View>
             </View>
@@ -48,13 +74,13 @@ export default function PreviewQuiz() {
             <View style={styles.questionsPart}>
                 <FlatList
                     style={styles.cardList}
-                    data={data.questions}
+                    data={data}
                     keyExtractor={item => item.id.toString()}
                     renderItem={({ item, index }) => (
                         <View key={index} style={styles.card}>
                             <View style={styles.question}>
                                 <Text style={styles.label}>{index + 1}</Text>
-                                <Text>{item.questionText}</Text>
+                                <Text>{item.question_text}</Text>
                             </View>
                             {item.options.map((opt, oIdx) => {
                                 return (
@@ -70,7 +96,9 @@ export default function PreviewQuiz() {
             </View>
 
             {/* button */}
-            <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate("DoQuiz", { data: data }) }}>
+            <TouchableOpacity style={styles.button} onPress={() => {
+                navigation.navigate("DoQuiz", { quizTitle: quizToPreview.title, quizQuestions: data })
+            }}>
                 <Text style={styles.buttonText}>
                     Start
                 </Text>
@@ -100,7 +128,9 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 700,
     },
-    editButton: {
+    editButtonContainer: {
+        flexDirection: 'row',
+        gap: 10,
     },
     detail: {
         gap: 4,

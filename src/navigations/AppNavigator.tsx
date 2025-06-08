@@ -10,7 +10,7 @@ import LearnScreen from "../screens/Exercise/LearnScreen";
 import PracticeScreen from "../screens/Exercise/PracticeScreen";
 import WordsList from "../screens/Exercise/WordsList";
 import { WordType } from "../types/WordType";
-import { QuizResultType, QuizType } from "../types/QuizType";
+import { QuizResult, Quiz, QuizQuestion } from "../interfaces/QuizInterface";
 import CreateEditQuiz from "../screens/Quiz/CreateEditQuiz";
 import PreviewQuiz from "../screens/Quiz/PreviewQuiz";
 import DoQuiz from "../screens/Quiz/DoQuiz";
@@ -69,11 +69,11 @@ export type RootStackParamList = {
   PracticeScreen: { words: WordType[] };
   WordsList: { words: WordType[] };
 
-  CreateEditQuiz: { quizToEdit?: QuizType } | undefined;
-  PreviewQuiz: { data: QuizType };
-  DoQuiz: { data: QuizType };
-  FinishQuiz: { resultData: QuizResultType };
-  ReviewFinishQuizResult: { resultData: QuizResultType };
+  CreateEditQuiz: { quizToEdit?: Quiz, quizQuestionsToEdit?: QuizQuestion[] } | undefined;
+  PreviewQuiz: { quizToPreview: Quiz };
+  DoQuiz: { quizTitle: string, quizQuestions: QuizQuestion[] };
+  FinishQuiz: { resultData: QuizResult };
+  ReviewFinishQuizResult: { resultData: QuizResult };
 
   TermsOfService: undefined;
   PrivacyPolicy: undefined;
