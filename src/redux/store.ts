@@ -8,6 +8,8 @@ import { messageApi } from "../services/messageService";
 import { paymentApi } from "../services/paymentService";
 import { postApi } from "../services/postService";
 import { attendanceApi } from "../services/attendanceService";
+import { quizApi } from "../services/quizService";
+import { quizQuestionApi } from "../services/quizQuestionService";
 
 export const store = configureStore({
   reducer: {
@@ -19,6 +21,8 @@ export const store = configureStore({
     [paymentApi.reducerPath]: paymentApi.reducer,
     [postApi.reducerPath]: postApi.reducer,
     [attendanceApi.reducerPath]: attendanceApi.reducer,
+    [quizApi.reducerPath]: quizApi.reducer,
+    [quizQuestionApi.reducerPath]: quizQuestionApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -29,7 +33,9 @@ export const store = configureStore({
       messageApi.middleware,
       paymentApi.middleware,
       postApi.middleware,
-      attendanceApi.middleware
+      attendanceApi.middleware,
+      quizApi.middleware,
+      quizQuestionApi.middleware,
     ),
 });
 

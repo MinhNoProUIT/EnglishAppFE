@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Platform, FlatList } from 'react-native';
 import { AntDesign, SimpleLineIcons } from '@expo/vector-icons';
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { QuizType } from '../../types/QuizType';
+import { useGetAllQuizQuery } from '../../services/quizService';
 
 type CreateQuizScreenNavigationProp = StackNavigationProp<
     RootStackParamList,
     "CreateEditQuiz"
 >;
 
+{/*
 const quizzes: QuizType[] = [
     {
         id: 1,
@@ -154,8 +155,19 @@ const quizzes: QuizType[] = [
         ],
     }
 ];
+*/}
 
 export default function Quizzes() {
+    const {
+        data: quizzes,
+        refetch,
+    } = useGetAllQuizQuery();
+
+    useFocusEffect(
+        useCallback(() => {
+            refetch();
+        }, [refetch])
+    );
     const navigation = useNavigation<CreateQuizScreenNavigationProp>();
 
     return (
@@ -175,12 +187,12 @@ export default function Quizzes() {
                             <Text style={styles.title}>{item.title}</Text>
                             <View style={styles.detail}>
                                 <SimpleLineIcons name="book-open" size={12} />
-                                <Text style={styles.detailText}>Total question: {item.questions.length}</Text>
+                                <Text style={styles.detailText}>Total question: {item.total_questions}</Text>
                             </View>
                         </View>
 
                         <TouchableOpacity style={styles.learnButton}
-                            onPress={() => { navigation.navigate("PreviewQuiz", { data: item }) }}>
+                            onPress={() => { navigation.navigate("PreviewQuiz", { quizToPreview: item }) }}>
                             <SimpleLineIcons name="arrow-right" size={14} color='white' />
                         </TouchableOpacity>
                     </View>
