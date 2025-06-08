@@ -15,48 +15,8 @@ import UserItem from "../items/UserRecommendItem";
 import { User } from "./../../interfaces/UserInterface";
 import { useCreateGroupMutation } from "../../services/groupService";
 import { ActivityIndicator } from "react-native";
-
-const mockUsers = Array.from({ length: 30 }, (_, index) => {
-  const id = index + 1;
-  const names = [
-    "Nguyễn Văn A",
-    "Trần Thị B",
-    "Lê Văn C",
-    "Phạm Thị D",
-    "Hoàng Văn E",
-    "Đặng Thị F",
-    "Bùi Văn G",
-    "Võ Thị H",
-    "Đỗ Văn I",
-    "Ngô Thị J",
-    "Phan Văn K",
-    "Lý Thị L",
-    "Tạ Văn M",
-    "Chu Thị N",
-    "Dương Văn O",
-    "Hồ Thị P",
-    "Trịnh Văn Q",
-    "Mai Thị R",
-    "Vũ Văn S",
-    "Kiều Thị T",
-    "Lâm Văn U",
-    "Tô Thị V",
-    "Cao Văn W",
-    "La Thị X",
-    "Trà Văn Y",
-    "Thiều Thị Z",
-    "Nguyễn Văn Bảo",
-    "Trần Thị Mai",
-    "Lê Văn Minh",
-    "Phạm Thị Hương",
-  ];
-
-  return {
-    id,
-    name: names[index],
-    avatar: `https://i.pravatar.cc/100?img=${id}`,
-  };
-});
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useGetAllUserRecommendsQuery } from "../../services/userService";
 
 interface GroupModalProps {
   visible: boolean;
@@ -69,47 +29,57 @@ export default function CreateGroupModal({
   onClose,
   refetchGroups,
 }: GroupModalProps) {
+  const [userId, setUserId] = useState<string | null>(null);
   const { t } = useTranslation();
   const [groupName, setGroupName] = useState("");
   const [avatar, setAvatar] = useState<string | null>(null);
-  const [countNumber, setCountNumber] = useState(1);
-  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
 
   const [msgError, setMsgError] = useState("");
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [userRecommend, setUserRecommend] = useState(mockUsers);
-
-  const PAGE_SIZE = 15;
 
   const [page, setPage] = useState(1);
   const [displayedUsers, setDisplayedUsers] = useState<User[]>([]);
 
   const [createGroup, { isLoading }] = useCreateGroupMutation();
+  const { data: recommendedUsers = [] } = useGetAllUserRecommendsQuery();
 
   useEffect(() => {
-    if (visible) {
-      setDisplayedUsers(mockUsers.slice(0, PAGE_SIZE));
+    AsyncStorage.getItem("userId").then(setUserId);
+  }, []);
+
+  useEffect(() => {
+    if (visible && recommendedUsers.length > 0) {
+      setDisplayedUsers(recommendedUsers.slice(0, PAGE_SIZE));
       setPage(1);
     }
-  }, [visible]);
+  }, [visible, recommendedUsers]);
+
+  const PAGE_SIZE = 15;
 
   const filteredUsers = useMemo(() => {
-    return userRecommend.filter((user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [searchTerm, userRecommend]);
+    return recommendedUsers
+      .filter((user) => user.id !== userId) // bỏ chính mình
+      .filter((user) =>
+        user.username.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+  }, [searchTerm, recommendedUsers]);
+
+  const paginatedUsers = useMemo(() => {
+    return filteredUsers.slice(0, page * PAGE_SIZE);
+  }, [filteredUsers, page]);
 
   const loadMoreUsers = () => {
     const nextPage = page + 1;
-    const nextUsers = mockUsers.slice(0, nextPage * PAGE_SIZE);
-    if (nextUsers.length > displayedUsers.length) {
-      setDisplayedUsers(nextUsers);
+    if (nextPage * PAGE_SIZE <= filteredUsers.length) {
       setPage(nextPage);
     }
   };
 
-  const toggleMember = (id: number) => {
+  const toggleMember = (id: string) => {
+    if (id === userId) return; // không cho chọn bản thân
+
     setSelectedMembers((prev) =>
       prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]
     );
@@ -132,13 +102,16 @@ export default function CreateGroupModal({
       return;
     }
 
+    console.log("Selected members:", selectedMembers);
+    console.log("Sending user_ids:", selectedMembers.join(","));
+
     const formData = new FormData();
     formData.append("name", groupName);
-    formData.append("created_by", "81f5c7d9-0cc5-4b40-b801-5ffdc3279d16"); // Replace with actual user ID
-    formData.append("count_member", countNumber.toString());
-    if (selectedMembers.length === 0) {
-      formData.append("user_ids", ""); // hoặc bỏ luôn nếu backend cho phép
+    if (userId) {
+      formData.append("created_by", userId);
     }
+    formData.append("count_member", (1).toString());
+    selectedMembers.forEach((id) => formData.append("user_ids", id));
     if (avatar) {
       const fileName = avatar.split("/").pop() || "image.jpg";
       const match = /\.(\w+)$/.exec(fileName);
@@ -208,12 +181,12 @@ export default function CreateGroupModal({
 
             <FlatList
               data={filteredUsers}
-              keyExtractor={(item) => item.id.toString()}
+              keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
                 <UserItem
                   id={item.id}
-                  avatar={item.avatar}
-                  name={item.name}
+                  avatar={item.image_url}
+                  name={item.username}
                   selected={selectedMembers.includes(item.id)}
                   onPress={() => toggleMember(item.id)}
                 />

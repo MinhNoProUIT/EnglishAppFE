@@ -1,7 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { createBaseQuery } from "./api";
 import { GroupItemQueryProps } from "../interfaces/GroupInterface";
-import { AddMemberData, KickMemberResponse, MemberData } from "../interfaces/MemberInterface";
+import { AddMemberData, MemberData } from "../interfaces/MemberInterface";
 
 export const groupMemberApi = createApi({
   reducerPath: "groupMemberApi",
@@ -20,23 +20,37 @@ export const groupMemberApi = createApi({
       }),
     }),
     addMemberToGroup: builder.mutation<
-      AddMemberData,
-      { group_id: string; user_id: string }
+      AddMemberData[],
+      { group_id: string; user_ids: string[]; is_admin?: boolean }
     >({
-      query: ({ user_id }) => ({
-        url: `api/group-members`,
+      query: ({ user_ids, group_id, is_admin = false }) => ({
+        url: `api/group-members/add`,
         method: "POST",
-        body: { user_id },
+        body: { user_ids, group_id, is_admin },
       }),
     }),
-    kickMemberFromGroup: builder.mutation<
-      KickMemberResponse,
-      { group_id: string; user_id: string }
-    >({
-      query: ({ group_id, user_id }) => ({
-        url: `api/group-members/kick/${group_id}/${user_id}`,
+    kickMemberFromGroup: builder.mutation<string, { group_id: string; user_ids: string[] }>(
+      {
+        query: ({ user_ids, group_id }) => ({
+          url: `api/group-members/kick`,
+          method: "POST",
+          body: { user_ids, group_id },
+        }),
+      }
+    ),
+    leaveGroup: builder.mutation<string, { group_id: string; user_id: string }>(
+      {
+        query: ({ group_id, user_id }) => ({
+          url: `api/group-members/leave`,
+          method: "POST",
+          body: { group_id, user_id },
+        }),
+      }
+    ),
+    dishBandGroup: builder.mutation<string, { group_id: string }>({
+      query: ({ group_id }) => ({
+        url: `api/group-members/dishband/${group_id}`,
         method: "DELETE",
-        body: { group_id, user_id },
       }),
     }),
   }),
@@ -47,4 +61,6 @@ export const {
   useGetAllMembersQuery,
   useAddMemberToGroupMutation,
   useKickMemberFromGroupMutation,
+  useLeaveGroupMutation,
+  useDishBandGroupMutation,
 } = groupMemberApi;

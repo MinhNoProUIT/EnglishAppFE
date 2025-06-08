@@ -5,10 +5,6 @@ export interface AddMemberData {
   is_admin: boolean;
 }
 
-export interface KickMemberResponse {
-  message: string;
-}
-
 export interface MemberData {
   id: string;
   user_id: string;

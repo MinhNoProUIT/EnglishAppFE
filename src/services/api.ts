@@ -1,4 +1,5 @@
 // src/api.ts
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 

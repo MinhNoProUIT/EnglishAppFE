@@ -1,5 +1,6 @@
 // components/ChatActionSlider.tsx
-import React from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useEffect, useMemo, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import Modal from "react-native-modal";
 
@@ -16,8 +17,15 @@ export default function ChatActionSlider({
   onAction,
   created_by,
 }: Props) {
-  const userId = "81f5c7d9-0cc5-4b40-b801-5ffdc3279d16"; // Replace with actual user ID
-  const isUserAdmin = created_by === userId;
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    AsyncStorage.getItem("userId").then(setUserId);
+  }, []);
+
+  const isUserAdmin = useMemo(() => {
+    return created_by === userId;
+  }, [created_by, userId]);
 
   return (
     <Modal
@@ -56,12 +64,17 @@ export default function ChatActionSlider({
           <Text className="text-base">Xem tất cả thành viên</Text>
         </TouchableOpacity>
         {isUserAdmin ? (
-          <TouchableOpacity
-            onPress={() => onAction("disband")}
-            className="mb-4"
-          >
-            <Text className="text-base text-red-500">Giải tán nhóm</Text>
-          </TouchableOpacity>
+          <View>
+            <TouchableOpacity onPress={() => onAction("kick")} className="mb-4">
+              <Text className="text-base text-red-500">Kick thành viên</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => onAction("disband")}
+              className="mb-4"
+            >
+              <Text className="text-base text-red-500">Giải tán nhóm</Text>
+            </TouchableOpacity>
+          </View>
         ) : (
           <TouchableOpacity onPress={() => onAction("leave")} className="mb-4">
             <Text className="text-base text-red-500">Rời nhóm</Text>

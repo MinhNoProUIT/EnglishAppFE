@@ -11,10 +11,8 @@ export interface PostData {
 }
 
 export interface PostCreate {
-  id: number;
-  images: string[];
-  fullname: string;
-  avatar: string;
+  user_id: string;
+  image: string;
   content: string;
 }
 

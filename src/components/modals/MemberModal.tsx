@@ -6,7 +6,6 @@ import {
   Text,
   Image,
   TouchableOpacity,
-  ActivityIndicator,
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -24,20 +23,19 @@ export default function MemberModal({
   onClose,
   members,
 }: Props) {
-  console.log("Modal members:", members, visible);
 
   const handleClose = () => {
-    console.log("Closing modal...");
     onClose();
   };
+  
   return (
     <Modal
       visible={visible}
-      animationType="slide"
+      animationType="fade"
       transparent={true}
     >
-      <View className="flex-1 justify-center  items-center bg-black/50 p-4">
-        <View className="bg-white rounded-2xl p-4 max-h-[80%]">
+      <View className="flex-1 justify-center items-center bg-black/30 px-4 z-50">
+        <View className="bg-white w-full max-w-md max-h-[80%] rounded-xl p-4">
           <View className="flex-row justify-between items-center mb-4">
             <Text className="text-lg font-semibold">Thành viên nhóm</Text>
             <TouchableOpacity onPress={handleClose}>
