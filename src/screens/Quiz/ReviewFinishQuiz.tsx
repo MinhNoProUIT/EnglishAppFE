@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
 import { AntDesign, FontAwesome, MaterialIcons, } from '@expo/vector-icons';
-import { QuizResultType, } from "../../types/QuizType";
-import { QuizQuestionResultType } from "../../types/QuizType";
 import { useNavigation, RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -13,20 +11,16 @@ type ReviewFinishQuizResultScreenNavigationProp = StackNavigationProp<
     "ReviewFinishQuizResult"
 >;
 
-type ReviewFinishQuizResultScreenRouteParams = {
-    resultData: QuizResultType
-};
-
 export default function ReviewFinishQuizResult() {
     const navigation = useNavigation<ReviewFinishQuizResultScreenNavigationProp>();
-    const route = useRoute<RouteProp<{ params: ReviewFinishQuizResultScreenRouteParams }, 'params'>>();
+        const route = useRoute<RouteProp<RootStackParamList, "ReviewFinishQuizResult">>();
     const { resultData } = route.params;
 
     return (
         <View style={styles.container}>
             {/* header */}
             <View style={styles.headerBar}>
-                <TouchableOpacity style={styles.closeIcon} onPress={() => navigation.popToTop()}>
+                <TouchableOpacity style={styles.closeIcon} onPress={() => navigation.popTo("MainTabs")}>
                     <AntDesign name='close' size={24} />
                 </TouchableOpacity>
                 <Text style={styles.headerText}>Kết quả: </Text>
@@ -39,7 +33,7 @@ export default function ReviewFinishQuizResult() {
             <FlatList
                 style={styles.cardList}
                 data={resultData.questions}
-                keyExtractor={item => item.id.toString()}
+                //keyExtractor={item => item.id.toString()}
                 ListHeaderComponent={
                     <View style={[styles.card, styles.titleCard]}>
                         <Text>Quiz Title:</Text>
@@ -50,10 +44,10 @@ export default function ReviewFinishQuizResult() {
                     <View key={index} style={styles.card}>
                         <View style={styles.question}>
                             <Text style={styles.label}>{index + 1}</Text>
-                            <Text>{item.questionText}</Text>
+                            <Text>{item.question_text}</Text>
                         </View>
                         {item.options.map((opt, oIdx) => {
-                            const isCorrect = oIdx.toString() == item.correctAnswer;
+                            const isCorrect = oIdx.toString() == item.correct_answer;
                             const isSelected = oIdx.toString() == item.selectedAnswer;
                             return (
                                 <View key={oIdx} style={[

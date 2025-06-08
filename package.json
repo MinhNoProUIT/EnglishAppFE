@@ -27,7 +27,7 @@
     "expo-status-bar": "~2.0.1",
     "i18next": "^24.2.3",
     "nativewind": "^4.1.23",
-    "react": "^19.0.0",
+    "react": "19.0.0",
     "react-addons-shallow-compare": "^15.6.3",
     "react-i18next": "^15.4.1",
     "react-native": "^0.79.2",
@@ -55,14 +55,15 @@
     "react-native-tab-view": "^4.0.6",
     "react-native-vector-icons": "^10.2.0",
     "react-redux": "^9.2.0",
+    "socket.io-client": "^4.8.1",
     "tailwindcss": "3.4.17"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
-    "@types/react": "~18.3.12",
+    "@types/react": "^19.0.0",
     "@types/react-native-snap-carousel": "^3.8.11",
-    "metro-react-native-babel-transformer": "^0.77.0",
     "metro-react-native-babel-preset": "^0.77.0",
+    "metro-react-native-babel-transformer": "^0.77.0",
     "typescript": "^5.3.3"
   },
   "private": true

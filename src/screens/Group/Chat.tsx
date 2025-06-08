@@ -6,7 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ChatHeader from "../../components/headers/ChatHeader";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import MessageItem from "../../components/items/MessageItem";
@@ -17,10 +17,14 @@ import {
 import { MessageItemProps } from "../../interfaces/MessageInterface";
 import { useGetDetailsGroupQuery } from "../../services/groupService";
 import { Group } from "../../interfaces/GroupInterface";
+import socket from "../../socket";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Chat() {
   const route = useRoute<RouteProp<RootStackParamList, "Chat">>();
   const { groupId } = route.params;
+
+  const flatListRef = useRef<FlatList>(null);
 
   const {
     data: fetchedMessages,
@@ -39,6 +43,26 @@ export default function Chat() {
   const [messages, setMessages] = useState<MessageItemProps[]>([]);
   const [details, setDetails] = useState<Group>();
   const [inputText, setInputText] = useState("");
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    AsyncStorage.getItem("userId").then(setUserId);
+  }, []);
+
+  // Join group when component mounts
+  useEffect(() => {
+    socket.emit("joinGroup", groupId);
+    // Listen to newMessage event
+    socket.on("newMessage", (message: MessageItemProps) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+      flatListRef.current?.scrollToEnd({ animated: true });
+    });
+    // Cleanup when component unmounts
+    return () => {
+      socket.emit("leaveGroup", groupId);
+      socket.off("newMessage");
+    };
+  }, [groupId]);
 
   useEffect(() => {
     if (fetchedMessages) {
@@ -55,12 +79,14 @@ export default function Chat() {
 
     const messagePayload = {
       group_id: groupId,
-      sender_id: "81f5c7d9-0cc5-4b40-b801-5ffdc3279d16", // TODO: Replace with actual user ID from auth
+      sender_id: userId,
       content: trimmed,
     };
 
     try {
-      await sendMessageMutation(messagePayload).unwrap();
+      if (userId) {
+        await sendMessageMutation(messagePayload).unwrap();
+      }
       setInputText("");
       refetchMessages();
     } catch (error) {
@@ -78,6 +104,7 @@ export default function Chat() {
         created_by={details?.created_by}
       />
       <FlatList
+        ref={flatListRef}
         data={messages}
         keyExtractor={(item) => item.id.toString()}
         className="p-4 flex-1"

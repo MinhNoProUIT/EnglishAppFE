@@ -1,74 +1,118 @@
 import React, { useState } from "react";
 import { View, TextInput, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
 import { AntDesign, FontAwesome, MaterialIcons, } from '@expo/vector-icons';
-import { QuizType, QuizQuestionType } from "../../types/QuizType";
+import { CreateEditQuizQuestionProps, CreateEditQuizWithQuestionsProps, } from "../../interfaces/QuizInterface";
 import { useNavigation, RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RadioButton } from "react-native-paper";
+import { useCreateQuizWithQuestionsMutation, useEditQuizWithQuestionsMutation } from "../../services/quizService";
 
 type CreateEditQuizScreenNavigationProp = StackNavigationProp<
     RootStackParamList,
     "CreateEditQuiz"
 >;
 
-type CreateEditQuizScreenRouteParams = {
-    quizToEdit: QuizType
-};
-
 export default function CreateQuiz() {
     const navigation = useNavigation<CreateEditQuizScreenNavigationProp>();
-    const route = useRoute<RouteProp<{ params: CreateEditQuizScreenRouteParams }, 'params'>>();
+    const route = useRoute<RouteProp<RootStackParamList, "CreateEditQuiz">>();
     const quizToEdit = route.params?.quizToEdit;
+    const quizQuestionsToEdit = route.params?.quizQuestionsToEdit;
     const [quizTitle, setQuizTitle] = useState(quizToEdit?.title ?? '');
-    const [questions, setQuestions] = useState(quizToEdit?.questions ?? [{
-        id: Date.now(),
-        questionText: '',
+    const [questions, setQuestions] = useState<CreateEditQuizQuestionProps[]>(quizQuestionsToEdit ?? [{
+        question_text: '',
         options: ['', '', '', ''],
-        correctAnswer: '0',
+        correct_answer: '0',
     }]);
 
     const addQuestion = () => {
-        const newQuestion: QuizQuestionType = {
-            id: Date.now(),
-            questionText: '',
+        const newQuestion: CreateEditQuizQuestionProps = {
+            question_text: '',
             options: ['', '', '', ''],
-            correctAnswer: '0',
+            correct_answer: '0',
         };
         setQuestions(prev => [...prev, newQuestion]);
     };
 
-    const deleteQuestion = (id: number) => {
-        const newQuestions = questions.filter(item => item.id !== id);
-        setQuestions(newQuestions);
-    }
+    const deleteQuestionByIndex = (index: number) => {
+        const updated = [...questions];
+        updated.splice(index, 1);
+        setQuestions(updated);
+    };
 
     const updateQuestionText = (index: number, text: string) => {
-        const updated = [...questions];
-        updated[index].questionText = text;
+        const updated = questions.map((q, i) =>
+            i === index ? { ...q, question_text: text } : q
+        );
         setQuestions(updated);
     };
 
     const updateOption = (qIndex: number, oIndex: number, text: string) => {
-        const updated = [...questions];
-        updated[qIndex].options[oIndex] = text;
+        const updated = questions.map((q, i) => {
+            if (i !== qIndex) return q;
+
+            const newOptions = [...q.options];
+            newOptions[oIndex] = text;
+
+            return { ...q, options: newOptions };
+        });
+
         setQuestions(updated);
     };
 
     const updateCorrectAnswer = (qIndex: number, text: string) => {
-        const updated = [...questions];
-        updated[qIndex].correctAnswer = text;
+        const updated = questions.map((q, i) =>
+            i === qIndex ? { ...q, correct_answer: text } : q
+        );
         setQuestions(updated);
     };
 
-    const submitQuiz = () => {
-        const quiz: QuizType = {
-            id: Date.now(),
+    const [createQuizWithQuestions] = useCreateQuizWithQuestionsMutation();
+    const [editQuizWithQuestions] = useEditQuizWithQuestionsMutation();
+    const submitQuiz = async () => {
+        // Kiểm tra tiêu đề quiz
+        if (!quizTitle.trim()) {
+            alert("Vui lòng nhập tiêu đề quiz.");
+            return;
+        }
+        // Kiểm tra tất cả câu hỏi
+        for (let i = 0; i < questions.length; i++) {
+            const q = questions[i];
+            if (!q.question_text.trim()) {
+                alert(`Câu hỏi số ${i + 1} chưa có nội dung.`);
+                return;
+            }
+            const allOptionsFilled = q.options.every(opt => opt.trim() !== '');
+            if (!allOptionsFilled) {
+                alert(`Câu hỏi số ${i + 1} phải có đầy đủ 4 đáp án.`);
+                return;
+            }
+        }
+
+        const payload: CreateEditQuizWithQuestionsProps = {
             title: quizTitle,
-            questions,
+            questions: questions,
         };
-        console.log('Quiz saved:', quiz);
-        navigation.goBack()
+
+        try {
+            let response;
+            if (quizToEdit) {
+                // Trường hợp cập nhật quiz
+                response = await editQuizWithQuestions({
+                    quiz_id: quizToEdit.id,
+                    body: payload,
+                }).unwrap();
+                console.log("Quiz updated:", response);
+            } else {
+                // Trường hợp tạo mới quiz
+                response = await createQuizWithQuestions(payload).unwrap();
+                console.log("Quiz created:", response);
+            }
+        } catch (err) {
+            console.error("Failed to submit quiz:", err);
+        }
+
+        navigation.goBack();
     };
 
     return (
@@ -88,7 +132,7 @@ export default function CreateQuiz() {
             <FlatList
                 style={styles.cardList}
                 data={questions}
-                keyExtractor={item => item.id.toString()}
+                //keyExtractor={item => item.id.toString()}
                 ListHeaderComponent={
                     <View style={[styles.card, styles.titleCard]}>
                         <Text style={styles.titleText}>Quiz Title:</Text>
@@ -105,7 +149,7 @@ export default function CreateQuiz() {
                         <View style={styles.cardLabelContainer}>
                             <Text style={styles.label}>{index + 1}</Text>
                             {index > 0 &&
-                                <TouchableOpacity onPress={() => { deleteQuestion(item.id) }}>
+                                <TouchableOpacity onPress={() => { deleteQuestionByIndex(index) }}>
                                     <AntDesign name='close' size={22} color='#ccc' />
                                 </TouchableOpacity>
                             }
@@ -114,16 +158,16 @@ export default function CreateQuiz() {
                         <View style={styles.inputContainer}>
                             <TextInput
                                 placeholder="Nhập câu hỏi"
-                                value={item.questionText}
+                                value={item.question_text}
                                 onChangeText={(text) => updateQuestionText(index, text)}
                             />
 
                             <RadioButton.Group
                                 onValueChange={(value) => updateCorrectAnswer(index, value)}
-                                value={item.correctAnswer}
+                                value={item.correct_answer}
                             >
                                 {item.options.map((opt, oIdx) => {
-                                    const isCorrect = oIdx.toString() == item.correctAnswer;
+                                    const isCorrect = oIdx.toString() == item.correct_answer;
                                     return (
                                         <View key={oIdx} style={[styles.optionContainer, isCorrect && styles.correctOption]}>
                                             <View style={styles.optionText}>

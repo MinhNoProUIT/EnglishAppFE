@@ -21,24 +21,31 @@ import Entypo from "@expo/vector-icons/Entypo";
 import { useGetAllPaymentQuery } from "../../services/paymentService";
 import { IGetAllPayment } from "../../models/Payment";
 
+import { useGetAllUserQuery } from "../../services/attendanceService";
+import { IGetAllAttendance } from "../../models/Attendance";
+
 const screenHeight = Dimensions.get("window").height;
 
 const PaymentSuccessful = () => {
   const {
-    data: paymentResponse,
+    data: attendanceResponse,
     isLoading,
     isFetching,
     refetch,
-  } = useGetAllPaymentQuery();
+  } = useGetAllUserQuery();
 
-  const paymentData = (paymentResponse?.Data as IGetAllPayment[]) || [];
-
+  const attendancetData =
+    (attendanceResponse?.Data as IGetAllAttendance[]) || [];
+  // const getAccessToken = async() => {
+  //   const savedToken = await AsyncStorage.getItem("authToken");
+  // return savedToken
+  // }
   useEffect(() => {
-    if (paymentResponse) {
-      console.log("📦 paymentResponse:", paymentResponse);
-      console.log("✅ paymentData:", paymentData);
-    }
-  }, [paymentResponse]);
+    if (attendanceResponse) {
+      console.log("📦 attendanceResponse:", attendanceResponse);
+      console.log("✅ attendancetData:", attendancetData);
+    } else console.log("kh lay dc");
+  }, [attendanceResponse]);
   return (
     <View
       style={{

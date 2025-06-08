@@ -33,7 +33,9 @@ export default function SighIn() {
       const response = await login({ email, password }).unwrap();
       console.log(response.accessToken); // gọi API login
       await AsyncStorage.setItem("authToken", response.accessToken);
-      await AsyncStorage.getItem("refreshToken");
+      await AsyncStorage.setItem("refreshToken", response.refreshToken);
+
+      await AsyncStorage.setItem("userId", response.userId);
       navigation.navigate("MainTabs"); // 👈 chuyển sang trang Main (hoặc tên bạn đặt)
     } catch (err: any) {
       Alert.alert(

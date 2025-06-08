@@ -13,99 +13,73 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import UserItem from "../items/UserRecommendItem";
 import { User } from "./../../interfaces/UserInterface";
-import { CreateGroupProps } from "../../interfaces/GroupInterface";
-
-const mockUsers = Array.from({ length: 30 }, (_, index) => {
-  const id = index + 1;
-  const names = [
-    "Nguyễn Văn A",
-    "Trần Thị B",
-    "Lê Văn C",
-    "Phạm Thị D",
-    "Hoàng Văn E",
-    "Đặng Thị F",
-    "Bùi Văn G",
-    "Võ Thị H",
-    "Đỗ Văn I",
-    "Ngô Thị J",
-    "Phan Văn K",
-    "Lý Thị L",
-    "Tạ Văn M",
-    "Chu Thị N",
-    "Dương Văn O",
-    "Hồ Thị P",
-    "Trịnh Văn Q",
-    "Mai Thị R",
-    "Vũ Văn S",
-    "Kiều Thị T",
-    "Lâm Văn U",
-    "Tô Thị V",
-    "Cao Văn W",
-    "La Thị X",
-    "Trà Văn Y",
-    "Thiều Thị Z",
-    "Nguyễn Văn Bảo",
-    "Trần Thị Mai",
-    "Lê Văn Minh",
-    "Phạm Thị Hương",
-  ];
-
-  return {
-    id,
-    name: names[index],
-    avatar: `https://i.pravatar.cc/100?img=${id}`,
-  };
-});
+import { useCreateGroupMutation } from "../../services/groupService";
+import { ActivityIndicator } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useGetAllUserRecommendsQuery } from "../../services/userService";
 
 interface GroupModalProps {
   visible: boolean;
   onClose: () => void;
-  onSubmit: (formData: FormData) => void;
+  refetchGroups: () => void;
 }
 
 export default function CreateGroupModal({
   visible,
   onClose,
-  onSubmit,
+  refetchGroups,
 }: GroupModalProps) {
+  const [userId, setUserId] = useState<string | null>(null);
   const { t } = useTranslation();
   const [groupName, setGroupName] = useState("");
   const [avatar, setAvatar] = useState<string | null>(null);
-  const [countNumber, setCountNumber] = useState(1);
-  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+
   const [msgError, setMsgError] = useState("");
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [userRecommend, setUserRecommend] = useState(mockUsers);
-
-  const PAGE_SIZE = 15;
 
   const [page, setPage] = useState(1);
   const [displayedUsers, setDisplayedUsers] = useState<User[]>([]);
 
+  const [createGroup, { isLoading }] = useCreateGroupMutation();
+  const { data: recommendedUsers = [] } = useGetAllUserRecommendsQuery();
+
   useEffect(() => {
-    if (visible) {
-      setDisplayedUsers(mockUsers.slice(0, PAGE_SIZE));
+    AsyncStorage.getItem("userId").then(setUserId);
+  }, []);
+
+  useEffect(() => {
+    if (visible && recommendedUsers.length > 0) {
+      setDisplayedUsers(recommendedUsers.slice(0, PAGE_SIZE));
       setPage(1);
     }
-  }, [visible]);
+  }, [visible, recommendedUsers]);
+
+  const PAGE_SIZE = 15;
 
   const filteredUsers = useMemo(() => {
-    return userRecommend.filter((user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [searchTerm, userRecommend]);
+    return recommendedUsers
+      .filter((user) => user.id !== userId) // bỏ chính mình
+      .filter((user) =>
+        user.username.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+  }, [searchTerm, recommendedUsers]);
+
+  const paginatedUsers = useMemo(() => {
+    return filteredUsers.slice(0, page * PAGE_SIZE);
+  }, [filteredUsers, page]);
 
   const loadMoreUsers = () => {
     const nextPage = page + 1;
-    const nextUsers = mockUsers.slice(0, nextPage * PAGE_SIZE);
-    if (nextUsers.length > displayedUsers.length) {
-      setDisplayedUsers(nextUsers);
+    if (nextPage * PAGE_SIZE <= filteredUsers.length) {
       setPage(nextPage);
     }
   };
 
-  const toggleMember = (id: number) => {
+  const toggleMember = (id: string) => {
+    if (id === userId) return; // không cho chọn bản thân
+
     setSelectedMembers((prev) =>
       prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]
     );
@@ -113,51 +87,49 @@ export default function CreateGroupModal({
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
       allowsEditing: true,
       quality: 1,
     });
-
     if (!result.canceled) {
       setAvatar(result.assets[0].uri);
     }
   };
 
-  const handleCreateGroup = () => {
-    if (!groupName) {
-      setMsgError("Tên nhóm không được để trống.");
+  const handleCreateGroup = async () => {
+    if (!groupName || selectedMembers.length === 0) {
+      setMsgError("Vui lòng nhập tên nhóm và chọn thành viên.");
       return;
     }
-    if (selectedMembers.length === 0) {
-      setMsgError("Hãy chọn ít nhất một thành viên.");
-      return;
-    }
+
+    console.log("Selected members:", selectedMembers);
+    console.log("Sending user_ids:", selectedMembers.join(","));
 
     const formData = new FormData();
-    if (avatar) {
-      const filename = avatar.split("/").pop();
-      const match = /\.(\w+)$/.exec(filename ?? "");
-      const type = match ? `image/${match[1]}` : `image`;
-
-      formData.append("image_url", {
-        uri: avatar,
-        name: filename,
-        type,
-      } as any);
-
-      formData.append("name", groupName);
-      formData.append("created_by", "81f5c7d9-0cc5-4b40-b801-5ffdc3279d16"); // Replace with actual user ID
-      formData.append("count_member", countNumber.toString());
-      formData.append("user_ids", JSON.stringify(selectedMembers));
+    formData.append("name", groupName);
+    if (userId) {
+      formData.append("created_by", userId);
     }
-    onSubmit(formData);
-    setGroupName("");
-    setAvatar("");
-    setSelectedMembers([]);
-    setSearchTerm("");
-    setMsgError("");
-    setDisplayedUsers([]);
-    onClose();
+    formData.append("count_member", (1).toString());
+    selectedMembers.forEach((id) => formData.append("user_ids", id));
+    if (avatar) {
+      const fileName = avatar.split("/").pop() || "image.jpg";
+      const match = /\.(\w+)$/.exec(fileName);
+      const fileType = match ? `image/${match[1]}` : `image`;
+      formData.append("image", {
+        uri: avatar,
+        name: fileName,
+        type: fileType,
+      } as any);
+    }
+    try {
+      await createGroup(formData).unwrap();
+      refetchGroups();
+      handleCancel();
+    } catch (err) {
+      console.error("Lỗi tạo nhóm:", err);
+      setMsgError("Tạo nhóm thất bại, vui lòng thử lại.");
+    }
   };
 
   const handleCancel = () => {
@@ -172,8 +144,8 @@ export default function CreateGroupModal({
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
-      <View className="flex-1 justify-center items-center bg-black/30">
-        <View className="bg-white w-11/12 h-full mt-8 rounded-xl p-4">
+      <View className="flex-1 justify-center items-center bg-black/30 px-4">
+        <View className="bg-white w-full max-w-md max-h-[80%] rounded-xl p-4">
           <Text className="text-xl font-bold mb-4">Create group</Text>
 
           <TouchableOpacity onPress={pickImage} className="items-center mb-3">
@@ -209,12 +181,12 @@ export default function CreateGroupModal({
 
             <FlatList
               data={filteredUsers}
-              keyExtractor={(item) => item.id.toString()}
+              keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
                 <UserItem
                   id={item.id}
-                  avatar={item.avatar}
-                  name={item.name}
+                  avatar={item.image_url}
+                  name={item.username}
                   selected={selectedMembers.includes(item.id)}
                   onPress={() => toggleMember(item.id)}
                 />
@@ -222,7 +194,7 @@ export default function CreateGroupModal({
               onEndReached={loadMoreUsers}
               onEndReachedThreshold={0.5}
               showsVerticalScrollIndicator={false}
-              style={{ maxHeight: 440 }}
+              style={{ maxHeight: 300 }} // hoặc 400 tùy màn hình
             />
           </View>
 
@@ -232,16 +204,22 @@ export default function CreateGroupModal({
 
           <View className="flex-row justify-between gap-3 mt-3">
             <TouchableOpacity
-              className="flex-1 bg-red-500 py-2 rounded-lg items-center"
+              className="flex-1 border border-[#FE9519] py-3 rounded-lg items-center"
               onPress={handleCancel}
             >
-              <Text className="text-white font-bold">Cancel</Text>
+              <Text className="text-[#FE9519] font-bold">Cancel</Text>
             </TouchableOpacity>
+
             <TouchableOpacity
-              className="flex-1 bg-green-500 py-2 rounded-lg items-center"
+              className="flex-1 bg-[#FE9519] py-3 rounded-lg items-center"
               onPress={handleCreateGroup}
+              disabled={isLoading}
             >
-              <Text className="text-white font-bold">Create</Text>
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text className="text-white font-bold">Create</Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>

@@ -4,73 +4,52 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import GroupListHeader from "../../components/headers/GroupListHeader";
 import GroupItem from "../../components/items/GroupItem";
-import { useCallback, useState } from "react";
-import { useCreateGroupMutation } from "../../services/groupService";
+import { useCallback, useEffect, useState } from "react";
 import { useGetAllGroupByUserQuery } from "../../services/groupMemberService";
 import { ActivityIndicator } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function GroupList() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const userId = "81f5c7d9-0cc5-4b40-b801-5ffdc3279d16"; // Replace with actual user ID
-  const { data: groups, isLoading, error, refetch } = useGetAllGroupByUserQuery(userId);
+  const [userId, setUserId] = useState<string | null>(null);
 
-  const [groupList, setGroupList] = useState(groups);
-  const [createGroup] = useCreateGroupMutation();
+  useEffect(() => {
+    AsyncStorage.getItem("userId").then(setUserId);
+  }, []);
+
+  const {
+    data: groups,
+    isLoading,
+    error,
+    refetch,
+  } = useGetAllGroupByUserQuery(userId!);
 
   useFocusEffect(
     useCallback(() => {
-      if (userId) {
-        refetch();
-      }
-    }, [userId, refetch])
+      refetch();
+    }, [refetch])
   );
-
-  const handleAddGroup = async (group: FormData) => {
-    try {
-
-      // const res = await fetch("https://englishapp-uit.onrender.com/api/groups/create", {
-      //   method: "POST",
-      //   body: group,
-      // });
-      // const json = await res.json();
-      // console.log(json);
-      
-      // const response = await createGroup(group).unwrap();
-
-      // const newGroup = {
-      //   id: response.id,
-      //   group_name: response.name,
-      //   group_image_url: response.image_url,
-      //   last_username: "", 
-      //   last_message: "",  
-      //   last_time_message: new Date(),
-      // };
-      // setGroupList((prev) => [newGroup, ...(prev ?? [])]);
-    } catch (error) {
-      console.error("Error creating group:", error);
-    }
-  };
 
   if (isLoading) {
     return (
       <View className="flex-1 justify-center items-center bg-white">
-        <ActivityIndicator size="large" color="#007bff" />
+        <ActivityIndicator size="large" color="#FE9519" />
         <Text className="mt-2 text-gray-600">Loading groups...</Text>
       </View>
     );
   }
 
   if (error) {
-    return <Text>Error: {JSON.stringify(error)}</Text>;
+    return <Text className="flex-1 justify-center items-center mt-20">Error: {JSON.stringify(error)}</Text>;
   }
 
   return (
     <View className="flex-1 bg-white p-4">
-      <GroupListHeader onCreateGroup={handleAddGroup} />
+      <GroupListHeader refetch={refetch} />
       <FlatList
-        data={groupList}
+        data={groups}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <GroupItem
@@ -90,7 +69,7 @@ export default function GroupList() {
         ListEmptyComponent={
           <View className="items-center justify-center mt-20">
             <Text className="text-gray-500 text-center">
-            You don't have any groups yet. Create one to get started!
+              You don't have any groups yet. Create one to get started!
             </Text>
           </View>
         }
