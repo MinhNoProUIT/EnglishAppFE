@@ -48,6 +48,7 @@ import PaymentIntroduction from "../screens/Pay/PaymentIntroduction";
 import GroupList from "../screens/Group/GroupList";
 import Chat from "../screens/Group/Chat";
 import PaymentSuccessful from "../screens/Pay/PaymentSuccessful";
+import { ICreatePaymentResponse } from "../services/paymentService";
 
 export type RootStackParamList = {
   MainTabs: undefined;
@@ -86,10 +87,19 @@ export type RootStackParamList = {
 
   PaymentType: undefined;
   ProfileHeader: undefined;
-  Payment: undefined;
+  Payment: {
+    paymentData: ICreatePaymentResponse;
+    amount: number;
+    description: string;
+  };
   PaymentIntroduction: undefined;
 
-  PaymentSuccessful: undefined;
+  PaymentSuccessful: {
+    amount: number;
+    paid_at: Date;
+    orderCode: number;
+    description: string;
+  };
 
   Onboarding: undefined;
 };

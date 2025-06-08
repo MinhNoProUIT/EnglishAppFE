@@ -22,5 +22,10 @@
   "USERNAME": "Username",
   "EMAIL": "Email",
   "PASSWORD": "Password",
-  "CONFIRM_PASSWORD": "Confirm password"
+  "CONFIRM_PASSWORD": "Confirm password",
+  "1week": "1 Week",
+  "1month": "1 Month",
+  "3months": "3 Month",
+  "1year": "1 Year",
+  "PERIOD": "/turn"
 }

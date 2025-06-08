@@ -23,10 +23,17 @@ import { IGetAllPayment } from "../../models/Payment";
 
 import { useGetAllUserQuery } from "../../services/attendanceService";
 import { IGetAllAttendance } from "../../models/Attendance";
+import { RootStackParamList } from "../../navigations/AppNavigator";
+import { RouteProp } from "@react-navigation/native";
 
 const screenHeight = Dimensions.get("window").height;
 
-const PaymentSuccessful = () => {
+const PaymentSuccessful = ({
+  route,
+}: {
+  route: RouteProp<RootStackParamList, "PaymentSuccessful">;
+}) => {
+  const { amount, paid_at, orderCode, description } = route.params;
   const {
     data: attendanceResponse,
     isLoading,
@@ -91,7 +98,7 @@ const PaymentSuccessful = () => {
               color: "#00c500",
             }}
           >
-            50.000 VNĐ
+            {formatCurrency(amount)}
           </Text>
           <Text
             style={{
@@ -101,7 +108,7 @@ const PaymentSuccessful = () => {
               color: "rgb(173, 170, 170)",
             }}
           >
-            08:30 Thứ Ba ngày 05/06/2025
+            {paid_at.toISOString()}
           </Text>
         </View>
         <View
@@ -165,7 +172,7 @@ const PaymentSuccessful = () => {
             <Text style={{ fontSize: 15 }}>Mã giao dịch</Text>
             <View style={{ width: "45%", alignItems: "flex-end" }}>
               <Text style={{ fontSize: 15, fontWeight: "bold" }}>
-                101110008992
+                {orderCode}
               </Text>
             </View>
           </View>
@@ -181,10 +188,10 @@ const PaymentSuccessful = () => {
               marginRight: 20,
             }}
           >
-            <Text style={{ fontSize: 15 }}>Tên người thụ hưởng</Text>
+            <Text style={{ fontSize: 15 }}>Nội dung chuyển khoản</Text>
             <View style={{ width: "45%", alignItems: "flex-end" }}>
               <Text style={{ fontSize: 15, fontWeight: "bold" }}>
-                Thanh toan khoa hoc 06062025
+                {description}
               </Text>
             </View>
           </View>

@@ -10,6 +10,7 @@ import { postApi } from "../services/postService";
 import { attendanceApi } from "../services/attendanceService";
 import { quizApi } from "../services/quizService";
 import { quizQuestionApi } from "../services/quizQuestionService";
+import { premiumPackageApi } from "../services/PremiumPackageService";
 
 export const store = configureStore({
   reducer: {
@@ -23,6 +24,7 @@ export const store = configureStore({
     [attendanceApi.reducerPath]: attendanceApi.reducer,
     [quizApi.reducerPath]: quizApi.reducer,
     [quizQuestionApi.reducerPath]: quizQuestionApi.reducer,
+    [premiumPackageApi.reducerPath]: premiumPackageApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -36,6 +38,8 @@ export const store = configureStore({
       attendanceApi.middleware,
       quizApi.middleware,
       quizQuestionApi.middleware,
+      attendanceApi.middleware,
+      premiumPackageApi.middleware
     ),
 });
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -15,6 +15,15 @@ import { LinearGradient } from "expo-linear-gradient";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { formatCurrency } from "../../utils/formatCurrentcy";
 import QRCode from "react-native-qrcode-svg";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { RootStackParamList } from "../../navigations/AppNavigator";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { useCheckOrderStatusQuery } from "../../services/paymentService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+type PaymentScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "Payment"
+>;
 
 const qrInfo = {
   bankId: "MB",
@@ -24,6 +33,23 @@ const qrInfo = {
 };
 
 const Payment = () => {
+  const navigation = useNavigation<PaymentScreenNavigationProp>();
+  const route = useRoute<RouteProp<RootStackParamList, "Payment">>();
+  const { paymentData, amount, description } = route.params; // Nhận tham số từ route
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    console.log("paymentdata: ", paymentData);
+    console.log("checkoutUrl: ", paymentData.Data?.checkoutUrl);
+    console.log("orderCode: ", paymentData.Data?.orderCode);
+    console.log("qrCode: ", paymentData.Data?.qrCode);
+    AsyncStorage.getItem("userId").then(setUserId);
+  }, [paymentData]);
+  console.log("userId: ", userId);
+
+  const [orderStatus, setOrderStatus] = useState<string | null>(null);
+  const [isChecking, setIsChecking] = useState(true);
+
   return (
     <ScrollView style={{ backgroundColor: "rgb(255, 255, 255)" }}>
       <View style={{ padding: 10 }}>
@@ -53,21 +79,19 @@ const Payment = () => {
             alignItems: "center",
           }}
         >
-          <QRCode
-            value={
-              "00020101021238570010A000000727012700069704220113VQRQACSVW05140208QRIBFTTA5303704540420005802VN62230819Thanh toan khoa hoc630400C3"
-            } // qrCode là chuỗi QR mà bạn nhận từ API
-            size={250}
+          {/* <QRCode
+            value={paymentData.Data?.qrCode} // qrCode là chuỗi QR mà bạn nhận từ API
+            size={200}
             color="black"
             backgroundColor="white"
-          />
-          {/* <Image
+          /> */}
+          <Image
             style={{ width: 280, height: 280 }}
             source={{
               uri: `https://img.vietqr.io/image/${qrInfo.bankId}-${qrInfo.accountNo}-compact.png?amount=${qrInfo.amount}&addInfo=${qrInfo.description}`,
             }}
             resizeMode="contain"
-          /> */}
+          />
         </View>
         <View
           style={{
@@ -246,7 +270,7 @@ const Payment = () => {
               <Text
                 style={{ fontSize: 15, fontWeight: "bold", color: "#31473A" }}
               >
-                {formatCurrency(qrInfo.amount)}
+                {formatCurrency(amount)}
               </Text>
             </View>
             <TouchableOpacity>
@@ -292,7 +316,7 @@ const Payment = () => {
               <Text
                 style={{ fontSize: 15, fontWeight: "bold", color: "#31473A" }}
               >
-                103380133
+                {description}
               </Text>
             </View>
             <TouchableOpacity>
