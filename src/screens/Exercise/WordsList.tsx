@@ -1,47 +1,68 @@
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native";
 import Icon from '@expo/vector-icons/SimpleLineIcons';
 import { ProgressBar } from 'react-native-paper';
-import { RouteProp, useRoute } from "@react-navigation/native";
-import { WordType } from "../../types/WordType";
+import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
+import { useGetAllWordsWithProgressQuery } from "../../services/userProgressService";
+import { playTTS } from '../../utils/playTTS';
 
 type PracticeScreenRouteParams = {
-  words: WordType[]
+  course_id: string
 };
 
 export default function WordsList() {
   const route = useRoute<RouteProp<{ params: PracticeScreenRouteParams }, 'params'>>();
-  const { words } = route.params;
+  const { course_id } = route.params;
+
+  const {
+    data: words,
+    refetch
+  } = useGetAllWordsWithProgressQuery(course_id);
+
+  useEffect(() => {
+    if (words) {
+      console.log(words)
+    }
+    else console.log("khong lay duoc tu vung")
+  }, [words]);
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch])
+  );
   return (
     <View style={styles.container}>
       {/* list */}
       <FlatList style={styles.wordsList}
         data={words}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.word}>
-            <View style={styles.progressBarContainer}>
-              <Text style={styles.progressText}>{item.level}</Text>
-              <ProgressBar
-                progress={item.level / 5}
-                color="#FF991F"
-                style={styles.progressBar}
-              />
-            </View>
+        renderItem={({ item }) => {
+          return (
+            <TouchableOpacity style={styles.word}>
+              <View style={styles.progressBarContainer}>
+                <Text style={styles.progressText}>{item.level}</Text>
+                <ProgressBar
+                  progress={item.level / 6}
+                  color="#FF991F"
+                  style={styles.progressBar}
+                />
+              </View>
 
-            <View style={styles.wordPart}>
-              <Text style={styles.wordText}>{item.eng}</Text>
-              <TouchableOpacity style={styles.speakerIcon}>
-                <Icon name="volume-2" size={20} color="#2563EB" />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.wordPart}>
-              <Text style={styles.wordText}>{item.vie}</Text>
-            </View>
-          </TouchableOpacity>
-        )}
+              <View style={styles.wordPart}>
+                <Text style={styles.wordText}>{item.englishname}</Text>
+                <TouchableOpacity style={styles.speakerIcon} onPress={() => playTTS(item.englishname, 1.2)}>
+                  <Icon name="volume-2" size={20} color="#2563EB" />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.wordPart}>
+                <Text style={styles.wordText}>{item.vietnamesename}</Text>
+              </View>
+            </TouchableOpacity>
+          )
+        }}
       />
-    </View>
+    </View >
   );
 }
 const styles = StyleSheet.create({

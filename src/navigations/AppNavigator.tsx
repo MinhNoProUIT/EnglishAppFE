@@ -9,7 +9,6 @@ import SignIn from "../screens/Login/SignIn";
 import LearnScreen from "../screens/Exercise/LearnScreen";
 import PracticeScreen from "../screens/Exercise/PracticeScreen";
 import WordsList from "../screens/Exercise/WordsList";
-import { WordType } from "../types/WordType";
 import { QuizResult, Quiz, QuizQuestion } from "../interfaces/QuizInterface";
 import CreateEditQuiz from "../screens/Quiz/CreateEditQuiz";
 import PreviewQuiz from "../screens/Quiz/PreviewQuiz";
@@ -73,9 +72,9 @@ export type RootStackParamList = {
   Profile: undefined;
 
   Courses: undefined;
-  LearnScreen: { words: WordType[] };
-  PracticeScreen: { words: WordType[] };
-  WordsList: { words: WordType[] };
+  LearnScreen: { course_id: string };
+  PracticeScreen: { course_id: string, toCheckCompleted: boolean, onFinish: () => void };
+  WordsList: { course_id: string };
 
   CreateEditQuiz:
     | { quizToEdit?: Quiz; quizQuestionsToEdit?: QuizQuestion[] }

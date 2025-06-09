@@ -7,37 +7,40 @@ import {
     TouchableOpacity,
 } from "react-native";
 import AnswerCheckMenu from "./AnswerCheckMenu";
-import { WordType } from "../../types/WordType";
+import { Word } from "../../interfaces/WordInterface";
 
 export default function LearnByTranslate({ 
     words, 
     onNext, 
-    onWrongAnswer 
+    onWrongAnswer,
+    onCorrectAnswer,
 }: { 
-    words: WordType[], 
+    words: Word[], 
     onNext: () => void, 
-    onWrongAnswer: (word: WordType) => void 
+    onWrongAnswer: (word: Word, isPairWord: boolean) => void 
+    onCorrectAnswer: (word: Word) => void
 }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [userInput, setUserInput] = useState("");
     const [isCorrect, setIsCorrect] = useState(false);
     const [showCheck, setShowCheck] = useState(false);
 
-    const currentWord = words[currentIndex];
-    const wordLength = currentWord.eng.length;
+    const currentWord = words[currentIndex]
+    const wordLength = currentWord.englishname.length;
 
     const checkAnswer = () => {
-        if (userInput.trim().toLowerCase() === currentWord.eng.toLowerCase()) {
+        if (userInput.trim().toLowerCase() === currentWord.englishname.toLowerCase()) {
+            onCorrectAnswer(currentWord);
             setIsCorrect(true);
         } else {
-            onWrongAnswer(currentWord);
+            onWrongAnswer(currentWord, false);
             setIsCorrect(false);
         }
         setShowCheck(true);
     };
 
     const renderInputBoxes = () => {
-        return currentWord.eng.split("").map((_, index) => (
+        return currentWord.englishname.split("").map((_, index) => (
             <View key={index} style={styles.letterBox}>
                 <Text style={styles.letter}>{userInput[index] || ""}</Text>
             </View>
@@ -61,7 +64,7 @@ export default function LearnByTranslate({
                 <Text style={styles.title}>Điền từ</Text>
 
                 {/* word */}
-                <Text style={styles.word}>{currentWord.vie} ({currentWord.type})</Text>
+                <Text style={styles.word}>{currentWord.vietnamesename} ({currentWord.type})</Text>
 
                 {/* input */}
                 {/* Ô nhập có sẵn gạch chân */}

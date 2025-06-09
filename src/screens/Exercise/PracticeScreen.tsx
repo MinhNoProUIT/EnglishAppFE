@@ -1,46 +1,106 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { ProgressBar } from 'react-native-paper';
 import Icon from '@expo/vector-icons/AntDesign';
-import { useNavigation, RouteProp, useRoute } from "@react-navigation/native";
+import { useNavigation, RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { WordType } from "../../types/WordType";
 
 import LearnByTranslate from './LearnByTranslate';
 import LearnByListenAndGuess from './LearnByListenAndGuess';
 import PairWord from './PairWord';
 import FinishStudy from './FinishStudy';
+import { useGetAllCompletedWordsByCourseQuery, useGetAllTodayRepeatWordsQuery, useUpdateUserProgressMutation } from '../../services/userProgressService';
+import { Word, UserProgressWithWord } from '../../interfaces/WordInterface';
 
 type PracticeScreenNavigationProp = StackNavigationProp<
     RootStackParamList, "PracticeScreen"
 >;
-type PracticeScreenRouteParams = {
-    words: WordType[]
-};
 
 export default function PracticeScreen() {
     const navigation = useNavigation<PracticeScreenNavigationProp>();
-    const route = useRoute<RouteProp<{ params: PracticeScreenRouteParams }, 'params'>>();
-    const { words } = route.params;
+    const route = useRoute<RouteProp<RootStackParamList, "PracticeScreen">>();
+    const { course_id, toCheckCompleted, onFinish } = route.params;
+    const { data, refetch } = toCheckCompleted
+        ? useGetAllCompletedWordsByCourseQuery(course_id)
+        : useGetAllTodayRepeatWordsQuery(course_id);
 
-    // Define learning sessions
-    const [sessions, setSessions] = useState(() => [
-        { level: 1, words: words.filter(w => w.level === 1), Component: LearnByTranslate },
-        { level: 2, words: words.filter(w => w.level === 2), Component: LearnByListenAndGuess },
-        { level: 3, words: words.filter(w => w.level === 3), Component: PairWord },
-        { level: 4, words: words.filter(w => w.level === 4), Component: LearnByTranslate },
-        { level: 5, words: words.filter(w => w.level === 5), Component: LearnByListenAndGuess },
-    ]);
+    useFocusEffect(
+        useCallback(() => {
+            refetch();
+        }, [refetch])
+    );
 
+    const [score, setScore] = useState(0);
+    const [words, setWords] = useState<UserProgressWithWord[]>([]);
+    const [sessions, setSessions] = useState<{
+        level: number;
+        words: Word[];
+        Component: any;
+        retryMap: { [wordId: string]: number };
+    }[]>([]);
     const [sessionIndex, setSessionIndex] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
     const [isFinish, setIsFinish] = useState(false);
 
+    useEffect(() => {
+        if (data) {
+            console.log(data)
+            setWords(data);
+            const newSessions = toCheckCompleted ? [{
+                level: 6,
+                words: data.map(wp => wp.words),
+                Component: PairWord,
+                retryMap: {},
+            }] : [1, 2, 3, 4, 5].map(level => {
+                const levelWords = data
+                    .filter(w => w.level === level)
+                    .map(wp => wp.words);
+                const retryMap: { [wordId: string]: number } = {};
+                levelWords.forEach(word => {
+                    retryMap[word.id.toString()] = 0;
+                });
+                let Component;
+                switch (level) {
+                    case 1:
+                        Component = LearnByTranslate;
+                        break;
+                    case 2:
+                        Component = LearnByListenAndGuess;
+                        break;
+                    case 3:
+                        Component = PairWord;
+                        break;
+                    case 4:
+                        Component = LearnByTranslate;
+                        break;
+                    case 5:
+                        Component = LearnByListenAndGuess;
+                        break;
+                }
+                return {
+                    level,
+                    words: levelWords,
+                    Component,
+                    retryMap
+                };
+            });
+            setSessions(newSessions);
+        }
+        else console.log("khong lay duoc tu vung")
+    }, [data]);
+
     const currentSession = sessions[sessionIndex];
     const totalPages = sessions.reduce((sum, session) => sum + session.words.length, 0);
 
+    useEffect(() => {
+        if (sessions.length > 0 && currentSession?.words.length === 0) {
+            handleNextLevel();
+        }
+    }, [sessionIndex, sessions]);
+
     const handleGoBack = () => {
+        onFinish();
         navigation.goBack();
     };
 
@@ -68,19 +128,41 @@ export default function PracticeScreen() {
         }
     };
 
-    const handleWrongAnswer = (word: WordType) => {
+    const handleWrongAnswer = (word: Word, isPairWord: boolean) => {
         setSessions(prev => {
             const newSessions = [...prev];
-            newSessions[sessionIndex].words = [...newSessions[sessionIndex].words, word];
+            const session = newSessions[sessionIndex];
+            if (!isPairWord) session.words = [...session.words, word];
+
+            const id = word.id.toString();
+            session.retryMap[id] = (session.retryMap[id] || 0) + 1;
+
             return newSessions;
         });
     };
 
-    const renderView = () => {
-        if (currentSession.words.length === 0) {
-            handleNextLevel();
-            if (sessionIndex === sessions.length - 1) return;
+    const [updateUserProgress] = useUpdateUserProgressMutation();
+    const handleCorrectAnswer = async (word: Word) => {
+        const session = sessions[sessionIndex];
+        const retryCount = session.retryMap[word.id.toString()] || 0;
+        if (retryCount == 0) setScore(pre => pre + 1);
+        console.log(score)
+        if (toCheckCompleted) return;
+        try {
+            await updateUserProgress({
+                word_id: word.id,
+                body: {
+                    isCorrect: true,
+                    isRetry: retryCount > 0
+                }
+            }).unwrap();
+        } catch (error) {
+            console.error("Update user progress failed:", error);
         }
+    };
+
+    const renderView = () => {
+        if (!currentSession || currentSession.words.length === 0) return null;
 
         const { Component, words } = currentSession;
 
@@ -89,11 +171,14 @@ export default function PracticeScreen() {
                 words={words}
                 onNext={handleNextPage}
                 onWrongAnswer={handleWrongAnswer}
+                onCorrectAnswer={handleCorrectAnswer}
             />
         );
     };
 
-    if (isFinish) return <FinishStudy onNext={handleGoBack} />;
+    if (isFinish) {
+        return <FinishStudy onNext={handleGoBack} score={score} total={words.length} />;
+    }
 
     return (
         <View style={styles.container}>
@@ -103,7 +188,7 @@ export default function PracticeScreen() {
                     <Icon name="close" size={24} />
                 </TouchableOpacity>
                 <ProgressBar
-                    progress={currentPage / totalPages}
+                    progress={totalPages > 0 ? currentPage / totalPages : 0}
                     color="#2563EB"
                     style={styles.progressBar}
                 />

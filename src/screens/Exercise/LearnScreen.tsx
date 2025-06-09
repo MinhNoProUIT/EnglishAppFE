@@ -1,31 +1,41 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { ProgressBar } from 'react-native-paper';
 import Icon from '@expo/vector-icons/AntDesign';
 import { useNavigation, RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { WordType } from "../../types/WordType";
 
 import LearnByFlashcard from './LearnByFlashcard';
 import LearnByTranslate from './LearnByTranslate';
 import LearnByListenAndGuess from './LearnByListenAndGuess';
 import FinishStudy from './FinishStudy';
 import PairWord from './PairWord';
+import { useGetUnlearnedWordsByCourseQuery } from '../../services/userProgressService';
+import { Word } from '../../interfaces/WordInterface';
 
 type LearnScreenNavigationProp = StackNavigationProp<
     RootStackParamList,
     "LearnScreen"
 >;
 
-type LearnScreenRouteParams = {
-    words: WordType[];
-};
-
 export default function LearnScreen() {
     const navigation = useNavigation<LearnScreenNavigationProp>();
-    const route = useRoute<RouteProp<{ params: LearnScreenRouteParams }, 'params'>>();
-    const { words } = route.params;
+    const route = useRoute<RouteProp<RootStackParamList, "LearnScreen">>();
+    const { course_id } = route.params;
+    const { data } = useGetUnlearnedWordsByCourseQuery(course_id);
+
+    const [score, setScore] = useState(0);
+    const [words, setWords] = useState<Word[]>([]);
+
+    useEffect(() => {
+        if (data) {
+            setWords(data);
+            console.log(data)
+        }
+        else console.log("khong lay duoc tu vung")
+    }, [data]);
+
     const [currentPage, setCurrentPage] = useState(0);
     const [isFinish, setIsFinish] = useState(false);
     const totalPages = words.length * 4;
@@ -53,24 +63,31 @@ export default function LearnScreen() {
                     words={words}
                     onNext={handleNext}
                     onWrongAnswer={() => { }}
+                    onCorrectAnswer={() => { }}
                 />;
             case 2:
                 return <LearnByListenAndGuess
                     words={words}
                     onNext={handleNext}
                     onWrongAnswer={() => { }}
+                    onCorrectAnswer={() => { }}
                 />;
             case 3:
                 return <PairWord
                     words={words}
                     onNext={handleNext}
+                    onWrongAnswer={() => { }}
+                    onCorrectAnswer={() => { }}
                 />;
             default:
                 return null;
         }
     };
 
-    if (isFinish) return <FinishStudy onNext={handleGoBack} />;
+    if (isFinish) {
+        return <FinishStudy onNext={handleGoBack} score={score} total={words.length} />;
+    }
+    
     else return (
         <View style={styles.container}>
             {/* status */}
@@ -79,7 +96,7 @@ export default function LearnScreen() {
                     <Icon name='close' size={24} onPress={handleGoBack} />
                 </TouchableOpacity>
                 <ProgressBar
-                    progress={currentPage / totalPages}
+                    progress={totalPages > 0 ? currentPage / totalPages : 0}
                     color="#2563EB"
                     style={styles.progressBar}
                 />

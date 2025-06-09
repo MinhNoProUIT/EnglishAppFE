@@ -1,12 +1,12 @@
 import React from "react";
 import { View, Text, Modal, TouchableOpacity, StyleSheet, } from "react-native";
 import Icon2 from '@expo/vector-icons/Ionicons';
-import { WordType } from "../../types/WordType";
+import { Word } from "../../interfaces/WordInterface";
 
 interface AnswerCheckMenu {
     visible: boolean;
     isCorrect: boolean;
-    correctAnswer: WordType;
+    correctAnswer: Word;
     onNext: () => void;
 };
 
@@ -22,10 +22,10 @@ const AnswerCheckMenu: React.FC<AnswerCheckMenu> = ({ visible, isCorrect, correc
                             </TouchableOpacity>
                         </View>
                         <View style={styles.answerContainer}>
-                            <Text style={styles.eng}>{correctAnswer.eng}</Text>
+                            <Text style={styles.eng}>{correctAnswer.englishname}</Text>
                             <Text style={styles.transcription}>/{correctAnswer.transcription}/</Text>
-                            <Text style={styles.vie}>{correctAnswer.vie} ({correctAnswer.type})</Text>
-                            <Text style={styles.example}>{correctAnswer.example}</Text>
+                            <Text style={styles.vie}>{correctAnswer.vietnamesename} ({correctAnswer.type})</Text>
+                            <Text style={styles.example}>{correctAnswer.examplesentence}</Text>
                         </View>
 
                     </View>

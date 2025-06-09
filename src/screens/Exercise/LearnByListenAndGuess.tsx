@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import {
     View,
     Text,
@@ -9,16 +9,19 @@ import {
 } from "react-native";
 import Icon from '@expo/vector-icons/Ionicons';
 import AnswerCheckMenu from "./AnswerCheckMenu";
-import { WordType } from "../../types/WordType";
+import { Word } from "../../interfaces/WordInterface";
+import { playTTS } from '../../utils/playTTS';
 
-export default function LearnByListenAndGuess({ 
-    words, 
-    onNext, 
-    onWrongAnswer 
-}: { 
-    words: WordType[], 
-    onNext: () => void, 
-    onWrongAnswer: (word: WordType) => void 
+export default function LearnByListenAndGuess({
+    words,
+    onNext,
+    onWrongAnswer,
+    onCorrectAnswer,
+}: {
+    words: Word[],
+    onNext: () => void,
+    onWrongAnswer: (word: Word, isPairWord: boolean) => void
+    onCorrectAnswer: (word: Word) => void
 }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [userInput, setUserInput] = useState("");
@@ -28,10 +31,11 @@ export default function LearnByListenAndGuess({
     const currentWord = words[currentIndex];
 
     const checkAnswer = () => {
-        if (userInput.toLowerCase() === currentWord.eng.toLowerCase()) {
+        if (userInput.toLowerCase() === currentWord.englishname.toLowerCase()) {
+            onCorrectAnswer(currentWord);
             setIsCorrect(true);
         } else {
-            onWrongAnswer(currentWord);
+            onWrongAnswer(currentWord, false);
             setIsCorrect(false);
         }
         setShowCheck(true);
@@ -55,10 +59,16 @@ export default function LearnByListenAndGuess({
 
                 {/* buttons */}
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={[styles.circleButton, styles.audioButton]}>
+                    <TouchableOpacity
+                        style={[styles.circleButton, styles.audioButton]}
+                        onPress={() => playTTS(currentWord.englishname, 1.5)}
+                    >
                         <Icon name="volume-high" size={40} color="#FFB718" />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.circleButton, styles.slowButton]}>
+                    <TouchableOpacity
+                        style={[styles.circleButton, styles.slowButton]}
+                        onPress={() => playTTS(currentWord.englishname, 1)}
+                    >
                         <Image style={styles.snailImage}
                             source={require("../../../assets/SnailIcon.png")} />
                     </TouchableOpacity>
