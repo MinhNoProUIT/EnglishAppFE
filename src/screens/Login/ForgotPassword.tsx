@@ -11,6 +11,7 @@ import {
   Keyboard,
   ScrollView,
   Animated,
+  Alert,
 } from "react-native";
 import ImageForgot from "../../svg/imageReset.svg";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
@@ -18,13 +19,34 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation } from "@react-navigation/native";
+import { useForgotPasswordMutation } from "../../services/AuthService";
 
 type ResetPasswordScreen = StackNavigationProp<
   RootStackParamList,
-  "VerifyEmailScreen"
+  "ResetPassword"
 >;
 export default function ForgotPassword() {
   const navigation = useNavigation<ResetPasswordScreen>();
+  const [email, setEmail] = useState("");
+  const [forgotPassword] = useForgotPasswordMutation();
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      Alert.alert("Lỗi", "Vui lòng nhập email");
+      return;
+    }
+
+    try {
+      const response = await forgotPassword({ email }).unwrap();
+      const token = response.token;
+      console.log("token", token); // Token nhận được từ API sau khi gửi email
+      navigation.navigate("ResetPassword", { token });
+      Alert.alert("Thành công", "Email đặt lại mật khẩu đã được gửi!");
+    } catch (error) {
+      Alert.alert("Lỗi", "Có lỗi xảy ra khi gửi email");
+      console.error("error", error);
+    }
+  };
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -132,12 +154,14 @@ export default function ForgotPassword() {
               <TextInput
                 style={[styles.input, { marginRight: 10, flex: 1 }]}
                 placeholder="Email"
+                value={email}
+                onChangeText={setEmail}
               ></TextInput>
             </View>
             <View style={styles.view_end}>
               <TouchableOpacity
                 style={styles.button}
-                onPress={() => navigation.navigate("VerifyEmailScreen")}
+                onPress={handleForgotPassword}
               >
                 <Text style={styles.buttonText}>Send</Text>
               </TouchableOpacity>

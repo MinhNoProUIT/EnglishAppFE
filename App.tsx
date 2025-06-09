@@ -5,6 +5,7 @@ import { ActivityIndicator, View } from "react-native";
 import "./global.css";
 import { NavigationContainer } from "@react-navigation/native";
 import AppNavigator, {
+  linking,
   RootStackParamList,
 } from "./src/navigations/AppNavigator";
 import "./src/locales/index";
@@ -76,7 +77,7 @@ export default function App() {
 
   return (
     <Provider store={store}>
-      <NavigationContainer>
+      <NavigationContainer linking={linking}>
         <AppNavigator initialRoute={initialRoute} />
       </NavigationContainer>
     </Provider>

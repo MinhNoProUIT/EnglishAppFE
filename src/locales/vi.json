@@ -22,5 +22,8 @@
   "USERNAME": "Tên đăng nhập",
   "EMAIL": "Email",
   "PASSWORD": "Mật khẩu",
-  "CONFIRM_PASSWORD": "Xác nhận mật khẩu"
+  "CONFIRM_PASSWORD": "Xác nhận mật khẩu",
+  "UPDATE_INFO": "Cập nhật thông tin",
+  "CHANGE_INFO": "Thay đổi thông tin",
+  "CHANGE_PASSWORD": "Đổi mật khẩu"
 }

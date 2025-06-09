@@ -2,6 +2,18 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { createBaseQuery } from "./api";
 import { GetAllUsersResponse, User } from "../interfaces/UserInterface";
 
+export interface update {
+  username: string;
+  phonenumber: string;
+  email: string;
+  birthday: Date;
+  gender: boolean;
+  fullname: string;
+  address: string;
+  image_url: string;
+  created_date: Date;
+}
+
 export const userApi = createApi({
   reducerPath: "userApi",
   baseQuery: createBaseQuery("https://englishapp-uit.onrender.com"),
@@ -42,7 +54,32 @@ export const userApi = createApi({
         method: "GET",
       }),
     }),
+    getById: builder.query<update, void>({
+      query: () => ({
+        url: `api/users/getById`,
+        method: "GET",
+      }),
+    }),
+    update: builder.mutation<void, { formData: FormData; changeBy: string }>({
+      query: ({ formData, changeBy }) => ({
+        url: `api/users/update/${changeBy}`,
+        method: "PUT",
+        body: formData,
+      }),
+    }),
+    remove: builder.mutation<void, { id: string }>({
+      query: ({ id }) => ({
+        url: `api/users/remove/${id}`,
+        method: "PUT",
+      }),
+    }),
   }),
 });
 
-export const { useGetAllUsersQuery, useGetAllUserRecommendsQuery } = userApi;
+export const {
+  useGetAllUsersQuery,
+  useGetAllUserRecommendsQuery,
+  useGetByIdQuery,
+  useUpdateMutation,
+  useRemoveMutation,
+} = userApi;

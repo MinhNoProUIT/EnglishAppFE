@@ -22,5 +22,8 @@
   "USERNAME": "Username",
   "EMAIL": "Email",
   "PASSWORD": "Password",
-  "CONFIRM_PASSWORD": "Confirm password"
+  "CONFIRM_PASSWORD": "Confirm password",
+  "UPDATE_INFO": "Update information",
+  "CHANGE_INFO": "Change information",
+  "CHANGE_PASSWORD": "Change password"
 }

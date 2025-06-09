@@ -36,6 +36,7 @@ export default function SighIn() {
       await AsyncStorage.setItem("refreshToken", response.refreshToken);
 
       await AsyncStorage.setItem("userId", response.userId);
+      console.log(response.userId);
       navigation.navigate("MainTabs"); // 👈 chuyển sang trang Main (hoặc tên bạn đặt)
     } catch (err: any) {
       Alert.alert(
