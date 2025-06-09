@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Icon from "@expo/vector-icons/SimpleLineIcons";
 import { ProgressBar } from "react-native-paper";
 import CourseDetailMenu from "./CourseDetailMenu";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -13,8 +13,10 @@ import {
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigations/AppNavigator";
+import { CourseDetailMenuProps } from "../../interfaces/CourseInterface";
 import { CourseType } from "../../types/CourseType";
 import { WordType } from "../../types/WordType";
+import { useGetAllCompletedCoursesQuery } from "../../services/courseService";
 
 const words: WordType[] = [
   {
@@ -48,7 +50,6 @@ const words: WordType[] = [
     level: 3,
   },
 ];
-
 
 const courses: CourseType[] = [
   {
@@ -113,17 +114,10 @@ const courses: CourseType[] = [
   },
 ];
 
-const NullCourse = {
-  id: "",
-  title: "",
-  totalWords: 0,
-  ongoingWords: 0,
+const NullCourseDetailMenu = {
+  course_id: "",
   completedWords: 0,
   remainWords: 0,
-  topic: "",
-  level: "",
-  image: "",
-  vocabulary: [],
 };
 
 type CoursesScreenNavigationProp = StackNavigationProp<
@@ -134,7 +128,25 @@ type CoursesScreenNavigationProp = StackNavigationProp<
 export default function CompletedCourses() {
   const navigation = useNavigation<CoursesScreenNavigationProp>();
   const [detailMenuVisible, setDetailMenuVisible] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState<CourseType>(NullCourse);
+  const [selectedCourse, setSelectedCourse] = useState<CourseDetailMenuProps>(NullCourseDetailMenu);
+
+  const {
+    data: courses,
+    refetch,
+  } = useGetAllCompletedCoursesQuery();
+
+  useEffect(() => {
+    if (courses) {
+      console.log(courses)
+    }
+    else console.log("khong lay duoc course")
+  }, [courses]);
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch])
+  );
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff", }}>
@@ -148,7 +160,11 @@ export default function CompletedCourses() {
             style={styles.card}
             onPress={() => {
               setDetailMenuVisible(true)
-              setSelectedCourse(item)
+              setSelectedCourse({
+                course_id: item.id,
+                completedWords: item.completedWords,
+                remainWords: 0
+              })
             }}
           >
             <Image style={styles.image} source={{ uri: item.image }} />
@@ -204,11 +220,10 @@ export default function CompletedCourses() {
         onLearn={() => { }}
         onRepeat={() => {
           setDetailMenuVisible(false); // Đóng modal trước
-          navigation.navigate("PracticeScreen", { words: selectedCourse.vocabulary }); // Điều hướng đến PracticeScreen
         }}
         onReview={() => {
           setDetailMenuVisible(false); // Đóng modal trước
-          navigation.navigate("WordsList", { words: selectedCourse.vocabulary }); // Điều hướng đến WordsList
+          navigation.navigate("WordsList", { course_id: selectedCourse.course_id }); // Điều hướng đến WordsList
         }}
         selectedCourse={selectedCourse}
       />

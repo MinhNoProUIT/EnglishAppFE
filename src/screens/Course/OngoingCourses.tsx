@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Icon from "@expo/vector-icons/SimpleLineIcons";
 import { ProgressBar } from "react-native-paper";
 import CourseDetailMenu from "./CourseDetailMenu";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -13,8 +13,10 @@ import {
 } from "react-native";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { CourseDetailMenuProps } from "../../interfaces/CourseInterface";
 import { CourseType } from "../../types/CourseType";
 import { WordType } from "../../types/WordType";
+import { useGetAllOngoingCoursesQuery } from "../../services/courseService";
 
 const words: WordType[] = [
   {
@@ -119,7 +121,6 @@ const words: WordType[] = [
   }
 ]
 
-
 const courses: CourseType[] = [
   {
     id: "1",
@@ -147,17 +148,10 @@ const courses: CourseType[] = [
   },
 ];
 
-const NullCourse = {
-  id: "",
-  title: "",
-  totalWords: 0,
-  ongoingWords: 0,
+const NullCourseDetailMenu = {
+  course_id: "",
   completedWords: 0,
   remainWords: 0,
-  topic: "",
-  level: "",
-  image: "",
-  vocabulary: [],
 };
 
 type CoursesScreenNavigationProp = StackNavigationProp<
@@ -168,7 +162,25 @@ type CoursesScreenNavigationProp = StackNavigationProp<
 export default function OngoingCourses() {
   const navigation = useNavigation<CoursesScreenNavigationProp>();
   const [detailMenuVisible, setDetailMenuVisible] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState<CourseType>(NullCourse);
+  const [selectedCourse, setSelectedCourse] = useState<CourseDetailMenuProps>(NullCourseDetailMenu);
+
+  const {
+    data: courses,
+    refetch,
+  } = useGetAllOngoingCoursesQuery();
+
+  useEffect(() => {
+    if (courses) {
+      console.log(courses)
+    }
+    else console.log("khong lay duoc course")
+  }, [courses]);
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch])
+  );
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff", }}>
@@ -181,8 +193,12 @@ export default function OngoingCourses() {
           <TouchableOpacity
             style={styles.card}
             onPress={() => {
+              setSelectedCourse({
+                course_id: item.id,
+                completedWords: item.completedWords,
+                remainWords: item.remainWords
+              })
               setDetailMenuVisible(true)
-              setSelectedCourse(item)
             }}
           >
             <Image style={styles.image} source={{ uri: item.image }} />
@@ -213,7 +229,7 @@ export default function OngoingCourses() {
               </View>
 
               <ProgressBar
-                progress={40 / 100}
+                progress={item.progressScore / (6 * item.totalWords)}
                 color="#FF991F"
                 style={{ height: 3, width: "100%", borderRadius: 10 }}
               />
@@ -237,15 +253,14 @@ export default function OngoingCourses() {
         onClose={() => setDetailMenuVisible(false)}
         onLearn={() => {
           setDetailMenuVisible(false); // Đóng modal trước
-          navigation.navigate("LearnScreen", { words: selectedCourse.vocabulary }); // Điều hướng đến LearnScreen
+          navigation.navigate("LearnScreen", { course_id: selectedCourse.course_id }); // Điều hướng đến LearnScreen
         }}
         onRepeat={() => {
           setDetailMenuVisible(false); // Đóng modal trước
-          navigation.navigate("PracticeScreen", { words: selectedCourse.vocabulary }); // Điều hướng đến PracticeScreen
         }}
         onReview={() => {
           setDetailMenuVisible(false); // Đóng modal trước
-          navigation.navigate("WordsList", { words: selectedCourse.vocabulary }); // Điều hướng đến WordsList
+          navigation.navigate("WordsList", { course_id: selectedCourse.course_id }); // Điều hướng đến WordsList
         }}
         selectedCourse={selectedCourse}
       />

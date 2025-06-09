@@ -9,21 +9,37 @@ import {
   Dimensions,
 } from "react-native";
 import Icon from '@expo/vector-icons/Ionicons';
-import { WordType } from "../../types/WordType";
+import { Word } from "../../interfaces/WordInterface";
+import { useCreateUserProgressMutation } from "../../services/userProgressService";
 
 const { width } = Dimensions.get("window");
 
-export default function LearnByListenAndGuess({ words, onNext }: { words: WordType[], onNext: () => void }) {
+export default function LearnByListenAndGuess({ words, onNext }: { words: Word[], onNext: () => void }) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isContinuable, setIsContinuable] = useState(false);
   const flipAnimations = useRef(words.map(() => new Animated.Value(0))).current;
   const translateX = useRef(new Animated.Value(0)).current;
+  const [flippedOnce, setFlippedOnce] = useState<boolean[]>(words.map(() => false));
+  const [createUserProgress] = useCreateUserProgressMutation();
 
   // Hiệu ứng lật thẻ
-  const flipCard = (index: number) => {
+  const flipCard = async (index: number, word_id: string) => {
     setIsFlipped(!isFlipped);
     setIsContinuable(true);
+    const alreadyFlipped = flippedOnce[index];
+
+    if (!alreadyFlipped) {
+      try {
+        await createUserProgress(word_id);
+      } catch (error) {
+        console.error("Failed to create user progress:", error);
+      }
+      const updated = [...flippedOnce];
+      updated[index] = true;
+      setFlippedOnce(updated);
+    }
+
     Animated.spring(flipAnimations[index], {
       toValue: isFlipped ? 0 : 1,
       tension: 10,
@@ -86,18 +102,18 @@ export default function LearnByListenAndGuess({ words, onNext }: { words: WordTy
               <View key={i} style={styles.cardWrapper}>
                 {/* front */}
                 < Animated.View style={[styles.card, styles.cardFront, frontAnimatedStyle]} >
-                  <TouchableOpacity style={styles.cardContent} onPress={() => flipCard(i)}>
-                    <Image style={styles.image} source={{ uri: word.image }} />
-                    <Text style={styles.example}>{word.example}</Text>
+                  <TouchableOpacity style={styles.cardContent} onPress={() => flipCard(i, word.id)}>
+                    <Image style={styles.image} source={{ uri: word.imageurl }} />
+                    <Text style={styles.example}>{word.examplesentence}</Text>
                   </TouchableOpacity>
                 </Animated.View>
 
                 {/* back */}
                 <Animated.View style={[styles.card, styles.cardBack, backAnimatedStyle]}>
-                  <TouchableOpacity style={[styles.cardContent, styles.meaningContent]} onPress={() => flipCard(i)}>
-                    <Text style={styles.eng}>{word.eng}</Text>
+                  <TouchableOpacity style={[styles.cardContent, styles.meaningContent]} onPress={() => flipCard(i, word.id)}>
+                    <Text style={styles.eng}>{word.englishname}</Text>
                     <Text style={styles.transcription}>/{word.transcription}/</Text>
-                    <Text style={styles.vie}>{word.vie} ({word.type})</Text>
+                    <Text style={styles.vie}>{word.vietnamesename} ({word.type})</Text>
                   </TouchableOpacity>
                 </Animated.View>
               </View>
