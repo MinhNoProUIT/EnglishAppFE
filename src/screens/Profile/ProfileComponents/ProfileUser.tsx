@@ -19,6 +19,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../../navigations/AppNavigator";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import { useGetByIdQuery } from "../../../services/userService";
 type ProfilesScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   "Profile"
@@ -99,13 +100,26 @@ const ProfileUser = () => {
   const navigateToProfile = () => {
     navigation.navigate("Setting"); // Điều hướng đến màn hình Setting
   };
+
+  const [fullname, setFullname] = useState("");
+  const [address, setAddress] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const { data } = useGetByIdQuery();
+
+  useEffect(() => {
+    if (data) {
+      setAddress(data.address);
+      setFullname(data.fullname);
+      setImageUrl(data.image_url);
+    }
+  }, [data]);
   return (
     <View className="bg-[#FFFAF0] p-6 rounded-lg m-3">
       <View className="flex-row justify-between">
         <View className=" relative flex-row items-center ">
           <Image
             style={{ borderWidth: 2, borderColor: "#2563EB" }}
-            source={require("../../../../assets/book_cartoon.jpg")}
+            source={{ uri: imageUrl }}
             className="w-32 h-32 rounded-full"
           />
           <TouchableOpacity className="bg-[#2563EB] rounded-full h-9 w-9 items-center justify-center absolute right-0.5 border-2 border-white bottom-1 ">
@@ -125,11 +139,11 @@ const ProfileUser = () => {
           <View className="rounded-full bg-[#3E87F6] h-7 w-7  items-center justify-center">
             <Foundation name="crown" size={15} color="white" />
           </View>
-          <Text className="text-lg font-bold mb-2 ml-3">Tran Van Minh</Text>
+          <Text className="text-lg font-bold mb-2 ml-3">{fullname}</Text>
         </View>
         <View className="flex-row item-center">
           <Ionicons name="location-outline" size={20} color="black" />
-          <Text className="text-sm mb-2 ml-1"> Ho Chi Minh City, Vietnam</Text>
+          <Text className="text-sm mb-2 ml-1">{address}</Text>
         </View>
         <View className="flex-row item-center">
           <AntDesign name="book" size={20} color="black" />

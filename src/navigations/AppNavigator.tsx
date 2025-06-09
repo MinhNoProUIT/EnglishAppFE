@@ -23,6 +23,7 @@ import AccountInfomation from "../screens/Profile/AccInfoComponent/AccountInfoma
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 import ForgotPassword from "../screens/Login/ForgotPassword";
 import ResetPassword from "../screens/Login/ResetPassword";
@@ -48,6 +49,12 @@ import PaymentIntroduction from "../screens/Pay/PaymentIntroduction";
 import GroupList from "../screens/Group/GroupList";
 import Chat from "../screens/Group/Chat";
 import PaymentSuccessful from "../screens/Pay/PaymentSuccessful";
+import UpdateInfo from "../screens/Profile/UpdateInfoComponent/UpdateInfo";
+import { useTranslation } from "react-i18next";
+import ChangePasswordScreen from "../screens/Login/ChangePasswordScreen";
+import { Linking } from "react-native"; // Thêm Linking từ React Native để nhận deep link
+import { NavigationContainer } from "@react-navigation/native";
+
 import { ICreatePaymentResponse } from "../services/paymentService";
 
 export type RootStackParamList = {
@@ -70,9 +77,11 @@ export type RootStackParamList = {
   PracticeScreen: { words: WordType[] };
   WordsList: { words: WordType[] };
 
-  CreateEditQuiz: { quizToEdit?: Quiz, quizQuestionsToEdit?: QuizQuestion[] } | undefined;
+  CreateEditQuiz:
+    | { quizToEdit?: Quiz; quizQuestionsToEdit?: QuizQuestion[] }
+    | undefined;
   PreviewQuiz: { quizToPreview: Quiz };
-  DoQuiz: { quizTitle: string, quizQuestions: QuizQuestion[] };
+  DoQuiz: { quizTitle: string; quizQuestions: QuizQuestion[] };
   FinishQuiz: { resultData: QuizResult };
   ReviewFinishQuizResult: { resultData: QuizResult };
 
@@ -102,6 +111,9 @@ export type RootStackParamList = {
   };
 
   Onboarding: undefined;
+  UpdateInfo: undefined;
+  ChangePasswordScreen: undefined;
+  ResetPassword: { token: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -110,7 +122,19 @@ interface Props {
   initialRoute: keyof RootStackParamList;
 }
 
+export const linking = {
+  prefixes: ["https://englishapp-uit.onrender.com"], // Thêm prefix chính xác (URL của bạn trên Render)
+  config: {
+    screens: {
+      ForgotPassword: "auth/forgot-password", // Màn hình ForgotPassword
+      ResetPassword: "auth/reset-password/:token", // Màn hình ResetPassword nhận token từ URL
+      // Các màn hình khác như SignUp, SignIn, MainTabs có thể được thêm vào đây nếu cần
+    },
+  },
+};
+
 export default function AppNavigator({ initialRoute = "SignIn" }: Props) {
+  const { t } = useTranslation();
   return (
     <Stack.Navigator
       screenOptions={{
@@ -124,6 +148,7 @@ export default function AppNavigator({ initialRoute = "SignIn" }: Props) {
       <Stack.Screen name="SignUp" component={SignUp} />
       <Stack.Screen name="SignIn" component={SignIn} />
       <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+      <Stack.Screen name="ResetPassword" component={ResetPassword} />
       <Stack.Screen
         name="AccountCreatedScreen"
         component={AccountCreatedScreen}
@@ -188,6 +213,31 @@ export default function AppNavigator({ initialRoute = "SignIn" }: Props) {
                 <Ionicons name="chevron-back-outline" size={24} color="white" />
               </TouchableOpacity>
               <Text style={styles.headerTitle}>Thông tin tài khoản</Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("UpdateInfo")}
+              >
+                <MaterialCommunityIcons
+                  name="account-edit"
+                  size={24}
+                  color="white"
+                />
+              </TouchableOpacity>
+            </View>
+          ),
+        }}
+      />
+
+      <Stack.Screen
+        name="UpdateInfo"
+        component={UpdateInfo}
+        options={{
+          headerShown: true,
+          header: ({ navigation }) => (
+            <View style={styles.headerContainer}>
+              <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
+                <Ionicons name="chevron-back-outline" size={24} color="white" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>{t("UPDATE_INFO")}</Text>
             </View>
           ),
         }}
@@ -284,6 +334,22 @@ export default function AppNavigator({ initialRoute = "SignIn" }: Props) {
                 <Ionicons name="chevron-back-outline" size={24} color="white" />
               </TouchableOpacity>
               <Text style={styles.headerTitle}>Cài đặt khác</Text>
+            </View>
+          ),
+        }}
+      />
+
+      <Stack.Screen
+        name="ChangePasswordScreen"
+        component={ChangePasswordScreen}
+        options={{
+          headerShown: true,
+          header: ({ navigation }) => (
+            <View style={styles.headerContainer}>
+              <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
+                <Ionicons name="chevron-back-outline" size={24} color="white" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>{t("CHANGE_PASSWORD")}</Text>
             </View>
           ),
         }}

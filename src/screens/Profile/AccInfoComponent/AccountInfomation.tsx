@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView } from "react-native";
+import { useGetByIdQuery } from "../../../services/userService";
 
 interface AccountInfo {
   username: string;
@@ -25,129 +26,106 @@ const accountData: AccountInfo[] = [
   },
 ];
 const AccountInfomation = () => {
+  const [selectedDate, setSelectedDate] = useState(""); // Lưu trữ ngày sinh đã chọn
+  const [username, setUsername] = useState("");
+  const [phonenumber, setPhonenumber] = useState("");
+  const [gender, setGender] = useState<boolean | undefined>(undefined);
+  const [fullname, setFullname] = useState("");
+  const [address, setAddress] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const { data } = useGetByIdQuery();
+  useEffect(() => {
+    if (data) {
+      setUsername(data.username);
+      setPhonenumber(data.phonenumber);
+      setFullname(data.fullname);
+      setAddress(data.address);
+      setGender(data.gender);
+      setImageUrl(data.image_url);
+      setSelectedDate(
+        data.birthday ? new Date(data.birthday).toISOString().split("T")[0] : ""
+      );
+    }
+  }, [data]);
   return (
     <ScrollView style={{ padding: 10 }}>
       <View style={{ marginTop: 10, marginLeft: 10 }}>
-        {accountData.map((item, index) => (
-          <View key={index} style={{ gap: 10 }}>
-            <View style={{ gap: 5 }}>
-              <Text
-                style={{ fontWeight: "bold", fontSize: 15, color: "#7d7d7d" }}
-              >
-                Tên đăng nhập
-              </Text>
-              <View
-                style={{
-                  backgroundColor: "rgb(236, 236, 236)",
-                  height: 50,
-                  justifyContent: "center",
-                  borderRadius: 15,
-                }}
-              >
-                <Text
-                  style={{ fontWeight: "bold", fontSize: 15, marginLeft: 10 }}
-                >
-                  {item.username}
-                </Text>
-              </View>
-            </View>
-            <View style={{ gap: 5 }}>
-              <Text
-                style={{ fontWeight: "bold", fontSize: 15, color: "#7d7d7d" }}
-              >
-                Họ và tên
-              </Text>
-              <View
-                style={{
-                  backgroundColor: "rgb(236, 236, 236)",
-                  height: 50,
-                  justifyContent: "center",
-                  borderRadius: 15,
-                }}
-              >
-                <Text
-                  style={{ fontWeight: "bold", fontSize: 15, marginLeft: 10 }}
-                >
-                  {item.fullname}
-                </Text>
-              </View>
-            </View>
-            <View style={{ gap: 5 }}>
-              <Text
-                style={{ fontWeight: "bold", fontSize: 15, color: "#7d7d7d" }}
-              >
-                Email
-              </Text>
-              <View
-                style={{
-                  backgroundColor: "rgb(236, 236, 236)",
-                  height: 50,
-                  justifyContent: "center",
-                  borderRadius: 15,
-                }}
-              >
-                <Text
-                  style={{ fontWeight: "bold", fontSize: 15, marginLeft: 10 }}
-                >
-                  {item.email}
-                </Text>
-              </View>
-            </View>
+        <View style={{ gap: 10 }}>
+          <View style={{ gap: 5 }}>
+            <Text
+              style={{ fontWeight: "bold", fontSize: 15, color: "#7d7d7d" }}
+            >
+              Tên đăng nhập
+            </Text>
             <View
               style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                gap: 10,
+                backgroundColor: "rgb(236, 236, 236)",
+                height: 50,
+                justifyContent: "center",
+                borderRadius: 15,
               }}
             >
-              <View style={{ gap: 5, flex: 1 }}>
-                <Text
-                  style={{ fontWeight: "bold", fontSize: 15, color: "#7d7d7d" }}
-                >
-                  Ngày sinh
-                </Text>
-                <View
-                  style={{
-                    backgroundColor: "rgb(236, 236, 236)",
-                    height: 50,
-                    justifyContent: "center",
-                    borderRadius: 15,
-                  }}
-                >
-                  <Text
-                    style={{ fontWeight: "bold", fontSize: 15, marginLeft: 10 }}
-                  >
-                    {item.birthday}
-                  </Text>
-                </View>
-              </View>
-              <View style={{ gap: 5, flex: 1 }}>
-                <Text
-                  style={{ fontWeight: "bold", fontSize: 15, color: "#7d7d7d" }}
-                >
-                  Giới tính
-                </Text>
-                <View
-                  style={{
-                    backgroundColor: "rgb(236, 236, 236)",
-                    height: 50,
-                    justifyContent: "center",
-                    borderRadius: 15,
-                  }}
-                >
-                  <Text
-                    style={{ fontWeight: "bold", fontSize: 15, marginLeft: 10 }}
-                  >
-                    {item.gender}
-                  </Text>
-                </View>
-              </View>
+              <Text
+                style={{ fontWeight: "bold", fontSize: 15, marginLeft: 10 }}
+              >
+                {data?.username}
+              </Text>
             </View>
-            <View style={{ gap: 5 }}>
+          </View>
+          <View style={{ gap: 5 }}>
+            <Text
+              style={{ fontWeight: "bold", fontSize: 15, color: "#7d7d7d" }}
+            >
+              Họ và tên
+            </Text>
+            <View
+              style={{
+                backgroundColor: "rgb(236, 236, 236)",
+                height: 50,
+                justifyContent: "center",
+                borderRadius: 15,
+              }}
+            >
+              <Text
+                style={{ fontWeight: "bold", fontSize: 15, marginLeft: 10 }}
+              >
+                {data?.fullname}
+              </Text>
+            </View>
+          </View>
+          <View style={{ gap: 5 }}>
+            <Text
+              style={{ fontWeight: "bold", fontSize: 15, color: "#7d7d7d" }}
+            >
+              Email
+            </Text>
+            <View
+              style={{
+                backgroundColor: "rgb(236, 236, 236)",
+                height: 50,
+                justifyContent: "center",
+                borderRadius: 15,
+              }}
+            >
+              <Text
+                style={{ fontWeight: "bold", fontSize: 15, marginLeft: 10 }}
+              >
+                {data?.email}
+              </Text>
+            </View>
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              gap: 10,
+            }}
+          >
+            <View style={{ gap: 5, flex: 1 }}>
               <Text
                 style={{ fontWeight: "bold", fontSize: 15, color: "#7d7d7d" }}
               >
-                Số điện thoại
+                Ngày sinh
               </Text>
               <View
                 style={{
@@ -160,15 +138,15 @@ const AccountInfomation = () => {
                 <Text
                   style={{ fontWeight: "bold", fontSize: 15, marginLeft: 10 }}
                 >
-                  {item.phone}
+                  {data?.birthday.toString()}
                 </Text>
               </View>
             </View>
-            <View style={{ gap: 5 }}>
+            <View style={{ gap: 5, flex: 1 }}>
               <Text
                 style={{ fontWeight: "bold", fontSize: 15, color: "#7d7d7d" }}
               >
-                Địa chỉ
+                Giới tính
               </Text>
               <View
                 style={{
@@ -181,34 +159,76 @@ const AccountInfomation = () => {
                 <Text
                   style={{ fontWeight: "bold", fontSize: 15, marginLeft: 10 }}
                 >
-                  {item.address}
-                </Text>
-              </View>
-            </View>
-            <View style={{ gap: 5 }}>
-              <Text
-                style={{ fontWeight: "bold", fontSize: 15, color: "#7d7d7d" }}
-              >
-                Ngày tạo tài khoản
-              </Text>
-              <View
-                style={{
-                  backgroundColor: "rgb(236, 236, 236)",
-                  height: 50,
-                  justifyContent: "center",
-                  borderRadius: 15,
-                }}
-              >
-                <Text
-                  style={{ fontWeight: "bold", fontSize: 15, marginLeft: 10 }}
-                >
-                  {" "}
-                  {item.accountCreatedDate}
+                  {data?.gender !== undefined ? (gender ? "Nam" : "Nữ") : ""}
                 </Text>
               </View>
             </View>
           </View>
-        ))}
+          <View style={{ gap: 5 }}>
+            <Text
+              style={{ fontWeight: "bold", fontSize: 15, color: "#7d7d7d" }}
+            >
+              Số điện thoại
+            </Text>
+            <View
+              style={{
+                backgroundColor: "rgb(236, 236, 236)",
+                height: 50,
+                justifyContent: "center",
+                borderRadius: 15,
+              }}
+            >
+              <Text
+                style={{ fontWeight: "bold", fontSize: 15, marginLeft: 10 }}
+              >
+                {data?.phonenumber}
+              </Text>
+            </View>
+          </View>
+          <View style={{ gap: 5 }}>
+            <Text
+              style={{ fontWeight: "bold", fontSize: 15, color: "#7d7d7d" }}
+            >
+              Địa chỉ
+            </Text>
+            <View
+              style={{
+                backgroundColor: "rgb(236, 236, 236)",
+                height: 50,
+                justifyContent: "center",
+                borderRadius: 15,
+              }}
+            >
+              <Text
+                style={{ fontWeight: "bold", fontSize: 15, marginLeft: 10 }}
+              >
+                {data?.address}
+              </Text>
+            </View>
+          </View>
+          <View style={{ gap: 5 }}>
+            <Text
+              style={{ fontWeight: "bold", fontSize: 15, color: "#7d7d7d" }}
+            >
+              Ngày tạo tài khoản
+            </Text>
+            <View
+              style={{
+                backgroundColor: "rgb(236, 236, 236)",
+                height: 50,
+                justifyContent: "center",
+                borderRadius: 15,
+              }}
+            >
+              <Text
+                style={{ fontWeight: "bold", fontSize: 15, marginLeft: 10 }}
+              >
+                {" "}
+                {data?.created_date.toString()}
+              </Text>
+            </View>
+          </View>
+        </View>
       </View>
     </ScrollView>
   );

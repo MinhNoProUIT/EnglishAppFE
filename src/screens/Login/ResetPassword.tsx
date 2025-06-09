@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -10,10 +10,48 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ScrollView,
+  Alert,
 } from "react-native";
 import ImageForgot from "../../svg/imageReset.svg";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { useResetPasswordMutation } from "../../services/AuthService";
+
+type RootStackParamList = {
+  ResetPassword: { token: string }; // Kiểu tham số token cho màn hình ResetPassword
+};
+type ResetPasswordRouteProps = RouteProp<RootStackParamList, "ResetPassword">;
+
 export default function ResetPassword() {
+  const route = useRoute<ResetPasswordRouteProps>();
+  const { token } = route.params; // Lấy token từ route params
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [resetPassword] = useResetPasswordMutation();
+  const handleResetPassword = async () => {
+    if (!newPassword) {
+      Alert.alert("Lỗi", "Vui lòng nhập mật khẩu mới.");
+      return;
+    }
+
+    if (confirmPassword !== newPassword) {
+      Alert.alert("Lỗi", "Vui lòng xác nhận lại mật khẩu.");
+      return;
+    }
+
+    try {
+      const response = await resetPassword({ token, newPassword }).unwrap();
+      Alert.alert("Thành công", response.message);
+      // Chuyển hướng đến màn hình đăng nhập hoặc màn hình chính
+    } catch (error: unknown) {
+      // Ép kiểu error về Error để có thể truy cập message
+      if (error instanceof Error) {
+        Alert.alert("Lỗi", error.message); // Truy cập message của Error
+      } else {
+        Alert.alert("Lỗi", "Đã có lỗi xảy ra");
+      }
+    }
+  };
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -107,16 +145,23 @@ export default function ResetPassword() {
               <TextInput
                 style={[styles.input, { marginRight: 10, flex: 1 }]}
                 placeholder="New Password"
+                value={newPassword}
+                onChangeText={setNewPassword}
               ></TextInput>
             </View>
             <View style={styles.view_email}>
               <TextInput
                 style={[styles.input, { marginRight: 10, flex: 1 }]}
                 placeholder="Confirm New Password"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
               ></TextInput>
             </View>
             <View style={styles.view_end}>
-              <TouchableOpacity style={styles.button}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handleResetPassword}
+              >
                 <Text style={styles.buttonText}>Reset Password</Text>
               </TouchableOpacity>
             </View>

@@ -10,6 +10,7 @@ import {
   TouchableNativeFeedback,
   Pressable,
   Modal,
+  Alert,
 } from "react-native";
 import {
   Feather,
@@ -29,6 +30,11 @@ import { useTranslation } from "react-i18next";
 
 import Octicons from "@expo/vector-icons/Octicons";
 import { logout } from "../../../utils/authUtils";
+import {
+  useGetByIdQuery,
+  useRemoveMutation,
+} from "../../../services/userService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type SettingsScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -47,6 +53,26 @@ const Setting = () => {
   const [scaleAnim] = useState(new Animated.Value(0));
   const { t } = useTranslation();
 
+  const [email, setEmail] = useState("");
+  const [fullname, setFullname] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const { data } = useGetByIdQuery();
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (data) {
+      setFullname(data.fullname);
+      setEmail(data.email);
+      setImageUrl(data.image_url);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    // Lấy userId từ AsyncStorage
+    AsyncStorage.getItem("userId").then((storedUserId) => {
+      setUserId(storedUserId);
+    });
+  }, []);
   const onPressIn = () => {
     setBackgroundColor("#DDDDDD");
   };
@@ -70,15 +96,31 @@ const Setting = () => {
     navigation.navigate("AnotherSetting");
   };
 
+  const navigateChangePassword = () => {
+    navigation.navigate("ChangePasswordScreen");
+  };
+
   const handleLogout = async () => {
     await logout(navigation);
 
     console.log("Đăng xuất thành công");
     setShowLogoutModal(false);
   };
+  const [remove] = useRemoveMutation();
 
-  const handleDelete = () => {
-    console.log("Xóa tài khoản thành công");
+  const handleDelete = async () => {
+    if (!userId) {
+      Alert.alert("Lỗi", "User ID không hợp lệ.");
+      return;
+    }
+    try {
+      await remove({ id: userId });
+      Alert.alert("Xóa thành công!");
+      await logout(navigation);
+    } catch (error) {
+      console.log("Không thể xóa tài khoản: ", error);
+      Alert.alert("Lỗi khi xóa tài khoản");
+    }
     setShowDeleteModal(false);
   };
 
@@ -112,7 +154,7 @@ const Setting = () => {
                 height: 128,
                 borderRadius: 64,
               }}
-              source={require("../../../../assets/book_cartoon.jpg")}
+              source={{ uri: imageUrl }}
             />
 
             {/* Nút TouchableOpacity */}
@@ -143,10 +185,8 @@ const Setting = () => {
             marginBottom: 10,
           }}
         >
-          <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-            Tran Van Minh
-          </Text>
-          <Text style={{ fontSize: 12 }}>minh8dclv123@gmail.com</Text>
+          <Text style={{ fontSize: 18, fontWeight: "bold" }}>{fullname}</Text>
+          <Text style={{ fontSize: 12 }}>{email}</Text>
         </View>
         <TouchableOpacity
           onPress={() => navigateToAccInfo("AccountInfomation")}
@@ -354,6 +394,60 @@ const Setting = () => {
                   <Text style={{ fontWeight: "bold", fontSize: 18 }}>
                     {" "}
                     {t("ANOTHER_SETTING")}
+                  </Text>
+                </View>
+
+                <Ionicons
+                  name="chevron-forward"
+                  size={24}
+                  color="rgb(10, 179, 66)"
+                />
+              </View>
+            </View>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={navigateChangePassword}>
+          <View>
+            <View
+              style={{
+                justifyContent: "center",
+              }}
+            >
+              <View
+                style={{
+                  borderColor: "rgb(201, 192, 192)",
+                  borderBottomWidth: 1,
+                  padding: 15,
+
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexDirection: "row",
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 10,
+                  }}
+                >
+                  <View
+                    style={{
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 180,
+                    }}
+                  >
+                    <Image
+                      source={require("../../../../assets/reset_password.png")}
+                      className="w-10 h-10 rounded-full"
+                      resizeMode="contain"
+                    />
+                  </View>
+
+                  <Text style={{ fontWeight: "bold", fontSize: 18 }}>
+                    {" "}
+                    {t("CHANGE_PASSWORD")}
                   </Text>
                 </View>
 

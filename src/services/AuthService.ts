@@ -60,13 +60,31 @@ export const authApi = createApi({
       query: (body) => ({
         url: "/change-password",
         method: "PUT",
-        body,
+        body: body,
       }),
     }),
     logout: builder.mutation<void, void>({
       query: () => ({
         url: "/logout",
         method: "POST",
+      }),
+    }),
+    forgotPassword: builder.mutation<{ token: string }, { email: string }>({
+      query: (body) => ({
+        url: "/forgot-password",
+        method: "POST",
+        body,
+      }),
+    }),
+    // Thêm endpoint resetPassword
+    resetPassword: builder.mutation<
+      { message: string },
+      { token: string; newPassword: string }
+    >({
+      query: ({ token, newPassword }) => ({
+        url: `/reset-password/${token}`,
+        method: "POST",
+        body: { newPassword },
       }),
     }),
   }),
@@ -78,4 +96,6 @@ export const {
   useMeQuery,
   useChangePasswordMutation,
   useLogoutMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
 } = authApi;
