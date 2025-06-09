@@ -1,6 +1,8 @@
 import { View, Text, Image } from "react-native";
 import { MessageItemProps } from "../../interfaces/MessageInterface";
 import formatTimeMessage from "../../utils/formatTimeMessage";
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 export default function MessageItem({
@@ -12,7 +14,14 @@ export default function MessageItem({
   created_date,
   loading = false
 }: MessageItemProps) {
-  const isOwnMessage = sender_id === "81f5c7d9-0cc5-4b40-b801-5ffdc3279d16"; // Replace with actual user ID
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    AsyncStorage.getItem("userId").then(setUserId);
+  }, []); 
+
+  const isOwnMessage = sender_id === userId;
+
 
   if (loading) {
     return (

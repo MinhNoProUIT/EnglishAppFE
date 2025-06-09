@@ -14,7 +14,7 @@ import {
   useGetAllMessagesQuery,
   useSendMessageMutation,
 } from "../../services/messageService";
-import { MessageItemProps } from "../../interfaces/MessageInterface";
+import { MessageItemProps, SendMessageProps } from "../../interfaces/MessageInterface";
 import { useGetDetailsGroupQuery } from "../../services/groupService";
 import { Group } from "../../interfaces/GroupInterface";
 import socket from "../../socket";
@@ -40,7 +40,7 @@ export default function Chat() {
 
   const [sendMessageMutation] = useSendMessageMutation();
 
-  const [messages, setMessages] = useState<MessageItemProps[]>([]);
+  // const [messages, setMessages] = useState<MessageItemProps[]>([]);
   const [details, setDetails] = useState<Group>();
   const [inputText, setInputText] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
@@ -54,7 +54,6 @@ export default function Chat() {
     socket.emit("joinGroup", groupId);
     // Listen to newMessage event
     socket.on("newMessage", (message: MessageItemProps) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
       flatListRef.current?.scrollToEnd({ animated: true });
     });
     // Cleanup when component unmounts
@@ -65,9 +64,6 @@ export default function Chat() {
   }, [groupId]);
 
   useEffect(() => {
-    if (fetchedMessages) {
-      setMessages(fetchedMessages);
-    }
     if (fetchedDetails) {
       setDetails(fetchedDetails);
     }
@@ -75,9 +71,8 @@ export default function Chat() {
 
   const sendMessage = async () => {
     const trimmed = inputText.trim();
-    if (!trimmed) return;
-
-    const messagePayload = {
+    if (!trimmed || !userId) return;
+    const messagePayload: SendMessageProps = {
       group_id: groupId,
       sender_id: userId,
       content: trimmed,
@@ -105,7 +100,7 @@ export default function Chat() {
       />
       <FlatList
         ref={flatListRef}
-        data={messages}
+        data={fetchedMessages}
         keyExtractor={(item) => item.id.toString()}
         className="p-4 flex-1"
         renderItem={({ item }) => (

@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { createBaseQuery } from "./api";
-import { GetAllUsersResponse, User } from "../interfaces/UserInterface";
+import { GetAllUsersResponse, User, UserDetail } from "../interfaces/UserInterface";
 
 export const userApi = createApi({
   reducerPath: "userApi",
@@ -42,7 +42,17 @@ export const userApi = createApi({
         method: "GET",
       }),
     }),
+    getDetailsUser: builder.query<UserDetail, void>({
+      query: () => ({
+        url: `api/users/getById`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useGetAllUsersQuery, useGetAllUserRecommendsQuery } = userApi;
+export const {
+  useGetAllUsersQuery,
+  useGetAllUserRecommendsQuery,
+  useGetDetailsUserQuery,
+} = userApi;
