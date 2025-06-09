@@ -6,8 +6,7 @@ export interface Comment {
   parent_comment: string;
   root_comment: string;
   shared_post_id: string;
-  parentId: number | null; 
-  rootCommentId: number | null;
+  content: string;
   created_date: string;
 }
 
@@ -31,13 +30,12 @@ export interface CreateCommentPayload {
 }
 
 // Payload cho chỉnh sửa bình luận
-export interface EditCommentPayload extends CreateCommentPayload {
+export interface EditCommentPayload {
   id: string; // cần id để biết sửa bình luận nào
-}
-
-// Payload cho xóa bình luận
-export interface DeleteCommentPayload {
-  id: string;
+  content: string;
+  parent_comment?: string | null;
+  root_comment?: string | null;
+  react_count: number;
 }
 
 // Payload cho lấy tất cả bình luận theo post
@@ -51,4 +49,5 @@ export interface GetComment extends Comment {
   author_image: string;
   username_parent: string;
   username_root: string;
+  isLike?: boolean;
 }

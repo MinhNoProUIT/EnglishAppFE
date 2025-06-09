@@ -63,11 +63,11 @@ export default function ViewPostItem({
           className="flex flex-row items-center gap-1"
           onPress={() => handleLikePost(item)}
         >
-          {/* <Heart
+          <Heart
             name={item.isLike ? "heart" : "heart-outlined"}
             size={24}
             color={item.isLike ? "red" : "black"}
-          /> */}
+          />
           <Text className="font-bold">{item.react_count}</Text>
         </TouchableOpacity>
 

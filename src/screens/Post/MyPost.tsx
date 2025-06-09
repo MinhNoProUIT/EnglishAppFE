@@ -48,7 +48,7 @@ export default function MyPost() {
     AsyncStorage.getItem("userId").then(setUserId);
   }, []);
 
-  const { data: detailsUser } = useGetDetailsUserQuery(userId);
+  const { data: detailsUser } = useGetDetailsUserQuery();
 
   const { data: allSharedPosts, isLoading: isLoadingSharedPost } =
     useGetAllSharedPostsByUserQuery(userId);

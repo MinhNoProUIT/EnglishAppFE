@@ -9,6 +9,7 @@ export interface Post {
   author_image_url: string | null;
   shared_user_id_count: number;
   comment_count: number;
+  isLike?: boolean;
 }
 
 export interface PostCreate {
