@@ -27,7 +27,7 @@
     "expo-status-bar": "~2.0.1",
     "i18next": "^24.2.3",
     "nativewind": "^4.1.23",
-    "react": "^19.0.0",
+    "react": "19.0.0",
     "react-addons-shallow-compare": "^15.6.3",
     "react-i18next": "^15.4.1",
     "react-native": "^0.79.2",
@@ -60,7 +60,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
-    "@types/react": "~18.3.12",
+    "@types/react": "^19.0.0",
     "@types/react-native-snap-carousel": "^3.8.11",
     "metro-react-native-babel-preset": "^0.77.0",
     "metro-react-native-babel-transformer": "^0.77.0",

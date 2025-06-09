@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { AntDesign, FontAwesome, MaterialIcons, } from '@expo/vector-icons';
-import { QuizResultType } from "../../types/QuizType";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import { useNavigation, RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigations/AppNavigator";
@@ -12,13 +11,9 @@ type FinishQuizScreenNavigationProp = StackNavigationProp<
     "FinishQuiz"
 >;
 
-type FinishQuizScreenRouteParams = {
-    resultData: QuizResultType
-};
-
 export default function FinishQuiz() {
     const navigation = useNavigation<FinishQuizScreenNavigationProp>();
-    const route = useRoute<RouteProp<{ params: FinishQuizScreenRouteParams }, 'params'>>();
+    const route = useRoute<RouteProp<RootStackParamList, "FinishQuiz">>();
     const { resultData } = route.params;
     const [fill, setFill] = useState(0);
 
@@ -43,7 +38,7 @@ export default function FinishQuiz() {
                         rotation={0}
                         duration={2000}
                     >
-                        {(f) => <Text style={styles.percentage}>{Math.round(f)}%</Text>}
+                        {(f: number) => <Text style={styles.percentage}>{Math.round(f)}%</Text>}
                     </AnimatedCircularProgress>
                 </View>
 
@@ -63,7 +58,7 @@ export default function FinishQuiz() {
                     onPress={() => navigation.navigate("ReviewFinishQuizResult", { resultData: resultData })}>
                     <Text style={styles.buttonText}>Xem lại</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={() => navigation.popToTop()}>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.popTo("MainTabs")}>
                     <Text style={styles.buttonText}>Thoát</Text>
                 </TouchableOpacity>
             </View>

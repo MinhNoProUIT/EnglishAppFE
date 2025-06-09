@@ -47,8 +47,6 @@ export default function BottomTabs() {
             iconName = focused ? "newspaper" : "newspaper-outline";
           else if (route.name === "Exercises")
             iconName = focused ? "pencil" : "pencil-outline";
-          else if (route.name === "Login")
-            iconName = focused ? "pencil" : "pencil-outline";
 
           return <Ionicons name={iconName as any} size={size} color={color} />;
         },
@@ -80,10 +78,7 @@ export default function BottomTabs() {
         component={Quizzes}
         options={{ title: "Quiz", headerShown: false }}
       />
-      <Tab.Screen
-        name="Posts"
-        component={Posts}
-      />
+      <Tab.Screen name="Posts" component={Posts} />
       <Tab.Screen
         name="Profile"
         component={Profile}
@@ -92,11 +87,6 @@ export default function BottomTabs() {
           headerShown: true,
           header: () => <ProfileHeader />,
         }}
-      />
-      <Tab.Screen
-        name="Login"
-        component={SignUp}
-        options={{ title: "Đăng nhập" }}
       />
     </Tab.Navigator>
   );

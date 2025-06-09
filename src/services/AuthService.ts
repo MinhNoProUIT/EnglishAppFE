@@ -21,10 +21,10 @@ export interface LoginResponse {
 }
 
 export interface RegisterRequest {
+  username: string;
   email: string;
   password: string;
   confirmPassword: string;
-  username: string;
 }
 
 export interface ChangePasswordRequest {

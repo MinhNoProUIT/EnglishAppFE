@@ -18,5 +18,14 @@
   "VIETNAM": "Tiếng Việt",
   "ENGLISH": "Tiếng Anh",
   "NNHT": "Ngôn ngữ hiển thị",
-  "ANOTHER_SETTING": "Cài đặt khác"
+  "ANOTHER_SETTING": "Cài đặt khác",
+  "USERNAME": "Tên đăng nhập",
+  "EMAIL": "Email",
+  "PASSWORD": "Mật khẩu",
+  "CONFIRM_PASSWORD": "Xác nhận mật khẩu",
+  "1week": "1 Tuần",
+  "1month": "1 Tháng",
+  "3months": "3 Tháng",
+  "1year": "1 Năm",
+  "PERIOD": "/lượt"
 }

@@ -1,5 +1,5 @@
 import { StackNavigationProp } from "@react-navigation/stack";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,54 +12,63 @@ import {
 } from "react-native";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import { useNavigation } from "@react-navigation/native";
+import { IGetAllPremiumPackage } from "../../services/PremiumPackageService";
+import { useGetAllPremiumPackageQuery } from "../../services/PremiumPackageService";
+import { useTranslation } from "react-i18next";
+import { formatCurrency } from "../../utils/formatCurrentcy";
+import { useCreatePaymentOrderMutation } from "../../services/paymentService";
+import { ICreatePaymentResponse } from "../../services/paymentService";
 type PaymentTypeScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   "PaymentType"
 >;
 const PaymentType = () => {
+  const { t } = useTranslation();
   const [selectedPlan, setSelectedPlan] = useState("1week");
+  const [selectedPrice, setSelectedPrice] = useState(10000);
   const navigation = useNavigation<PaymentTypeScreenNavigationProp>();
-  const navigateToPayment = () => {
-    navigation.navigate("PaymentSuccessful");
+  const [paymentData, setPaymentData] = useState<ICreatePaymentResponse | null>(
+    null
+  );
+
+  const [createPaymentOrder, { isError, error }] =
+    useCreatePaymentOrderMutation();
+
+  const navigateToPayment = async (amount: number, description: string) => {
+    try {
+      const response = await createPaymentOrder({
+        amount,
+        description,
+      }).unwrap();
+      console.log("Payment created:", response);
+
+      // Set the payment data (orderCode, checkoutUrl, qrCode) to state
+      setPaymentData(response);
+      navigation.navigate("Payment", {
+        paymentData: response,
+        amount: amount,
+        description: description,
+      });
+    } catch (err) {
+      console.error("Error creating payment:", err);
+    }
   };
-  const plans = [
-    {
-      id: "1week",
-      title: "1 Tuần",
-      price: "10,000 VND",
-      originalPrice: "20,000 VND",
-      discount: "50% OFF",
-      period: "/lượt",
-      isPopular: true,
-    },
-    {
-      id: "1month",
-      title: "1 Tháng",
-      price: "70,000 VND",
-      originalPrice: "80,000 VND",
-      discount: "12,5% OFF",
-      period: "/lượt",
-      isPopular: false,
-    },
-    {
-      id: "3month",
-      title: "3 Tháng",
-      price: "200,000 VND",
-      originalPrice: "240,000 VND",
-      discount: "17% OFF",
-      period: "/lượt",
-      isPopular: false,
-    },
-    {
-      id: "1year",
-      title: "1 Năm",
-      price: "500,000 VND",
-      originalPrice: "800,000 VND",
-      discount: "37,5% OFF",
-      period: "/lượt",
-      isPopular: false,
-    },
-  ];
+
+  const {
+    data: premiumPackageResponse,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useGetAllPremiumPackageQuery();
+
+  const premiumPackageData =
+    (premiumPackageResponse?.Data as IGetAllPremiumPackage[]) || [];
+  useEffect(() => {
+    if (premiumPackageResponse) {
+      console.log("📦 attendanceResponse:", premiumPackageResponse);
+      console.log("✅ attendancetData:", premiumPackageData);
+    } else console.log("kh lay dc");
+  }, [premiumPackageResponse]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -68,22 +77,25 @@ const PaymentType = () => {
       <View style={styles.content}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           {/* Plans */}
-          {plans.map((plan, index) => (
+          {premiumPackageData.map((premiumPackage, index) => (
             <TouchableOpacity
-              key={plan.id}
+              key={premiumPackage.name}
               style={[
                 styles.planCard,
-                selectedPlan === plan.id && styles.selectedPlan,
-                plan.id === "3month" && styles.popularPlanCard,
+                selectedPlan === premiumPackage.name && styles.selectedPlan,
+                premiumPackage.id === "3months" && styles.popularPlanCard,
               ]}
-              onPress={() => setSelectedPlan(plan.id)}
+              onPress={() => {
+                setSelectedPlan(premiumPackage.name),
+                  setSelectedPrice(premiumPackage.price);
+              }}
               activeOpacity={0.9}
             >
-              {plan.isPopular && (
+              {/* {plan.isPopular && (
                 <View style={styles.popularBadge}>
                   <Text style={styles.popularText}>Popular</Text>
                 </View>
-              )}
+              )} */}
               <View
                 style={{
                   flexDirection: "row",
@@ -92,18 +104,24 @@ const PaymentType = () => {
                 }}
               >
                 <View style={styles.planLeftSection}>
-                  <Text style={styles.planTitle}>{plan.title}</Text>
+                  <Text style={styles.planTitle}>
+                    {t(`${premiumPackage.name}`)}
+                  </Text>
                   <View style={styles.priceInfo}>
                     <Text style={styles.originalPrice}>
-                      {plan.originalPrice}
+                      {formatCurrency(premiumPackage.original_price)}
                     </Text>
-                    <Text style={styles.discountText}>{plan.discount}</Text>
+                    <Text style={styles.discountText}>
+                      {premiumPackage.discount}
+                    </Text>
                   </View>
                 </View>
 
                 <View style={styles.planRightSection}>
-                  <Text style={styles.price}>{plan.price}</Text>
-                  <Text style={styles.period}>{plan.period}</Text>
+                  <Text style={styles.price}>
+                    {formatCurrency(premiumPackage.price)}
+                  </Text>
+                  <Text style={styles.period}>{t("PERIOD")}</Text>
                 </View>
               </View>
             </TouchableOpacity>
@@ -134,7 +152,7 @@ const PaymentType = () => {
         <View style={styles.bottomContainer}>
           <TouchableOpacity
             style={styles.continueButton}
-            onPress={navigateToPayment}
+            onPress={() => navigateToPayment(selectedPrice, selectedPlan)}
           >
             <Text style={styles.continueButtonText}>Continue</Text>
           </TouchableOpacity>

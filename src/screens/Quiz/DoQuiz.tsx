@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { ProgressBar } from 'react-native-paper';
 import Icon from '@expo/vector-icons/AntDesign';
-import { QuizQuestionResultType, QuizResultType, QuizType } from "../../types/QuizType";
+import { QuizQuestionResult, QuizResult, } from "../../interfaces/QuizInterface";
 import { useNavigation, RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -12,36 +12,32 @@ type DoQuizScreenNavigationProp = StackNavigationProp<
     "DoQuiz"
 >;
 
-type DoQuizScreenRouteParams = {
-    data: QuizType
-};
-
 export default function DoQuiz() {
     const navigation = useNavigation<DoQuizScreenNavigationProp>();
-    const route = useRoute<RouteProp<{ params: DoQuizScreenRouteParams }, 'params'>>();
-    const { data } = route.params;
+    const route = useRoute<RouteProp<RootStackParamList, "DoQuiz">>();
+    const { quizTitle, quizQuestions } = route.params;
     const [currentIndex, setCurrentIndex] = useState(0);
     const [selectedOption, setSelectedOption] = useState('');
     const [isContinuable, setIsContinuable] = useState(false);
-    const [questionsResult, setQuestionsResult] = useState<QuizQuestionResultType[]>([]);
+    const [questionsResult, setQuestionsResult] = useState<QuizQuestionResult[]>([]);
     const [score, setScore] = useState(0);
 
-    const result: QuizResultType = {
-        ...data,
+    const result: QuizResult = {
+        title: quizTitle,
         questions: questionsResult,
         score: score,
     };
-    const questions = data.questions;
+    const questions = quizQuestions;
     const currentQuestion = questions[currentIndex];
 
     const handleNext = () => {
-        const resultScore = score + (selectedOption == currentQuestion.correctAnswer ? 1 : 0);
-        const newQuestionResult: QuizQuestionResultType = {
+        const resultScore = score + (selectedOption == currentQuestion.correct_answer ? 1 : 0);
+        const newQuestionResult: QuizQuestionResult = {
             ...currentQuestion,
             selectedAnswer: selectedOption
         };
         const UpdatedQuizQuestionsResult = [...questionsResult, newQuestionResult];
-        const UpdatedQuizResult = {
+        const UpdatedQuizResult: QuizResult = {
             ...result,
             questions: UpdatedQuizQuestionsResult,
             score: resultScore
@@ -76,7 +72,7 @@ export default function DoQuiz() {
             {/* question */}
             <View style={styles.questionContainer}>
                 <View style={styles.question}>
-                    <Text style={styles.questionText}>{currentQuestion.questionText}</Text>
+                    <Text style={styles.questionText}>{currentQuestion.question_text}</Text>
                 </View>
 
                 <View style={styles.optionContainer}>
@@ -137,6 +133,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        paddingHorizontal: 15,
         backgroundColor: '#fff',
         borderColor: "#dedede",
         borderWidth: 1,
@@ -144,7 +141,8 @@ const styles = StyleSheet.create({
         borderRadius: 12,
     },
     questionText: {
-        fontSize: 24
+        fontSize: 24,
+        textAlign: 'center',
     },
     optionContainer: {
         flex: 1,
