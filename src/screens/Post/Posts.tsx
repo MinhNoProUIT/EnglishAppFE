@@ -25,7 +25,12 @@ import ShareBottomSheet from "../../components/bottomSheet/ShareBottomSheet";
 import CommentBottomSheet from "../../components/bottomSheet/CommentBottomSheet";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigations/AppNavigator";
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import {
+  RouteProp,
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import { BottomTabParamList } from "../../navigations/BottomTabs";
 import { Ionicons } from "@expo/vector-icons";
 import { useGetAllSharedPostsByUserQuery } from "../../services/sharedPostService";
@@ -33,7 +38,11 @@ import { useGetAllPostsByUserQuery } from "../../services/postService";
 import ViewPostItem from "../../components/items/ViewPostItem";
 import { Post } from "../../interfaces/PostInterface";
 import { SharedPost } from "../../interfaces/SharedPostInterface";
-import { useCreateReactPostMutation, useDeleteReactPostMutation } from "../../services/reactPostService";
+import {
+  useCreateReactPostMutation,
+  useDeleteReactPostMutation,
+  useLazyCheckLikePostQuery,
+} from "../../services/reactPostService";
 
 const { width } = Dimensions.get("window");
 
@@ -59,6 +68,7 @@ export default function Posts() {
   const [hasMoreData, setHasMoreData] = useState(true);
 
   const [selectedPost, setSelectedPost] = useState<Post | SharedPost>();
+  const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
 
   const bottomSheetRefComment = useRef<RBSheetRef | null>(null);
   const bottomSheetRefShare = useRef<RBSheetRef | null>(null);
@@ -70,22 +80,26 @@ export default function Posts() {
 
   console.log("user id params", userId, type);
 
+  const skipPostQuery = !userId || type !== "post";
+  const skipSharedQuery = !userId || type !== "shared";
+
   const {
     data: postData,
     isLoading: isPostLoading,
     refetch: refetchPosts,
-  } = useGetAllPostsByUserQuery(userId!, { skip: !userId || type !== "post" });
+  } = useGetAllPostsByUserQuery(userId!, { skip: skipPostQuery });
 
   const {
     data: sharedPostData,
     isLoading: isSharedLoading,
     refetch: refetchShared,
   } = useGetAllSharedPostsByUserQuery(userId!, {
-    skip: !userId || type !== "shared",
+    skip: skipSharedQuery,
   });
 
   const [createReactPost] = useCreateReactPostMutation();
-const [deleteReactPost] = useDeleteReactPostMutation();
+  const [deleteReactPost] = useDeleteReactPostMutation();
+  const [checkLikePost] = useLazyCheckLikePostQuery();
 
   const isLoading = type === "post" ? isPostLoading : isSharedLoading;
   const posts = type === "post" ? postData : sharedPostData;
@@ -93,6 +107,33 @@ const [deleteReactPost] = useDeleteReactPostMutation();
   const navigateToMyPost = () => {
     navigation.navigate("MyPost");
   };
+
+  const fetchLikeStatus = async () => {
+    if (!userId || !posts) return;
+
+    const likeStatusArray = await Promise.all(
+      posts.map(async (post) => {
+        try {
+          const res = await checkLikePost({
+            user_id: userId.toString(),
+            post_id: post.id,
+          }).unwrap();
+          return [post.id, res.isLike] as [string, boolean];
+        } catch (error) {
+          console.error(`Lỗi kiểm tra like post ${post.id}`, error);
+          return [post.id, false] as [string, boolean]; // fallback
+        }
+      })
+    );
+    const newLikedStatus = Object.fromEntries(likeStatusArray);
+    setLikedPosts(newLikedStatus);
+  };
+
+  useEffect(() => {
+    if (userId && posts) {
+      fetchLikeStatus();
+    }
+  }, [userId, posts]);
 
   const handleScroll = (
     event: NativeSyntheticEvent<NativeScrollEvent>,
@@ -106,17 +147,33 @@ const [deleteReactPost] = useDeleteReactPostMutation();
     }));
   };
 
-  const handleLikePost = (item: Post | SharedPost) => {
-    // setPostData((prevPost) =>
-    //   prevPost.map((post) => {
-    //     if (post.id === item.id){
-    //       const newTotalLike = item.isLike ? post.totalLike -1 : post.totalLike + 1;
-    //       const newStateLike = !item.isLike;
-    //       return {...post, totalLike: newTotalLike, isLike: newStateLike};
-    //     }
-    //     return post;
-    //   })
-    // )
+  const handleLikePost = async (item: Post | SharedPost) => {
+    if (!userId) return;
+
+    const isCurrentlyLiked = likedPosts[item.id];
+
+    try {
+      if (isCurrentlyLiked) {
+        await deleteReactPost({
+          user_id: userId.toString(),
+          post_id: item.id,
+        }).unwrap();
+        setLikedPosts((prev) => ({ ...prev, [item.id]: false }));
+      } else {
+        await createReactPost({
+          user_id: userId.toString(),
+          post_id: item.id,
+        }).unwrap();
+        setLikedPosts((prev) => ({ ...prev, [item.id]: true }));
+      }
+      if (type === "post") {
+        refetchPosts();
+      } else {
+        refetchShared();
+      }
+    } catch (error) {
+      console.error("Lỗi khi xử lý like/unlike:", error);
+    }
   };
 
   const handleOpenComment = (post: Post | SharedPost) => {
@@ -165,7 +222,7 @@ const [deleteReactPost] = useDeleteReactPostMutation();
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <ViewPostItem
-            item={item}
+            item={{ ...item, isLike: likedPosts[item.id] ?? false }}
             type={type}
             currentIndexes={currentIndexes}
             handleLikePost={handleLikePost}
@@ -191,7 +248,12 @@ const [deleteReactPost] = useDeleteReactPostMutation();
 
       {/*view bottom sheet - comment */}
       {selectedPost && (
-        <CommentBottomSheet ref={bottomSheetRefComment} post={selectedPost!} />
+        <CommentBottomSheet
+          ref={bottomSheetRefComment}
+          postId={selectedPost.id}
+          type={type}
+          refetch={type === "post" ? refetchPosts : refetchShared}
+        />
       )}
 
       {/*view bottom sheet - share */}

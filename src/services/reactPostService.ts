@@ -13,14 +13,26 @@ export const reactPostApi = createApi({
         body: data,
       }),
     }),
-    deleteReactPost: builder.mutation<any, string>({
-      query: (id) => ({
-        url: `api/react-posts/delete/${id}`,
+    deleteReactPost: builder.mutation<any, { user_id: string; post_id: string }>({
+      query: ({ user_id, post_id }) => ({
+        url: `api/react-posts/delete/${user_id}/${post_id}`,
         method: "DELETE",
+      }),
+    }),
+    checkLikePost: builder.query<
+      { isLike: boolean },
+      { user_id: string; post_id: string }
+    >({
+      query: ({ user_id, post_id }) => ({
+        url: `api/react-posts/check-like/${user_id}/${post_id}`,
+        method: "GET",
       }),
     }),
   }),
 });
 
-export const { useCreateReactPostMutation, useDeleteReactPostMutation } =
-  reactPostApi;
+export const {
+  useCreateReactPostMutation,
+  useDeleteReactPostMutation,
+  useLazyCheckLikePostQuery,
+} = reactPostApi;

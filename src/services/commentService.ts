@@ -3,7 +3,6 @@ import { createBaseQuery } from "./api";
 import {
   Comment,
   CreateCommentPayload,
-  DeleteCommentPayload,
   EditCommentPayload,
   GetComment,
   GetCommentsByPostPayload,
@@ -27,8 +26,8 @@ export const commentApi = createApi({
         body: data,
       }),
     }),
-    deleteComment: builder.mutation<string, DeleteCommentPayload>({
-      query: ({ id }) => ({
+    deleteComment: builder.mutation<string, { id: string}>({
+      query: (id) => ({
         url: `api/comments/delete/${id}`,
         method: "DELETE",
       }),

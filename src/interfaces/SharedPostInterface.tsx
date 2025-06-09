@@ -34,4 +34,5 @@ export interface SharedPost {
   image_url: string | null;
   shared_count: number;
   comment_count: number;
+  isLike?: boolean;
 }
