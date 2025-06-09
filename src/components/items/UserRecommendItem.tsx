@@ -1,9 +1,15 @@
 import React from "react";
-import { Text, TouchableOpacity, View, Image } from "react-native";
+import { Text, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { UserItemProps } from "../../interfaces/UserInterface";
+import { UserItemAddGroupProps } from "../../interfaces/UserInterface";
 
-export default function UserItem({ id, name, avatar, selected, onPress }: UserItemProps) {
+export default function UserItem({
+  id,
+  name,
+  avatar,
+  selected,
+  onPress,
+}: UserItemAddGroupProps) {
   return (
     <TouchableOpacity
       onPress={onPress}
