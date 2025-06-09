@@ -54,6 +54,7 @@ import { useTranslation } from "react-i18next";
 import ChangePasswordScreen from "../screens/Login/ChangePasswordScreen";
 import { Linking } from "react-native"; // Thêm Linking từ React Native để nhận deep link
 import { NavigationContainer } from "@react-navigation/native";
+import { ICreatePaymentResponse } from "../services/paymentService";
 
 export type RootStackParamList = {
   MainTabs: undefined;
@@ -94,10 +95,19 @@ export type RootStackParamList = {
 
   PaymentType: undefined;
   ProfileHeader: undefined;
-  Payment: undefined;
+  Payment: {
+    paymentData: ICreatePaymentResponse;
+    amount: number;
+    description: string;
+  };
   PaymentIntroduction: undefined;
 
-  PaymentSuccessful: undefined;
+  PaymentSuccessful: {
+    amount: number;
+    paid_at: Date;
+    orderCode: number;
+    description: string;
+  };
 
   Onboarding: undefined;
   UpdateInfo: undefined;

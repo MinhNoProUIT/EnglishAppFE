@@ -25,5 +25,10 @@
   "CONFIRM_PASSWORD": "Confirm password",
   "UPDATE_INFO": "Update information",
   "CHANGE_INFO": "Change information",
-  "CHANGE_PASSWORD": "Change password"
+  "CHANGE_PASSWORD": "Change password",
+  "1week": "1 Week",
+  "1month": "1 Month",
+  "3months": "3 Month",
+  "1year": "1 Year",
+  "PERIOD": "/turn"
 }

@@ -1,6 +1,10 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { createBaseQuery } from "./api";
-import { GetAllUsersResponse, User } from "../interfaces/UserInterface";
+import {
+  GetAllUsersResponse,
+  User,
+  UserDetail,
+} from "../interfaces/UserInterface";
 
 export interface update {
   username: string;
@@ -60,6 +64,12 @@ export const userApi = createApi({
         method: "GET",
       }),
     }),
+    getDetailsUser: builder.query<UserDetail, void>({
+      query: () => ({
+        url: `api/users/getById`,
+        method: "GET",
+      }),
+    }),
     update: builder.mutation<void, { formData: FormData; changeBy: string }>({
       query: ({ formData, changeBy }) => ({
         url: `api/users/update/${changeBy}`,
@@ -82,4 +92,5 @@ export const {
   useGetByIdQuery,
   useUpdateMutation,
   useRemoveMutation,
+  useGetDetailsUserQuery,
 } = userApi;

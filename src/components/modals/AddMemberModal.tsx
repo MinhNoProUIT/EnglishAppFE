@@ -17,6 +17,7 @@ import {
   useKickMemberFromGroupMutation,
 } from "../../services/groupMemberService";
 import { MemberData } from "../../interfaces/MemberInterface";
+import { User } from "../../interfaces/UserInterface";
 
 interface SelectMembersModalProps {
   visible: boolean;
@@ -147,6 +148,8 @@ export default function SelectMembersModal({
     }
   };
 
+  console.log("paginatedUsers",paginatedUsers);
+
   return (
     <Modal visible={visible} animationType="fade" transparent>
       <View className="flex-1 justify-center items-center bg-black/30">
@@ -167,15 +170,22 @@ export default function SelectMembersModal({
           <FlatList
             data={paginatedUsers}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <UserItem
-                id={item.id}
-                avatar={item.image_url}
-                name={item.username}
-                selected={selectedMembers.includes(item.id)}
-                onPress={() => toggleMember(item.id)}
-              />
-            )}
+            renderItem={({ item }) => {
+              const id = mode === "kick" ? (item as MemberData).user_id : (item as User).id;
+              const avatar = mode === "kick" ? (item as MemberData).image_url : (item as User).image_url;
+              const name = mode === "kick" ? (item as MemberData).username : (item as User).username;
+            
+              return (
+                <UserItem
+                  id={id}
+                  user_id={id}
+                  avatar={avatar}
+                  name={name}
+                  selected={selectedMembers.includes(id)}
+                  onPress={() => toggleMember(id)}
+                />
+              );
+            }}
             onEndReached={loadMoreUsers}
             onEndReachedThreshold={0.5}
             showsVerticalScrollIndicator={false}
