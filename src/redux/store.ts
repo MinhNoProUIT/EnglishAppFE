@@ -14,6 +14,7 @@ import { quizQuestionApi } from "../services/quizQuestionService";
 import { premiumPackageApi } from "../services/PremiumPackageService";
 import { commentApi } from "../services/commentService";
 import { reactCommentApi } from "../services/reactCommentService";
+import { wordApi } from "../services/WordService";
 
 export const store = configureStore({
   reducer: {
@@ -32,6 +33,7 @@ export const store = configureStore({
     [premiumPackageApi.reducerPath]: premiumPackageApi.reducer,
     [commentApi.reducerPath]: commentApi.reducer,
     [reactCommentApi.reducerPath]: reactCommentApi.reducer,
+    [wordApi.reducerPath]: wordApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -49,7 +51,8 @@ export const store = configureStore({
       quizQuestionApi.middleware,
       premiumPackageApi.middleware,
       commentApi.middleware,
-      reactCommentApi.middleware
+      reactCommentApi.middleware,
+      wordApi.middleware
     ),
 });
 
