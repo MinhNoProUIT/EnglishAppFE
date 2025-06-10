@@ -9,6 +9,11 @@ import {
   FlatList,
 } from "react-native";
 import PreviewCourseMenu from "./PreviewCourseMenu";
+import { useGetAllLearnMoreCoursesQuery } from "../../services/courseService";
+import { LockedCourse } from "../../interfaces/CourseInterface";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../navigations/AppNavigator";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 const courses = [
   {
@@ -48,9 +53,31 @@ const courses = [
     image: "https://picsum.photos/200/130",
   },
 ];
+
+const NullCoursePreviewMenu = {
+  id: "",
+  title: "",
+  topic: "",
+  level: "",
+  image_url: "",
+  description: "",
+  price: 0,
+  isActive: true,
+};
+
+type CoursesScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "Courses"
+>;
 export default function LockedCourses() {
-  const [previewCourseMenuVisible, setpreviewCourseMenuVisible] =
-    useState(false);
+  const navigation = useNavigation<CoursesScreenNavigationProp>();
+  const [previewCourseMenuVisible, setPreviewCourseMenuVisible] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<LockedCourse>(NullCoursePreviewMenu);
+  const {
+    data: courses,
+    refetch,
+  } = useGetAllLearnMoreCoursesQuery();
+
   return (
     <View style={{ flex: 1 }}>
       {/* list courses */}
@@ -61,28 +88,33 @@ export default function LockedCourses() {
         renderItem={({ item }) => (
           <View style={styles.card}>
             <View style={styles.row}>
-              <Image style={styles.image} source={{ uri: item.image }} />
+              <Image style={styles.image} source={{ uri: item.image_url }} />
               <View style={styles.info}>
                 <Text style={styles.title}>{item.title}</Text>
                 <Text style={styles.detail} numberOfLines={2}>
-                  {item.detail}
+                  {item.description}
                 </Text>
               </View>
-              {item.isActive == "true" ? (
+              {item.isActive ? (
                 <TouchableOpacity
                   style={[styles.button, { backgroundColor: "#2563EB" }]}
-                  onPress={() => setpreviewCourseMenuVisible(true)}
+                  onPress={() => {
+                    setPreviewCourseMenuVisible(true)
+                    setSelectedCourse(item)
+                  }}
                 >
                   <Icon name="arrow-right" size={15} color="white" />
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity
-                  style={[
-                    styles.button,
-                    { backgroundColor: "#FF8080", height: 58 },
-                  ]}
+                  style={styles.button}
+                  onPress={() => {
+                    setPreviewCourseMenuVisible(true)
+                    setSelectedCourse(item)
+                  }}
                 >
-                  <Text style={styles.buttonText}>ADS</Text>
+                  <Image style={styles.keyImage}
+                    source={require("../../../assets/key.png")} />
                 </TouchableOpacity>
               )}
             </View>
@@ -98,8 +130,9 @@ export default function LockedCourses() {
       {/* modals */}
       <PreviewCourseMenu
         visible={previewCourseMenuVisible}
-        onClose={() => setpreviewCourseMenuVisible(false)}
-        id="jhdska"
+        onClose={() => setPreviewCourseMenuVisible(false)}
+        selectedCourse={selectedCourse}
+        isActive={selectedCourse.isActive}
       />
     </View>
   );
@@ -159,6 +192,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 700,
     color: "#fff",
+  },
+  keyImage: {
+    height: 30,
+    width: 30,
   },
   topic: {
     fontSize: 14,

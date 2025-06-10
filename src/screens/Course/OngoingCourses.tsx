@@ -253,7 +253,6 @@ export default function OngoingCourses() {
         onClose={() => setDetailMenuVisible(false)}
         onLearn={() => {
           setDetailMenuVisible(false); // Đóng modal trước
-          navigation.navigate("LearnScreen", { course_id: selectedCourse.course_id }); // Điều hướng đến LearnScreen
         }}
         onRepeat={() => {
           setDetailMenuVisible(false); // Đóng modal trước

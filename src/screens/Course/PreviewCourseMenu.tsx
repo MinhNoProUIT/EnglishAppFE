@@ -16,10 +16,12 @@ import { useNavigation } from "@react-navigation/native";
 import { useGetAllByCourseQuery } from "../../services/WordService";
 import { CourseType } from "../../types/CourseType";
 import { WordType } from "../../types/WordType";
+import { LockedCourse } from "../../interfaces/CourseInterface";
 interface CourseMenuProps {
   visible: boolean;
   onClose: () => void;
-  id: string;
+  selectedCourse: LockedCourse;
+  isActive: boolean;
 }
 
 type CoursesScreenNavigationProp = StackNavigationProp<
@@ -170,32 +172,11 @@ const courses: CourseType[] = [
 const PreviewCourseMenu: React.FC<CourseMenuProps> = ({
   visible,
   onClose,
-  id,
+  selectedCourse,
+  isActive,
 }) => {
   const navigation = useNavigation<CoursesScreenNavigationProp>();
 
-  const { data } = useGetAllByCourseQuery(
-    "24535e3e-8ef4-482c-b361-4a630b402e5e"
-  );
-  const [words, setWords] = useState<WordType[]>([]);
-
-  useEffect(() => {
-    if (data) {
-      const temp: WordType[] = data.map((x) => ({
-        id: x.id,
-        eng: x.englishname,
-        vie: x.vietnamesename,
-        transcription: x.transcription,
-        type: x.type,
-        example: x.examplesentence || "", // Nếu không có ví dụ, sử dụng chuỗi rỗng
-        image: x.imageurl,
-        level: 1, // Hoặc giá trị level có trong data
-      }));
-
-      setWords(temp);
-    }
-  }, [data]);
-  console.log(data);
 
   return (
     <Modal visible={visible} transparent={true} animationType="fade">
@@ -204,48 +185,60 @@ const PreviewCourseMenu: React.FC<CourseMenuProps> = ({
           <TouchableWithoutFeedback>
             <View style={styles.menuContainer}>
               {/* image */}
-              <Image style={styles.image} source={{ uri: course.image }} />
+              <Image style={styles.image} source={{ uri: selectedCourse.image_url }} />
 
               {/* text */}
               <View style={styles.textPart}>
                 <View style={styles.row}>
-                  <Text style={styles.title}>{course.name}</Text>
+                  <Text style={styles.title}>{selectedCourse.title}</Text>
                   <View style={styles.details}>
-                    <View
-                      style={[styles.detail, { backgroundColor: "#ECF9EF" }]}
-                    >
-                      <Text style={styles.detailText}>
-                        {course.numberOfWords} words
-                      </Text>
-                    </View>
                     <View
                       style={[styles.detail, { backgroundColor: "#F4F4F5" }]}
                     >
-                      <Text style={styles.detailText}>{course.level}</Text>
+                      <Text style={styles.detailText}>{selectedCourse.level}</Text>
                     </View>
                   </View>
                 </View>
                 <Text style={styles.description} numberOfLines={3}>
-                  {course.description}
+                  {selectedCourse.description}
                 </Text>
               </View>
 
               {/* button */}
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() =>
-                  navigation.navigate("LearnScreen", {
-                    words: words,
-                  })
-                }
-              >
-                <Text style={styles.buttonText}>Start</Text>
-              </TouchableOpacity>
+              {isActive ?
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    onClose();
+                    navigation.navigate("LearnScreen", { course_id: selectedCourse.id, onFinish: () => { } }); // Điều hướng đến LearnScreen
+                  }}
+                >
+                  <Text style={styles.buttonText}>Start</Text>
+                </TouchableOpacity>
+                :
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    style={styles.button2}
+                    onPress={() => {
+                      onClose();
+                      navigation.navigate("PaymentIntroduction")
+                    }}
+                  >
+                    <Text style={styles.buttonText}>Get premium</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.button2}
+                    onPress={() => {}}
+                  >
+                    <Text style={styles.buttonText}>{selectedCourse.price} coins</Text>
+                  </TouchableOpacity>
+                </View>
+              }
             </View>
           </TouchableWithoutFeedback>
         </View>
-      </TouchableWithoutFeedback>
-    </Modal>
+      </TouchableWithoutFeedback >
+    </Modal >
   );
 };
 
@@ -318,8 +311,26 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 14,
     fontWeight: 500,
-    color: "#fff",
   },
+
+  buttonContainer: {
+    width: "80%",
+    flexDirection: 'row',
+    gap: 15,
+    position: "absolute",
+    bottom: 22,
+  },
+  button2: {
+    flex: 1,
+    height: 50,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    borderColor: "#2563EB",
+    borderWidth: 1,
+  },
+
 });
 
 export default PreviewCourseMenu;

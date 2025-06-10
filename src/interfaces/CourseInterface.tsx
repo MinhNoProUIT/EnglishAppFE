@@ -16,3 +16,14 @@ export interface CourseDetailMenuProps {
     completedWords: number,
     remainWords: number,
 };
+
+export interface LockedCourse {
+    id: string,
+    title: string,
+    topic: string,
+    level: string,
+    image_url: string,
+    description: string,
+    price: number,
+    isActive: boolean,
+};
