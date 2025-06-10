@@ -88,7 +88,8 @@ export type RootStackParamList = {
   PrivacyPolicy: undefined;
   AnotherSetting: undefined;
 
-  MyPost: undefined;
+  MyPost: { userId?: string | null; type?: string | null; username?: string | null};
+  Posts: { userId?: string | null; type?: string | null; username?: string | null }; 
 
   Group: undefined;
   Chat: { groupId: string };

@@ -11,7 +11,7 @@ import {
 import { Avatar } from "react-native-paper";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useEffect, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import { MyPostData, Post, PostCreate } from "../../interfaces/PostInterface";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -26,6 +26,8 @@ import {
   SharedPost,
   SharedPostResponse,
 } from "../../interfaces/SharedPostInterface";
+
+type PostsRouteProp = RouteProp<RootStackParamList, "Posts">;
 
 export default function MyPost() {
   const [numColumns, setNumColumns] = useState(3);
@@ -48,6 +50,11 @@ export default function MyPost() {
     AsyncStorage.getItem("userId").then(setUserId);
   }, []);
 
+  const route = useRoute<PostsRouteProp>();
+  const { userId: routeUserId, type, username } = route.params || {};
+
+  console.log("route", routeUserId, type, username)
+
   const { data: detailsUser } = useGetDetailsUserQuery();
 
   const { data: allSharedPosts, isLoading: isLoadingSharedPost } =
@@ -66,7 +73,7 @@ export default function MyPost() {
   }, [userId, allPosts, allSharedPosts]);
 
   const handleNavigatePost = (item: SharedPost | Post) => {
-    const type = "shared_by" in item ? "share" : "post";
+    const type = isSharedPost(item) ? "share" : "post";
     navigation.navigate("MainTabs", {
       screen: "Posts",
       params: { userId: userId, type, username: detailsUser?.username },
@@ -83,6 +90,10 @@ export default function MyPost() {
       ),
     });
   }, [navigation]);
+
+  const isSharedPost = (item: SharedPost | Post): item is SharedPost => {
+    return "user_shared_id" in item;
+  };
 
   const PersonalRoute = () => renderPostList(allPosts ?? []);
   const SharedRoute = () => renderSharedPostList(allSharedPosts ?? []);

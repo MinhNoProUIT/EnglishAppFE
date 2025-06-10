@@ -34,7 +34,7 @@ import {
 import { BottomTabParamList } from "../../navigations/BottomTabs";
 import { Ionicons } from "@expo/vector-icons";
 import { useGetAllSharedPostsByUserQuery } from "../../services/sharedPostService";
-import { useGetAllPostsByUserQuery } from "../../services/postService";
+import { useGetAllPostsByUserQuery, useLazyGetAllPostsQuery } from "../../services/postService";
 import ViewPostItem from "../../components/items/ViewPostItem";
 import { Post } from "../../interfaces/PostInterface";
 import { SharedPost } from "../../interfaces/SharedPostInterface";
@@ -43,8 +43,7 @@ import {
   useDeleteReactPostMutation,
   useLazyCheckLikePostQuery,
 } from "../../services/reactPostService";
-
-const { width } = Dimensions.get("window");
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export interface RBSheetRef {
   open: () => void;
@@ -66,12 +65,15 @@ export default function Posts() {
 
   const [page, setPage] = useState(1);
   const [hasMoreData, setHasMoreData] = useState(true);
+  const [allPosts, setAllPosts] = useState<(Post | SharedPost)[]>([]); // Lưu tất cả posts đã load
 
   const [selectedPost, setSelectedPost] = useState<Post | SharedPost>();
   const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
+  const [ownerId, setOwwnerId] = useState<string|null>(null);
 
   const bottomSheetRefComment = useRef<RBSheetRef | null>(null);
   const bottomSheetRefShare = useRef<RBSheetRef | null>(null);
+  const [isBottomLoading, setIsBottomLoading] = useState(false);
 
   const navigation = useNavigation<SettingsScreenNavigationProp>();
 
@@ -81,7 +83,7 @@ export default function Posts() {
   console.log("user id params", userId, type);
 
   const skipPostQuery = !userId || type !== "post";
-  const skipSharedQuery = !userId || type !== "shared";
+  const skipSharedQuery = !userId || type !== "share";
 
   const {
     data: postData,
@@ -97,23 +99,106 @@ export default function Posts() {
     skip: skipSharedQuery,
   });
 
+  const isViewAll = !userId && !type;
+  
+  // Sử dụng useLazyQuery thay vì useQuery để có thể control việc fetch
+  const [getAllPosts, { isLoading: isLoadingAll }] = useLazyGetAllPostsQuery();
   const [createReactPost] = useCreateReactPostMutation();
   const [deleteReactPost] = useDeleteReactPostMutation();
   const [checkLikePost] = useLazyCheckLikePostQuery();
 
   const isLoading = type === "post" ? isPostLoading : isSharedLoading;
   const posts = type === "post" ? postData : sharedPostData;
+  
+  useEffect(() => {
+    AsyncStorage.getItem("userId").then(setOwwnerId);
+  }, [])
+  // Load initial data khi component mount
+  useEffect(() => {
+    if (isViewAll) {
+      loadInitialPosts();
+    }
+  }, [isViewAll]);
 
-  const navigateToMyPost = () => {
-    navigation.navigate("MyPost");
+  const loadInitialPosts = async () => {
+    try {
+      const pageSize = 5;
+      let currentPage = 1;
+      let allData: Post[] = [];
+      let totalPages = 1;
+  
+      // Fetch the first page to get pagination info
+      const firstRes = await getAllPosts({ page: currentPage, limit: pageSize }).unwrap();
+      if (firstRes?.data) {
+        allData = [...firstRes.data];
+        const total = firstRes?.pagination?.total ?? 0;
+        totalPages = Math.ceil(total / pageSize);
+  
+        // Load remaining pages if any
+        while (currentPage < totalPages) {
+          currentPage++;
+          const res = await getAllPosts({ page: currentPage, limit: pageSize }).unwrap();
+          if (res?.data) {
+            allData = [...allData, ...res.data];
+          }
+        }
+  
+        setAllPosts(allData);
+        setHasMoreData(allData.length < (firstRes?.pagination?.total ?? 0));
+      }
+    } catch (error) {
+      console.error("Lỗi tải toàn bộ bài viết:", error);
+    }
   };
-
-  const fetchLikeStatus = async () => {
-    if (!userId || !posts) return;
+  
+  const fetchMorePosts = async () => {
+    if (!hasMoreData || isBottomLoading || !isViewAll) return;
+  
+    setIsBottomLoading(true);
+    const nextPage = page + 1;
+  
+    try {
+      const res = await getAllPosts({ page: nextPage, limit: 5 }).unwrap();
+      
+      if (res?.data && res.data.length > 0) {
+        // Append new posts to existing posts
+        setAllPosts(prevPosts => [...prevPosts, ...res.data]);
+        setPage(nextPage);
+        
+        // Check if we have more data
+        const total = res?.pagination?.total ?? 0;
+        const currentTotal = allPosts.length + res.data.length;
+        
+        if (currentTotal >= total) {
+          setHasMoreData(false);
+        }
+      } else {
+        setHasMoreData(false);
+      }
+    } catch (error) {
+      console.error("Lỗi tải thêm bài viết:", error);
+    } finally {
+      setIsBottomLoading(false);
+    }
+  };
+  
+  const navigateToMyPost = (item: Post) => {
+    navigation.navigate("MyPost", {
+      userId: item.user_id,
+      type,
+      username: item.author_name,
+    });
+  };
+  
+  const fetchLikeStatus = async (postsToCheck?: (Post | SharedPost)[]) => {
+    if (!userId) return;
+    
+    const targetPosts = postsToCheck || (isViewAll ? allPosts : posts);
+    if (!targetPosts) return;
 
     const likeStatusArray = await Promise.all(
-      posts.map(async (post) => {
-        try {
+      targetPosts.map(async (post) => {
+        try {  
           const res = await checkLikePost({
             user_id: userId.toString(),
             post_id: post.id,
@@ -121,36 +206,53 @@ export default function Posts() {
           return [post.id, res.isLike] as [string, boolean];
         } catch (error) {
           console.error(`Lỗi kiểm tra like post ${post.id}`, error);
-          return [post.id, false] as [string, boolean]; // fallback
+          return [post.id, false] as [string, boolean]; 
         }
       })
     );
     const newLikedStatus = Object.fromEntries(likeStatusArray);
-    setLikedPosts(newLikedStatus);
+    setLikedPosts(prev => ({ ...prev, ...newLikedStatus }));
   };
 
+  // Separate effect for initial load
   useEffect(() => {
-    if (userId && posts) {
-      fetchLikeStatus();
+    if (userId) {
+      if (isViewAll && allPosts.length > 0) {
+        fetchLikeStatus();
+      } else if (!isViewAll && posts) {
+        fetchLikeStatus();
+      }
     }
-  }, [userId, posts]);
+  }, [userId]);
 
-  const handleScroll = (
-    event: NativeSyntheticEvent<NativeScrollEvent>,
-    postId: number
-  ) => {
-    const contentOffsetX = event.nativeEvent.contentOffset.x;
-    const newIndex = Math.round(contentOffsetX / width);
-    setCurrentIndexes((prevIndexes) => ({
-      ...prevIndexes,
-      [postId]: newIndex,
-    }));
-  };
+  // Effect for when posts data changes (but not after like/unlike actions)
+  const initialLoadRef = useRef(true);
+  useEffect(() => {
+    if (userId && !initialLoadRef.current) {
+      if (isViewAll && allPosts.length > 0) {
+        // Only fetch for new posts, not existing ones
+        const existingPostIds = Object.keys(likedPosts);
+        const newPosts = allPosts.filter(post => !existingPostIds.includes(post.id));
+        if (newPosts.length > 0) {
+          fetchLikeStatus(newPosts);
+        }
+      } else if (!isViewAll && posts) {
+        fetchLikeStatus();
+      }
+    }
+    initialLoadRef.current = false;
+  }, [posts, allPosts]);
 
   const handleLikePost = async (item: Post | SharedPost) => {
     if (!userId) return;
 
     const isCurrentlyLiked = likedPosts[item.id];
+
+    // Optimistic update
+    setLikedPosts((prev) => ({ 
+      ...prev, 
+      [item.id]: !isCurrentlyLiked 
+    }));
 
     try {
       if (isCurrentlyLiked) {
@@ -158,21 +260,20 @@ export default function Posts() {
           user_id: userId.toString(),
           post_id: item.id,
         }).unwrap();
-        setLikedPosts((prev) => ({ ...prev, [item.id]: false }));
       } else {
         await createReactPost({
           user_id: userId.toString(),
           post_id: item.id,
         }).unwrap();
-        setLikedPosts((prev) => ({ ...prev, [item.id]: true }));
       }
-      if (type === "post") {
-        refetchPosts();
-      } else {
-        refetchShared();
-      }
+      
     } catch (error) {
       console.error("Lỗi khi xử lý like/unlike:", error);
+      // Revert optimistic update on error
+      setLikedPosts((prev) => ({ 
+        ...prev, 
+        [item.id]: isCurrentlyLiked 
+      }));
     }
   };
 
@@ -207,18 +308,32 @@ export default function Posts() {
           </TouchableOpacity>
         ) : null,
       headerRight: () => (
-        <TouchableOpacity onPress={() => navigateToMyPost()} className="pr-4">
+        <TouchableOpacity onPress={() => navigateToMyPost({user_id: ownerId })} className="pr-4">
           <Ionicons name="person-circle-outline" size={30} color="black" />
         </TouchableOpacity>
       ),
     });
   }, [username, userId]);
 
+  const isInitialLoading = isViewAll
+    ? isLoadingAll && allPosts.length === 0
+    : isLoading;
+
+  if (isInitialLoading) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color="#2563EB" />
+      </View>
+    );
+  }
+  // Determine which data to display
+  const displayData = isViewAll ? allPosts : posts ?? [];
+
   return (
     <View>
       {/* list post */}
       <FlatList<Post | SharedPost>
-        data={posts}
+        data={displayData}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <ViewPostItem
@@ -231,34 +346,49 @@ export default function Posts() {
             navigateToMyPost={navigateToMyPost}
           />
         )}
-        onEndReached={() => {
-          // pagination logic here (nếu có)
-        }}
-        onEndReachedThreshold={0.7}
+        onEndReached={isViewAll ? fetchMorePosts : undefined}
+        onEndReachedThreshold={0.5}
         ListFooterComponent={
-          isLoading ? (
-            <ActivityIndicator size="large" color="#2563EB" />
-          ) : hasMoreData ? null : (
-            <View className="text-center text-gray-500 p-4">
-              <Text>Không còn dữ liệu</Text>
+          isBottomLoading ? (
+            <View className="p-4 items-center">
+              <ActivityIndicator size="large" color="#2563EB" />
             </View>
-          )
+          ) : !hasMoreData && isViewAll && displayData.length > 0 ? (
+            <View className="p-4 items-center">
+              <Text className="text-gray-500">Không còn dữ liệu</Text>
+            </View>
+          ) : null
         }
       />
-
       {/*view bottom sheet - comment */}
       {selectedPost && (
         <CommentBottomSheet
           ref={bottomSheetRefComment}
           postId={selectedPost.id}
           type={type}
-          refetch={type === "post" ? refetchPosts : refetchShared}
+          refetch={
+            isViewAll 
+              ? loadInitialPosts 
+              : type === "post" 
+                ? refetchPosts 
+                : refetchShared
+          }
         />
       )}
-
       {/*view bottom sheet - share */}
       {selectedPost && (
-        <ShareBottomSheet ref={bottomSheetRefShare} post={selectedPost} />
+        <ShareBottomSheet
+          ref={bottomSheetRefShare}
+          postId={selectedPost.id}
+          type={type}
+          refetch={
+            isViewAll 
+              ? loadInitialPosts 
+              : type === "post" 
+                ? refetchPosts 
+                : refetchShared
+          }
+        />
       )}
     </View>
   );

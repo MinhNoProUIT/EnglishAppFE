@@ -1,7 +1,7 @@
 export interface CreateSharedPostProps {
-  post_id: string;
+  post_id?: string | null;
   user_id: string;
-  shared_post_id: string;
+  shared_post_id?: string | null;
   react_count?: number; // có thể không truyền thì mặc định 0
   comment_count?: number; // có thể không truyền thì mặc định 0
   shared_count?: number; // có thể không truyền thì mặc định 0

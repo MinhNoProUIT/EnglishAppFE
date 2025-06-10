@@ -26,7 +26,7 @@ export const commentApi = createApi({
         body: data,
       }),
     }),
-    deleteComment: builder.mutation<string, { id: string}>({
+    deleteComment: builder.mutation<string, string>({
       query: (id) => ({
         url: `api/comments/delete/${id}`,
         method: "DELETE",
