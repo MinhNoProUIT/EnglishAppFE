@@ -14,14 +14,8 @@ export const userProgressApi = createApi({
     "https://englishapp-uit.onrender.com/api/user-progress"
   ),
   endpoints: (builder) => ({
-    getUnlearnedWordsByCourse: builder.query<
-      Word[],
-      { course_id: string; user_Id: string }
-    >({
-      query: ({ course_id, user_Id }) => ({
-        url: `getUnlearnedWordsByCourse/${user_Id}/${course_id}`,
-        method: "GET",
-      }),
+    getUnlearnedWordsByCourse: builder.query<Word[], string>({
+      query: (course_id) => `getUnlearnedWordsByCourse/${course_id}`,
     }),
     getAllTodayRepeatWords: builder.query<UserProgressWithWord[], string>({
       query: (course_id) => `getAllTodayRepeatWordsByCourse/${course_id}`,
