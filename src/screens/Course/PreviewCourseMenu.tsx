@@ -66,7 +66,6 @@ const PreviewCourseMenu: React.FC<CourseMenuProps> = ({
         userCoinApi.util.invalidateTags([{ type: "UserCoin", id: "LIST" }])
       );
 
-      refetch();
       onClose();
     } catch (err) {
       console.error("Error updating coin:", err);
@@ -106,18 +105,8 @@ const PreviewCourseMenu: React.FC<CourseMenuProps> = ({
               </View>
 
               {/* button */}
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => {
-                  handleCoinUpdate(item.price);
-                }}
-              >
+              <TouchableOpacity style={styles.button}>
                 <Text style={styles.buttonText}>Start</Text>
-                <FontAwesome6
-                  name="coins"
-                  size={24}
-                  style={{ color: "rgb(243, 207, 5)" }}
-                />
               </TouchableOpacity>
             </View>
           </TouchableWithoutFeedback>

@@ -39,7 +39,7 @@ const storeLanguage = async (languageName: string) => {
 const AnotherSetting = () => {
   const [backgroundMusicValue, setBackgroundMusicValue] = useState(50);
   const [musicValue, setMusicValue] = useState(50);
-  const [selectedLanguage, setSelectedLanguage] = useState("English");
+  const [selectedLanguage, setSelectedLanguage] = useState("Tiếng Việt");
   const [showLanguageList, setShowLanguageList] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
 

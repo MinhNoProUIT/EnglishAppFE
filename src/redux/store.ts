@@ -63,10 +63,6 @@ export const store = configureStore({
       wordApi.middleware,
       courseApi.middleware,
       userProgressApi.middleware,
-      quizApi.middleware,
-      quizQuestionApi.middleware,
-      attendanceApi.middleware,
-      premiumPackageApi.middleware,
       userCoinApi.middleware,
       userCourseApi.middleware
     ),
