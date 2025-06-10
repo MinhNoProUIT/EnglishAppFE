@@ -22,6 +22,7 @@ interface CourseMenuProps {
   visible: boolean;
   item: any;
   onClose: () => void;
+  refetch: () => void;
 }
 
 const course = {
@@ -34,10 +35,11 @@ const course = {
   image: "https://picsum.photos/200/300",
 };
 
-const PreviewCourseMenu: React.FC<CourseMenuProps> = ({
+const PreviewCourseMenuBuy: React.FC<CourseMenuProps> = ({
   visible,
   onClose,
   item,
+  refetch,
 }) => {
   console.log(item);
 
@@ -112,7 +114,8 @@ const PreviewCourseMenu: React.FC<CourseMenuProps> = ({
                   handleCoinUpdate(item.price);
                 }}
               >
-                <Text style={styles.buttonText}>Start</Text>
+                <Text style={styles.buttonText}>Buy</Text>
+                <Text style={styles.buttonText}>{item.price}</Text>
                 <FontAwesome6
                   name="coins"
                   size={24}
@@ -201,4 +204,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PreviewCourseMenu;
+export default PreviewCourseMenuBuy;

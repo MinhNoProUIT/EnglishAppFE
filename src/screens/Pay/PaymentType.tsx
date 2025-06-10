@@ -16,8 +16,8 @@ import { IGetAllPremiumPackage } from "../../services/PremiumPackageService";
 import { useGetAllPremiumPackageQuery } from "../../services/PremiumPackageService";
 import { useTranslation } from "react-i18next";
 import { formatCurrency } from "../../utils/formatCurrentcy";
-import { useCreatePaymentOrderMutation } from "../../services/paymentService";
-import { ICreatePaymentResponse } from "../../services/paymentService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 type PaymentTypeScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   "PaymentType"
@@ -27,27 +27,18 @@ const PaymentType = () => {
   const [selectedPlan, setSelectedPlan] = useState("1week");
   const [selectedPrice, setSelectedPrice] = useState(10000);
   const navigation = useNavigation<PaymentTypeScreenNavigationProp>();
-  const [paymentData, setPaymentData] = useState<ICreatePaymentResponse | null>(
-    null
-  );
 
-  const [createPaymentOrder, { isError, error }] =
-    useCreatePaymentOrderMutation();
+  const [userId, setUserId] = useState<string | null>(null);
+  useEffect(() => {
+    AsyncStorage.getItem("userId").then(setUserId);
+  }, []);
 
   const navigateToPayment = async (amount: number, description: string) => {
     try {
-      const response = await createPaymentOrder({
-        amount,
-        description,
-      }).unwrap();
-      console.log("Payment created:", response);
-
-      // Set the payment data (orderCode, checkoutUrl, qrCode) to state
-      setPaymentData(response);
       navigation.navigate("Payment", {
-        paymentData: response,
         amount: amount,
         description: description,
+        userId: userId,
       });
     } catch (err) {
       console.error("Error creating payment:", err);

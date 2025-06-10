@@ -55,6 +55,7 @@ import { Linking } from "react-native"; // Thêm Linking từ React Native để
 import { NavigationContainer } from "@react-navigation/native";
 
 import { ICreatePaymentResponse } from "../services/paymentService";
+import LockedCourses from "../screens/Course/LockedCourses";
 
 export type RootStackParamList = {
   MainTabs: undefined;
@@ -72,8 +73,12 @@ export type RootStackParamList = {
   Profile: undefined;
 
   Courses: undefined;
-  LearnScreen: { course_id: string, onFinish: () => void };
-  PracticeScreen: { course_id: string, toCheckCompleted: boolean, onFinish: () => void };
+  LearnScreen: { course_id: string; onFinish: () => void };
+  PracticeScreen: {
+    course_id: string;
+    toCheckCompleted: boolean;
+    onFinish: () => void;
+  };
   WordsList: { course_id: string };
 
   CreateEditQuiz:
@@ -88,8 +93,16 @@ export type RootStackParamList = {
   PrivacyPolicy: undefined;
   AnotherSetting: undefined;
 
-  MyPost: { userId?: string | null; type?: string | null; username?: string | null};
-  Posts: { userId?: string | null; type?: string | null; username?: string | null }; 
+  MyPost: {
+    userId?: string | null;
+    type?: string | null;
+    username?: string | null;
+  };
+  Posts: {
+    userId?: string | null;
+    type?: string | null;
+    username?: string | null;
+  };
 
   Group: undefined;
   Chat: { groupId: string };
@@ -97,23 +110,24 @@ export type RootStackParamList = {
   PaymentType: undefined;
   ProfileHeader: undefined;
   Payment: {
-    paymentData: ICreatePaymentResponse;
     amount: number;
     description: string;
+    userId: string | null;
   };
   PaymentIntroduction: undefined;
 
   PaymentSuccessful: {
     amount: number;
-    paid_at: Date;
+    paid_at: string;
     orderCode: number;
-    description: string;
+    updatedDescription: string;
   };
 
   Onboarding: undefined;
   UpdateInfo: undefined;
   ChangePasswordScreen: undefined;
   ResetPassword: { token: string };
+  LockedCourses: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -376,6 +390,8 @@ export default function AppNavigator({ initialRoute = "SignIn" }: Props) {
         component={PaymentSuccessful}
         options={{ headerShown: false }}
       />
+
+      <Stack.Screen name="LockedCourses" component={LockedCourses} />
     </Stack.Navigator>
   );
 }

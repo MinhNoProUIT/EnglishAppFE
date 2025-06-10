@@ -21,21 +21,21 @@ export const paymentApi = createApi({
       query: () => "getAll",
     }),
 
-    createPaymentOrder: builder.mutation<
-      ICreatePaymentResponse,
-      { amount: number; description: string }
-    >({
-      query: (data) => ({
-        url: "create",
-        method: "POST",
-        body: data, // truyền vào {amount, description}
-      }),
-    }),
-
     checkOrderStatus: builder.query<paymentResponse, number>({
       query: (orderCode) => ({
         url: `status/${orderCode}`,
         method: "GET",
+      }),
+    }),
+
+    createPayment: builder.mutation<
+      void,
+      { amount: number; orderCode: string; description: string }
+    >({
+      query: (paymentData) => ({
+        url: "create",
+        method: "POST",
+        body: paymentData, // Truyền các tham số vào body của yêu cầu
       }),
     }),
   }),
@@ -43,6 +43,6 @@ export const paymentApi = createApi({
 
 export const {
   useGetAllPaymentQuery,
-  useCreatePaymentOrderMutation,
   useCheckOrderStatusQuery,
+  useCreatePaymentMutation,
 } = paymentApi;

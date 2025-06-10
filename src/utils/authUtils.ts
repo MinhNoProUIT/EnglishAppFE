@@ -36,6 +36,7 @@ export const logout = async (navigation?: any) => {
   await AsyncStorage.removeItem("authToken");
   await AsyncStorage.removeItem("refreshToken");
   await AsyncStorage.removeItem("userId");
+
   if (navigation) {
     navigation.reset({ index: 0, routes: [{ name: "SignIn" }] });
   }

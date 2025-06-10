@@ -24,16 +24,27 @@ import { IGetAllPayment } from "../../models/Payment";
 import { useGetAllUserQuery } from "../../services/attendanceService";
 import { IGetAllAttendance } from "../../models/Attendance";
 import { RootStackParamList } from "../../navigations/AppNavigator";
-import { RouteProp } from "@react-navigation/native";
+import { RouteProp, useNavigation } from "@react-navigation/native";
+import { useCreatePaymentMutation } from "../../services/paymentService";
+import { StackNavigationProp } from "@react-navigation/stack";
 
 const screenHeight = Dimensions.get("window").height;
+
+async function Create() {}
+
+type PaymentSuccessfulScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "PaymentSuccessful"
+>;
 
 const PaymentSuccessful = ({
   route,
 }: {
   route: RouteProp<RootStackParamList, "PaymentSuccessful">;
 }) => {
-  const { amount, paid_at, orderCode, description } = route.params;
+  const navigation = useNavigation<PaymentSuccessfulScreenNavigationProp>();
+
+  const { amount, paid_at, orderCode, updatedDescription } = route.params;
   const {
     data: attendanceResponse,
     isLoading,
@@ -41,6 +52,27 @@ const PaymentSuccessful = ({
     refetch,
   } = useGetAllUserQuery();
 
+  const [createPayment, { error, data }] = useCreatePaymentMutation();
+
+  const handleCreatePayment = async () => {
+    try {
+      console.log("amount", amount);
+      console.log("orderCode", orderCode);
+
+      console.log("updatedDescription", updatedDescription);
+
+      // Gọi API để tạo thanh toán
+      const paymentData = await createPayment({
+        amount,
+        orderCode: orderCode.toString(),
+        description: updatedDescription,
+      }).unwrap();
+
+      console.log("Payment created successfully:", paymentData);
+    } catch (error) {
+      console.error("Error creating payment:", error);
+    }
+  };
   const attendancetData =
     (attendanceResponse?.Data as IGetAllAttendance[]) || [];
   // const getAccessToken = async() => {
@@ -52,6 +84,7 @@ const PaymentSuccessful = ({
       console.log("📦 attendanceResponse:", attendanceResponse);
       console.log("✅ attendancetData:", attendancetData);
     } else console.log("kh lay dc");
+    handleCreatePayment();
   }, [attendanceResponse]);
   return (
     <View
@@ -108,7 +141,7 @@ const PaymentSuccessful = ({
               color: "rgb(173, 170, 170)",
             }}
           >
-            {paid_at.toISOString()}
+            {paid_at}
           </Text>
         </View>
         <View
@@ -191,7 +224,7 @@ const PaymentSuccessful = ({
             <Text style={{ fontSize: 15 }}>Nội dung chuyển khoản</Text>
             <View style={{ width: "45%", alignItems: "flex-end" }}>
               <Text style={{ fontSize: 15, fontWeight: "bold" }}>
-                {description}
+                {updatedDescription}
               </Text>
             </View>
           </View>
@@ -245,7 +278,7 @@ const PaymentSuccessful = ({
             marginTop: 20,
           }}
         >
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("MainTabs")}>
             <LinearGradient
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}

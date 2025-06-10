@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import Icon from "@expo/vector-icons/SimpleLineIcons";
 import {
   View,
@@ -12,8 +12,13 @@ import PreviewCourseMenu from "./PreviewCourseMenu";
 import { useGetAllLearnMoreCoursesQuery } from "../../services/courseService";
 import { LockedCourse } from "../../interfaces/CourseInterface";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { useNavigation } from "@react-navigation/native";
+import PreviewCourseMenuBuy from "./PreviewCourseMenuBuy";
+
+import { useGetUserCoursesQuery } from "../../services/userCourseService";
+import Entypo from "@expo/vector-icons/Entypo";
+import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigations/AppNavigator";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 const courses = [
   {
@@ -71,19 +76,47 @@ type CoursesScreenNavigationProp = StackNavigationProp<
 >;
 export default function LockedCourses() {
   const navigation = useNavigation<CoursesScreenNavigationProp>();
-  const [previewCourseMenuVisible, setPreviewCourseMenuVisible] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState<LockedCourse>(NullCoursePreviewMenu);
+  const [previewCourseMenuVisible, setPreviewCourseMenuVisible] =
+    useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<LockedCourse>(
+    NullCoursePreviewMenu
+  );
+
+  //   const route = useRoute<RouteProp<RootStackParamList, "LockedCourses">>();
+
+  //   const isLoadPayment = route.params?.isLoadPayment;
+
+  const [previewCourseMenuVisibleBuy, setpreviewCourseMenuVisibleBuy] =
+    useState(false);
   const {
-    data: courses,
+    data: userCourseResponse,
+    isLoading,
+    isFetching,
     refetch,
-  } = useGetAllLearnMoreCoursesQuery();
+  } = useGetUserCoursesQuery();
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch])
+  );
+
+  //if (isLoadPayment) refetch();
+
+  const [selectedItem, setSelectedItem] = useState({});
+
+  const userCourseData = userCourseResponse?.Data.courses;
+  if (isLoading) return;
+  const isPremium = userCourseResponse?.Data.isPremium;
+  console.log("userCourseData", userCourseData);
+  console.log("isPremium", isPremium);
 
   return (
     <View style={{ flex: 1 }}>
       {/* list courses */}
       <FlatList
         style={styles.coursesList}
-        data={courses}
+        data={userCourseData}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.card}>
@@ -95,31 +128,34 @@ export default function LockedCourses() {
                   {item.description}
                 </Text>
               </View>
-              {item.isActive ? (
+
+              {item.isBuy || isPremium ? (
                 <TouchableOpacity
                   style={[styles.button, { backgroundColor: "#2563EB" }]}
                   onPress={() => {
-                    setPreviewCourseMenuVisible(true)
-                    setSelectedCourse(item)
+                    setPreviewCourseMenuVisible(true);
+                    setSelectedItem(item);
                   }}
                 >
                   <Icon name="arrow-right" size={15} color="white" />
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity
-                  style={styles.button}
+                  style={[
+                    styles.button,
+                    { backgroundColor: "red", height: 58 },
+                  ]}
                   onPress={() => {
-                    setPreviewCourseMenuVisible(true)
-                    setSelectedCourse(item)
+                    setpreviewCourseMenuVisibleBuy(true);
+                    setSelectedItem(item);
                   }}
                 >
-                  <Image style={styles.keyImage}
-                    source={require("../../../assets/key.png")} />
+                  <Entypo name="lock" size={24} color="white" />
                 </TouchableOpacity>
               )}
             </View>
             <View style={styles.row}>
-              <Text style={styles.topic}>{item.topic}</Text>
+              <Text style={styles.topic}>{item.topics.name}</Text>
               <View style={styles.level}>
                 <Text style={styles.levelText}>{item.level}</Text>
               </View>
@@ -129,10 +165,22 @@ export default function LockedCourses() {
       />
       {/* modals */}
       <PreviewCourseMenu
+        item={selectedItem}
         visible={previewCourseMenuVisible}
-        onClose={() => setPreviewCourseMenuVisible(false)}
-        selectedCourse={selectedCourse}
-        isActive={selectedCourse.isActive}
+        onClose={() => {
+          setPreviewCourseMenuVisible(false);
+          setSelectedItem({});
+        }}
+      />
+
+      <PreviewCourseMenuBuy
+        item={selectedItem}
+        refetch={refetch}
+        visible={previewCourseMenuVisibleBuy}
+        onClose={() => {
+          setpreviewCourseMenuVisibleBuy(false);
+          setSelectedItem({});
+        }}
       />
     </View>
   );

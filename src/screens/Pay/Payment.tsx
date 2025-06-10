@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -20,6 +20,7 @@ import { RootStackParamList } from "../../navigations/AppNavigator";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useCheckOrderStatusQuery } from "../../services/paymentService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 type PaymentScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   "Payment"
@@ -31,24 +32,103 @@ const qrInfo = {
   amount: "100000",
   description: "1011000083",
 };
+let isSuccess = false;
+
+type CheckPairResult = { check: boolean; lastPair: any } | false;
+
+async function checkPair(
+  amount: number,
+  description: string
+): Promise<CheckPairResult> {
+  if (isSuccess) return false;
+
+  try {
+    const response = await fetch(
+      "https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjhtaWi3L5xYnDMzVO-qL7W_swKxBQv1Ek7-4KyBkaYrwy6AuUA01-DXjFbboRpgLW_7MoHWabjk-JwPoRFb276YbO5TNTpG79v91shDudXgnbWdWgoyv49NIWHR_lFLELajWVUl5jt5ohQY-Ci9iqF9OjSBMh8X9D4uEaaRD2vy_4Oxyq8Asc8r333wctULWvbo1wPSyFKczeqUScXwpp-Ui9KsoT4GlgeZPjpeHPOCZIf-44VMPlc30zwb5CT34SorKIGwXdx-oIJuDXbzS0vq6t8GWdmM9FdWPg8&lib=MegoFG1GBylzG7hkrwht9DYizfO9FnT2K"
+    );
+
+    const data = await response.json();
+    const lastPair = data?.data?.[data.data.length - 1];
+    const lastAmount = Number(lastPair?.["Giá trị"]);
+    const lastDescription = lastPair?.["Mô tả"] || "";
+    console.log("lastAmount", lastAmount);
+    console.log("lastDescription", lastDescription);
+    console.log("description", description);
+    console.log("lastPair", lastPair);
+
+    if (
+      !isNaN(lastAmount) &&
+      lastAmount >= amount &&
+      lastDescription.includes(description)
+    ) {
+      console.log("Thanh toan thanh cong");
+      isSuccess = true;
+      return { check: true, lastPair: lastPair };
+    }
+  } catch (err) {
+    console.error("Error in checkPair:", err);
+  }
+
+  return {
+    check: false,
+    lastPair: null,
+  };
+}
 
 const Payment = () => {
   const navigation = useNavigation<PaymentScreenNavigationProp>();
   const route = useRoute<RouteProp<RootStackParamList, "Payment">>();
-  const { paymentData, amount, description } = route.params; // Nhận tham số từ route
-  const [userId, setUserId] = useState<string | null>(null);
+  const { amount, description, userId } = route.params;
+  const first8Chars = userId?.slice(0, 8);
+  const updatedDescription = first8Chars + description;
+
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    console.log("paymentdata: ", paymentData);
-    console.log("checkoutUrl: ", paymentData.Data?.checkoutUrl);
-    console.log("orderCode: ", paymentData.Data?.orderCode);
-    console.log("qrCode: ", paymentData.Data?.qrCode);
-    AsyncStorage.getItem("userId").then(setUserId);
-  }, [paymentData]);
-  console.log("userId: ", userId);
+    console.log("updatedDescription: ", updatedDescription);
 
-  const [orderStatus, setOrderStatus] = useState<string | null>(null);
-  const [isChecking, setIsChecking] = useState(true);
+    // Gọi ngay lần đầu
+    checkPair(amount, updatedDescription).then((result) => {
+      if (result && result.check) {
+        setIsChecking(false);
+        if (intervalRef.current) clearInterval(intervalRef.current);
+
+        navigation.navigate("PaymentSuccessful", {
+          amount,
+          paid_at: result.lastPair?.["Ngày diễn ra"], // Giả sử bạn muốn lấy thời gian hiện tại
+          orderCode: result.lastPair?.["Mã GD"],
+          updatedDescription,
+        });
+      }
+    });
+
+    // Thiết lập interval kiểm tra mỗi 3 giây
+    intervalRef.current = setInterval(async () => {
+      const success = await checkPair(amount, updatedDescription);
+      if (success && success.check && intervalRef.current) {
+        clearInterval(intervalRef.current);
+        setIsChecking(false);
+        clearInterval(intervalRef.current);
+
+        navigation.navigate("PaymentSuccessful", {
+          amount,
+          paid_at: success.lastPair?.["Ngày diễn ra"], // Giả sử bạn muốn lấy thời gian hiện tại
+          orderCode: success.lastPair?.["Mã GD"],
+          updatedDescription,
+        });
+        isSuccess = false;
+      }
+    }, 3000);
+
+    // Cleanup khi unmount
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        isSuccess = false;
+      }
+    };
+  }, [amount, description, userId]);
 
   return (
     <ScrollView style={{ backgroundColor: "rgb(255, 255, 255)" }}>
@@ -88,7 +168,7 @@ const Payment = () => {
           <Image
             style={{ width: 280, height: 280 }}
             source={{
-              uri: `https://img.vietqr.io/image/${qrInfo.bankId}-${qrInfo.accountNo}-compact.png?amount=${qrInfo.amount}&addInfo=${qrInfo.description}`,
+              uri: `https://img.vietqr.io/image/${qrInfo.bankId}-${qrInfo.accountNo}-compact.png?amount=${amount}&addInfo=${updatedDescription}`,
             }}
             resizeMode="contain"
           />
@@ -316,7 +396,7 @@ const Payment = () => {
               <Text
                 style={{ fontSize: 15, fontWeight: "bold", color: "#31473A" }}
               >
-                {description}
+                {updatedDescription}
               </Text>
             </View>
             <TouchableOpacity>

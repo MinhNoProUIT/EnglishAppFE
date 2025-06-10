@@ -7,6 +7,12 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import { StackNavigationProp } from "@react-navigation/stack";
+import {
+  useGetCurrentCoinQuery,
+  userCoinApi,
+  useUpdateTotalCoinMutation,
+} from "../../services/userCoinService";
+import { useDispatch } from "react-redux";
 
 type ProfileHeadersScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -14,19 +20,43 @@ type ProfileHeadersScreenNavigationProp = StackNavigationProp<
 >;
 
 export default function ProfileHeader() {
+  const { data, error, isLoading } = useGetCurrentCoinQuery();
+  const coins = data?.Data;
+  const dispatch = useDispatch();
+
+  const [updateTotalCoin] = useUpdateTotalCoinMutation(); // Mutation để cập nhật coin
+
   const navigation = useNavigation<ProfileHeadersScreenNavigationProp>(); // Hook navigation
   const navigateToPaymentIntroduction = () => {
     navigation.navigate("PaymentIntroduction"); // Điều hướng đến màn hình Setting
   };
+
+  const handleCoinUpdate = async (coinChange: number) => {
+    try {
+      // Gọi API để cập nhật coin
+      await updateTotalCoin({ coinChange }).unwrap();
+
+      // Sau khi cập nhật thành công, tự động cập nhật dữ liệu trong cache
+      dispatch(
+        userCoinApi.util.invalidateTags([{ type: "UserCoin", id: "LIST" }])
+      );
+    } catch (err) {
+      console.error("Error updating coin:", err);
+    }
+  };
+  if (isLoading) return null;
+  console.log("coins", coins);
+  console.log("coins", data);
+
   return (
     <View style={styles.headerContainer}>
       <View style={{ flexDirection: "row", gap: 10, marginLeft: 20 }}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => handleCoinUpdate(-5)}>
           <View style={{ flexDirection: "row" }}>
             <FontAwesome6 name="coins" size={24} style={styles.coin} />
           </View>
         </TouchableOpacity>
-        <Text style={styles.titlecoin}>600</Text>
+        <Text style={styles.titlecoin}>{coins}</Text>
       </View>
       <Text style={styles.headerTitle}>Cá nhân</Text>
       <View style={{ flexDirection: "row", gap: 10, marginRight: 20 }}>

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import LinearGradient from "react-native-linear-gradient";
 import {
   View,
   Text,
@@ -20,19 +19,27 @@ import { RootStackParamList } from "../../../navigations/AppNavigator";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useGetByIdQuery } from "../../../services/userService";
+import { useDispatch } from "react-redux";
+import { userCoinApi } from "../../../services/userCoinService";
+import { useUpdateTotalCoinMutation } from "../../../services/userCoinService";
+import {
+  useCreateAttendanceMutation,
+  useGetWeeklyAttendanceStatusQuery,
+} from "../../../services/attendanceService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 type ProfilesScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   "Profile"
 >;
 
 const days = [
-  { label: "T2", key: "mon" },
-  { label: "T3", key: "tue" },
-  { label: "T4", key: "wed" },
-  { label: "T5", key: "thu" },
-  { label: "T6", key: "fri" },
-  { label: "T7", key: "sat" },
-  { label: "CN", key: "sun" },
+  { label: "T2", key: "Monday" },
+  { label: "T3", key: "Tuesday" },
+  { label: "T4", key: "Wednesday" },
+  { label: "T5", key: "Thursday" },
+  { label: "T6", key: "Friday" },
+  { label: "T7", key: "Saturday" },
+  { label: "CN", key: "Sunday" },
 ];
 
 // Helper để lấy thứ trong tuần của JS (0 = CN, 1 = T2, ...)
@@ -41,19 +48,19 @@ const getTodayKey = () => {
   // map JS day sang key của days:
   switch (jsDay) {
     case 0:
-      return "sun";
+      return "Sunday";
     case 1:
-      return "mon";
+      return "Monday";
     case 2:
-      return "tue";
+      return "Tuesday";
     case 3:
-      return "wed";
+      return "Wednesday";
     case 4:
-      return "thu";
+      return "Thursday";
     case 5:
-      return "fri";
+      return "Friday";
     case 6:
-      return "sat";
+      return "Saturday";
     default:
       return undefined;
   }
@@ -63,10 +70,32 @@ const ProfileUser = () => {
   const navigation = useNavigation<ProfilesScreenNavigationProp>(); // Hook navigation
   const scale = new Animated.Value(0.8);
   const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [createAttendance] = useCreateAttendanceMutation();
 
-  const [checkedDays, setCheckedDays] = useState<{ [key: string]: boolean }>(
-    {}
-  );
+  const { data, error, isLoading, refetch } =
+    useGetWeeklyAttendanceStatusQuery();
+
+  useEffect(() => {
+    AsyncStorage.getItem("userId").then(setUserId);
+  }, []);
+
+  const [updateTotalCoin] = useUpdateTotalCoinMutation();
+  const dispatch = useDispatch();
+
+  const handleCoinUpdate = async (coinChange: number) => {
+    try {
+      // Cập nhật coin
+      await updateTotalCoin({ coinChange }).unwrap();
+
+      // Sau khi cập nhật thành công, invalidate cache và re-fetch dữ liệu
+      dispatch(
+        userCoinApi.util.invalidateTags([{ type: "UserCoin", id: "LIST" }])
+      );
+    } catch (err) {
+      console.error("Error updating coin:", err);
+    }
+  };
 
   const todayKey = getTodayKey();
 
@@ -75,9 +104,31 @@ const ProfileUser = () => {
       // Xử lý trường hợp không xác định được ngày, hoặc return
       return;
     }
-    if (!checkedDays[todayKey]) {
-      setCheckedDays((prev) => ({ ...prev, [todayKey]: true }));
+
+    const todayData = data?.Data.find((day) => day.day === todayKey);
+
+    // if (!checkedDays[todayKey]) {
+    //   setCheckedDays((prev) => ({ ...prev, [todayKey]: true }));
+    // }
+
+    if (todayData?.attended) {
+      // Nếu hôm nay đã điểm danh rồi thì không cho nhấn nút "Nhận"
+      return;
     }
+
+    createAttendance().then(() => {
+      handleCoinUpdate(5); // Cộng thêm coin sau khi điểm danh thành công
+      console.log("Da cong tien");
+      // Cập nhật trạng thái điểm danh cho ngày hiện tại trong dữ liệu trả về
+      // const updatedAttendance = data?.Data.map((day) => {
+      //   if (day.day === todayKey) {
+      //     day.attended = true; // Đánh dấu đã điểm danh
+      //   }
+      //   return day;
+      // });
+      // setAttendanceData(updatedAttendance); // Cập nhật lại dữ liệu điểm danh
+      refetch();
+    });
   };
 
   useEffect(() => {
@@ -104,15 +155,17 @@ const ProfileUser = () => {
   const [fullname, setFullname] = useState("");
   const [address, setAddress] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const { data } = useGetByIdQuery();
+  const { data: userData } = useGetByIdQuery();
 
   useEffect(() => {
-    if (data) {
-      setAddress(data.address);
-      setFullname(data.fullname);
-      setImageUrl(data.image_url);
+    if (userData) {
+      setAddress(userData.address);
+      setFullname(userData.fullname);
+      setImageUrl(userData.image_url);
     }
-  }, [data]);
+  }, [userData]);
+  if (isLoading) return <Text>Loading...</Text>;
+  console.log(data);
   return (
     <View className="bg-[#FFFAF0] p-6 rounded-lg m-3">
       <View className="flex-row justify-between">
@@ -172,11 +225,11 @@ const ProfileUser = () => {
       >
         <View style={styles.container}>
           <View style={styles.daysRow}>
-            {days.map((day) => {
-              const checked = !!checkedDays[day.key];
+            {data?.Data.map((day) => {
+              const checked = day.attended;
               return (
                 <View
-                  key={day.key}
+                  key={day.day}
                   style={[
                     styles.circle,
                     checked ? styles.checkedCircle : styles.uncheckedCircle,
@@ -188,7 +241,7 @@ const ProfileUser = () => {
                       checked ? styles.checkedText : styles.uncheckedText,
                     ]}
                   >
-                    {day.label}
+                    {day.day.slice(0, 2)}
                   </Text>
                 </View>
               );
@@ -241,8 +294,13 @@ const ProfileUser = () => {
             style={styles.button}
             onPress={onCheckIn}
             activeOpacity={0.7}
+            disabled={data?.Data.find((day) => day.day === todayKey)?.attended} // Disable button nếu đã điểm danh
           >
-            <Text style={styles.buttonText}>Nhận</Text>
+            <Text style={styles.buttonText}>
+              {data?.Data.find((day) => day.day === todayKey)?.attended
+                ? "Đã nhận"
+                : "Nhận"}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

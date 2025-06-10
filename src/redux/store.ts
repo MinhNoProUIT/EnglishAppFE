@@ -17,6 +17,8 @@ import { reactCommentApi } from "../services/reactCommentService";
 import { wordApi } from "../services/WordService";
 import { courseApi } from "../services/courseService";
 import { userProgressApi } from "../services/userProgressService";
+import { userCoinApi } from "../services/userCoinService";
+import { userCourseApi } from "../services/userCourseService";
 
 export const store = configureStore({
   reducer: {
@@ -37,7 +39,9 @@ export const store = configureStore({
     [reactCommentApi.reducerPath]: reactCommentApi.reducer,
     [wordApi.reducerPath]: wordApi.reducer,
     [courseApi.reducerPath]: courseApi.reducer,
-    [userProgressApi.reducerPath]: userProgressApi.reducer,   
+    [userProgressApi.reducerPath]: userProgressApi.reducer,
+    [userCoinApi.reducerPath]: userCoinApi.reducer,
+    [userCourseApi.reducerPath]: userCourseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -59,6 +63,12 @@ export const store = configureStore({
       wordApi.middleware,
       courseApi.middleware,
       userProgressApi.middleware,
+      quizApi.middleware,
+      quizQuestionApi.middleware,
+      attendanceApi.middleware,
+      premiumPackageApi.middleware,
+      userCoinApi.middleware,
+      userCourseApi.middleware
     ),
 });
 
