@@ -1,7 +1,12 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { createBaseQuery } from "./api";
 
-import { WordWithProgress, UpdateUserProgressProps, Word, UserProgressWithWord } from "../interfaces/WordInterface";
+import {
+  WordWithProgress,
+  UpdateUserProgressProps,
+  Word,
+  UserProgressWithWord,
+} from "../interfaces/WordInterface";
+import { createBaseQuery } from "./api";
 
 export const userProgressApi = createApi({
   reducerPath: "userProgressApi",
@@ -9,8 +14,14 @@ export const userProgressApi = createApi({
     "https://englishapp-uit.onrender.com/api/user-progress"
   ),
   endpoints: (builder) => ({
-    getUnlearnedWordsByCourse: builder.query<Word[], string>({
-      query: (course_id) => `getUnlearnedWordsByCourse/${course_id}`,
+    getUnlearnedWordsByCourse: builder.query<
+      Word[],
+      { course_id: string; user_Id: string }
+    >({
+      query: ({ course_id, user_Id }) => ({
+        url: `getUnlearnedWordsByCourse/${user_Id}/${course_id}`,
+        method: "GET",
+      }),
     }),
     getAllTodayRepeatWords: builder.query<UserProgressWithWord[], string>({
       query: (course_id) => `getAllTodayRepeatWordsByCourse/${course_id}`,
@@ -18,9 +29,11 @@ export const userProgressApi = createApi({
     getNumberTodayRepeatWords: builder.query<number, string>({
       query: (course_id) => `getNumberTodayRepeatWordsByCourse/${course_id}`,
     }),
-    getAllCompletedWordsByCourse: builder.query<UserProgressWithWord[], string>({
-      query: (course_id) => `getCompletedWordsByCourse/${course_id}`,
-    }),
+    getAllCompletedWordsByCourse: builder.query<UserProgressWithWord[], string>(
+      {
+        query: (course_id) => `getCompletedWordsByCourse/${course_id}`,
+      }
+    ),
     getAllWordsWithProgress: builder.query<WordWithProgress[], string>({
       query: (course_id) => `getAllByCourse/${course_id}`,
     }),
@@ -30,8 +43,11 @@ export const userProgressApi = createApi({
         method: "POST",
       }),
     }),
-    updateUserProgress: builder.mutation<void, {word_id: string, body: UpdateUserProgressProps}>({
-      query: ({word_id, body}) => ({
+    updateUserProgress: builder.mutation<
+      void,
+      { word_id: string; body: UpdateUserProgressProps }
+    >({
+      query: ({ word_id, body }) => ({
         url: `update/${word_id}`,
         method: "PUT",
         body,
@@ -47,5 +63,5 @@ export const {
   useGetAllCompletedWordsByCourseQuery,
   useGetAllWordsWithProgressQuery,
   useCreateUserProgressMutation,
-  useUpdateUserProgressMutation
+  useUpdateUserProgressMutation,
 } = userProgressApi;

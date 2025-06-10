@@ -138,7 +138,7 @@ const AccountInfomation = () => {
                 <Text
                   style={{ fontWeight: "bold", fontSize: 15, marginLeft: 10 }}
                 >
-                  {data?.birthday.toString()}
+                  {data?.birthday}
                 </Text>
               </View>
             </View>
