@@ -1,7 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { createBaseQuery } from "./api";
 
-import { Course } from "../interfaces/CourseInterface";
+import { Course, LockedCourse } from "../interfaces/CourseInterface";
 
 export const courseApi = createApi({
   reducerPath: "courseApi",
@@ -15,10 +15,14 @@ export const courseApi = createApi({
     getAllCompletedCourses: builder.query<Course[], void>({
       query: () => "getAllCompletedCoursesByUser",
     }),
+    getAllLearnMoreCourses: builder.query<LockedCourse[], void>({
+      query: () => "getAll",
+    }),
   }),
 });
 
 export const {
   useGetAllOngoingCoursesQuery,
   useGetAllCompletedCoursesQuery,
+  useGetAllLearnMoreCoursesQuery
 } = courseApi;

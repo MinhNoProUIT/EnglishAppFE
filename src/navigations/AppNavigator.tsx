@@ -72,7 +72,7 @@ export type RootStackParamList = {
   Profile: undefined;
 
   Courses: undefined;
-  LearnScreen: { course_id: string };
+  LearnScreen: { course_id: string, onFinish: () => void };
   PracticeScreen: { course_id: string, toCheckCompleted: boolean, onFinish: () => void };
   WordsList: { course_id: string };
 

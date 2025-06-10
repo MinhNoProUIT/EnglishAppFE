@@ -33,7 +33,15 @@ const CourseDetailMenu: React.FC<CourseMenuProps> = ({ visible, onClose, onLearn
           <TouchableWithoutFeedback>
             <View style={styles.menuContainer}>
               {/* Learn */}
-              <TouchableOpacity style={styles.option} onPress={onLearn} disabled={selectedCourse.remainWords ? false : true}>
+              <TouchableOpacity style={styles.option}
+                onPress={() => {
+                  onLearn()
+                  navigation.navigate("LearnScreen", { 
+                    course_id: selectedCourse.course_id, 
+                    onFinish: refetch 
+                  }); // Điều hướng đến LearnScreen
+                }}
+                disabled={selectedCourse.remainWords ? false : true}>
                 <Icon name='playcircleo' size={35} color="#2563EB" />
                 <View style={styles.textContainer}>
                   <Text style={styles.optionText}>Learn</Text>
