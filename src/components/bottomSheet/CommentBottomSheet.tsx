@@ -45,7 +45,7 @@ interface CommentBottomSheetProps {
 }
 
 export default forwardRef(function CommentBottomSheet(
-  { postId, type, refetch }: CommentBottomSheetProps,
+  { postId, type = "post", refetch }: CommentBottomSheetProps,
   ref
 ) {
   const bottomSheetRefComment = useRef<RBSheetRef | null>(null);

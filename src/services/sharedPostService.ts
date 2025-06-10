@@ -6,7 +6,7 @@ export const sharedPostApi = createApi({
   reducerPath: "sharedPostApi",
   baseQuery: createBaseQuery("https://englishapp-uit.onrender.com"),
   endpoints: (builder) => ({
-    createPost: builder.mutation<SharedPostResponse, CreateSharedPostProps>({
+    createSharedPost: builder.mutation<SharedPostResponse, CreateSharedPostProps>({
       query: (formData) => ({
         url: "api/shared-post/create",
         method: "POST",
@@ -19,7 +19,7 @@ export const sharedPostApi = createApi({
         method: "GET",
       }),
     }),
-    getAllSharedPosts: builder.query<SharedPost[], string>({
+    getAllSharedPosts: builder.query<SharedPost[], void>({
       query: () => ({
         url: `api/shared-post/getAll`,
         method: "GET",
@@ -29,7 +29,7 @@ export const sharedPostApi = createApi({
 });
 
 export const {
-  useCreatePostMutation,
+  useCreateSharedPostMutation,
   useGetAllSharedPostsByUserQuery,
   useGetAllSharedPostsQuery,   // thêm export hook này
 } = sharedPostApi;

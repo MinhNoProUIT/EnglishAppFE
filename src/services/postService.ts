@@ -19,7 +19,23 @@ export const postApi = createApi({
         method: "GET",
       }),
     }),
+    getAllPosts: builder.query<
+      {
+        data: Post[];
+        pagination: { total: number; page: number; limit: number };
+      },
+      { page?: number; limit?: number }
+    >({
+      query: ({ page = 1, limit = 5 }) => ({
+        url: `/api/posts/getAll?page=${page}&limit=${limit}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useCreatePostMutation, useGetAllPostsByUserQuery } = postApi;
+export const {
+  useCreatePostMutation,
+  useGetAllPostsByUserQuery,
+  useLazyGetAllPostsQuery,
+} = postApi;
