@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -23,7 +23,7 @@ import Foundation from "@expo/vector-icons/Foundation";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import * as Progress from "react-native-progress";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../../navigations/AppNavigator";
 import { useTranslation } from "react-i18next";
@@ -56,7 +56,7 @@ const Setting = () => {
   const [email, setEmail] = useState("");
   const [fullname, setFullname] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const { data } = useGetByIdQuery();
+  const { data, refetch } = useGetByIdQuery();
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -73,6 +73,12 @@ const Setting = () => {
       setUserId(storedUserId);
     });
   }, []);
+
+  // useFocusEffect(() => {
+  //   useCallback(() => {
+  //     refetch();
+  //   }, [refetch, userId]);
+  // });
   const onPressIn = () => {
     setBackgroundColor("#DDDDDD");
   };

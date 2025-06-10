@@ -14,16 +14,19 @@ import {
 } from "react-native";
 import ImageForgot from "../../svg/imageReset.svg";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { useResetPasswordMutation } from "../../services/AuthService";
+import { RootStackParamList } from "../../navigations/AppNavigator";
+import { StackNavigationProp } from "@react-navigation/stack";
 
-type RootStackParamList = {
-  ResetPassword: { token: string }; // Kiểu tham số token cho màn hình ResetPassword
-};
-type ResetPasswordRouteProps = RouteProp<RootStackParamList, "ResetPassword">;
+type SignInScreen = StackNavigationProp<RootStackParamList, "SignIn">;
 
-export default function ResetPassword() {
-  const route = useRoute<ResetPasswordRouteProps>();
+export default function ResetPassword({
+  route,
+}: {
+  route: RouteProp<RootStackParamList, "ResetPassword">;
+}) {
+  const navigation = useNavigation<SignInScreen>();
   const { token } = route.params; // Lấy token từ route params
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -42,6 +45,7 @@ export default function ResetPassword() {
     try {
       const response = await resetPassword({ token, newPassword }).unwrap();
       Alert.alert("Thành công", response.message);
+      navigation.navigate("SignIn");
       // Chuyển hướng đến màn hình đăng nhập hoặc màn hình chính
     } catch (error: unknown) {
       // Ép kiểu error về Error để có thể truy cập message

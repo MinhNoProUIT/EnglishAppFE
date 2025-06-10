@@ -211,20 +211,6 @@ export default function SighIn() {
                   <Text style={styles.socialText}>Sign in with Google</Text>
                 </TouchableOpacity>
               </View>
-              <View>
-                <TouchableOpacity style={styles.socialButton}>
-                  <View
-                    style={{ alignItems: "center", justifyContent: "center" }}
-                  >
-                    <Ionicons
-                      name="logo-facebook"
-                      size={20}
-                      color={"#1877F2"}
-                    ></Ionicons>
-                  </View>
-                  <Text style={styles.socialText}>Sign in with Facebook</Text>
-                </TouchableOpacity>
-              </View>
             </View>
             <View
               style={{
