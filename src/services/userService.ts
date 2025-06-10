@@ -21,6 +21,7 @@ export interface update {
 export const userApi = createApi({
   reducerPath: "userApi",
   baseQuery: createBaseQuery("https://englishapp-uit.onrender.com"),
+  tagTypes: ["User"],
   endpoints: (builder) => ({
     getAllUsers: builder.query<
       GetAllUsersResponse[],
@@ -58,11 +59,12 @@ export const userApi = createApi({
         method: "GET",
       }),
     }),
-    getById: builder.query<update, void>({
+    getById: builder.query<UserDetail, void>({
       query: () => ({
         url: `api/users/getById`,
         method: "GET",
       }),
+      providesTags: ["User"],
     }),
     getDetailsUser: builder.query<UserDetail, void>({
       query: () => ({
@@ -76,6 +78,7 @@ export const userApi = createApi({
         method: "PUT",
         body: formData,
       }),
+      invalidatesTags: [{ type: "User", id: "LIST" }],
     }),
     remove: builder.mutation<void, { id: string }>({
       query: ({ id }) => ({

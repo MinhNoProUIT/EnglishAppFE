@@ -38,7 +38,7 @@ export default function UpdateInfo() {
 
   console.log("id", userId);
 
-  const { data } = useGetByIdQuery();
+  const { data, refetch } = useGetByIdQuery();
 
   // Set initial data from response
   useEffect(() => {
@@ -106,6 +106,7 @@ export default function UpdateInfo() {
       }).unwrap();
       console.log("Cập nhật thành công:", result);
       Alert.alert("Cập nhật thành công!");
+      refetch();
     } catch (error) {
       console.log("Lỗi khi cập nhật:", error);
       Alert.alert("Lỗi khi cập nhật thông tin");
