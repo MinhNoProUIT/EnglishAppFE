@@ -34,7 +34,10 @@ import {
 import { BottomTabParamList } from "../../navigations/BottomTabs";
 import { Ionicons } from "@expo/vector-icons";
 import { useGetAllSharedPostsByUserQuery } from "../../services/sharedPostService";
-import { useGetAllPostsByUserQuery, useLazyGetAllPostsQuery } from "../../services/postService";
+import {
+  useGetAllPostsByUserQuery,
+  useLazyGetAllPostsQuery,
+} from "../../services/postService";
 import ViewPostItem from "../../components/items/ViewPostItem";
 import { Post } from "../../interfaces/PostInterface";
 import { SharedPost } from "../../interfaces/SharedPostInterface";
@@ -69,7 +72,7 @@ export default function Posts() {
 
   const [selectedPost, setSelectedPost] = useState<Post | SharedPost>();
   const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
-  const [ownerId, setOwwnerId] = useState<string|null>(null);
+  const [ownerId, setOwwnerId] = useState<string | null>(null);
 
   const bottomSheetRefComment = useRef<RBSheetRef | null>(null);
   const bottomSheetRefShare = useRef<RBSheetRef | null>(null);
@@ -100,7 +103,7 @@ export default function Posts() {
   });
 
   const isViewAll = !userId && !type;
-  
+
   // Sử dụng useLazyQuery thay vì useQuery để có thể control việc fetch
   const [getAllPosts, { isLoading: isLoadingAll }] = useLazyGetAllPostsQuery();
   const [createReactPost] = useCreateReactPostMutation();
@@ -109,10 +112,10 @@ export default function Posts() {
 
   const isLoading = type === "post" ? isPostLoading : isSharedLoading;
   const posts = type === "post" ? postData : sharedPostData;
-  
+
   useEffect(() => {
     AsyncStorage.getItem("userId").then(setOwwnerId);
-  }, [])
+  }, []);
   // Load initial data khi component mount
   useEffect(() => {
     if (isViewAll) {
@@ -120,29 +123,41 @@ export default function Posts() {
     }
   }, [isViewAll]);
 
+  useFocusEffect(
+    useCallback(() => {
+      loadInitialPosts();
+    }, [])
+  );
+
   const loadInitialPosts = async () => {
     try {
       const pageSize = 5;
       let currentPage = 1;
       let allData: Post[] = [];
       let totalPages = 1;
-  
+
       // Fetch the first page to get pagination info
-      const firstRes = await getAllPosts({ page: currentPage, limit: pageSize }).unwrap();
+      const firstRes = await getAllPosts({
+        page: currentPage,
+        limit: pageSize,
+      }).unwrap();
       if (firstRes?.data) {
         allData = [...firstRes.data];
         const total = firstRes?.pagination?.total ?? 0;
         totalPages = Math.ceil(total / pageSize);
-  
+
         // Load remaining pages if any
         while (currentPage < totalPages) {
           currentPage++;
-          const res = await getAllPosts({ page: currentPage, limit: pageSize }).unwrap();
+          const res = await getAllPosts({
+            page: currentPage,
+            limit: pageSize,
+          }).unwrap();
           if (res?.data) {
             allData = [...allData, ...res.data];
           }
         }
-  
+
         setAllPosts(allData);
         setHasMoreData(allData.length < (firstRes?.pagination?.total ?? 0));
       }
@@ -150,25 +165,25 @@ export default function Posts() {
       console.error("Lỗi tải toàn bộ bài viết:", error);
     }
   };
-  
+
   const fetchMorePosts = async () => {
     if (!hasMoreData || isBottomLoading || !isViewAll) return;
-  
+
     setIsBottomLoading(true);
     const nextPage = page + 1;
-  
+
     try {
       const res = await getAllPosts({ page: nextPage, limit: 5 }).unwrap();
-      
+
       if (res?.data && res.data.length > 0) {
         // Append new posts to existing posts
-        setAllPosts(prevPosts => [...prevPosts, ...res.data]);
+        setAllPosts((prevPosts) => [...prevPosts, ...res.data]);
         setPage(nextPage);
-        
+
         // Check if we have more data
         const total = res?.pagination?.total ?? 0;
         const currentTotal = allPosts.length + res.data.length;
-        
+
         if (currentTotal >= total) {
           setHasMoreData(false);
         }
@@ -181,7 +196,7 @@ export default function Posts() {
       setIsBottomLoading(false);
     }
   };
-  
+
   const navigateToMyPost = (item: Post) => {
     navigation.navigate("MyPost", {
       userId: item.user_id,
@@ -189,29 +204,29 @@ export default function Posts() {
       username: item.author_name,
     });
   };
-  
+
   const fetchLikeStatus = async (postsToCheck?: (Post | SharedPost)[]) => {
-    if (!userId) return;
-    
+    if (!ownerId) return; // Changed from userId to ownerId
+
     const targetPosts = postsToCheck || (isViewAll ? allPosts : posts);
     if (!targetPosts) return;
 
     const likeStatusArray = await Promise.all(
       targetPosts.map(async (post) => {
-        try {  
+        try {
           const res = await checkLikePost({
-            user_id: userId.toString(),
+            user_id: ownerId.toString(), // Changed from userId to ownerId
             post_id: post.id,
           }).unwrap();
           return [post.id, res.isLike] as [string, boolean];
         } catch (error) {
           console.error(`Lỗi kiểm tra like post ${post.id}`, error);
-          return [post.id, false] as [string, boolean]; 
+          return [post.id, false] as [string, boolean];
         }
       })
     );
     const newLikedStatus = Object.fromEntries(likeStatusArray);
-    setLikedPosts(prev => ({ ...prev, ...newLikedStatus }));
+    setLikedPosts((prev) => ({ ...prev, ...newLikedStatus }));
   };
 
   // Separate effect for initial load
@@ -232,7 +247,9 @@ export default function Posts() {
       if (isViewAll && allPosts.length > 0) {
         // Only fetch for new posts, not existing ones
         const existingPostIds = Object.keys(likedPosts);
-        const newPosts = allPosts.filter(post => !existingPostIds.includes(post.id));
+        const newPosts = allPosts.filter(
+          (post) => !existingPostIds.includes(post.id)
+        );
         if (newPosts.length > 0) {
           fetchLikeStatus(newPosts);
         }
@@ -244,35 +261,50 @@ export default function Posts() {
   }, [posts, allPosts]);
 
   const handleLikePost = async (item: Post | SharedPost) => {
-    if (!userId) return;
+    if (!ownerId) {
+      // Changed from userId to ownerId
+      console.log("No owner ID found, cannot like post");
+      return;
+    }
 
     const isCurrentlyLiked = likedPosts[item.id];
+    // console.log(Attempting to ${isCurrentlyLiked ? 'unlike' : 'like'} post ${item.id});
 
     // Optimistic update
-    setLikedPosts((prev) => ({ 
-      ...prev, 
-      [item.id]: !isCurrentlyLiked 
+    setLikedPosts((prev) => ({
+      ...prev,
+      [item.id]: !isCurrentlyLiked,
     }));
 
     try {
       if (isCurrentlyLiked) {
+        console.log("Deleting like...");
         await deleteReactPost({
-          user_id: userId.toString(),
+          user_id: ownerId.toString(), // Changed from userId to ownerId
           post_id: item.id,
         }).unwrap();
+        console.log("Like deleted successfully");
       } else {
+        console.log("Creating like...");
         await createReactPost({
-          user_id: userId.toString(),
+          user_id: ownerId.toString(), // Changed from userId to ownerId
           post_id: item.id,
         }).unwrap();
+        console.log("Like created successfully");
       }
-      
+      if (isViewAll) {
+        loadInitialPosts();
+      } else if (type === "post") {
+        refetchPosts();
+      } else {
+        refetchShared();
+      }
     } catch (error) {
       console.error("Lỗi khi xử lý like/unlike:", error);
       // Revert optimistic update on error
-      setLikedPosts((prev) => ({ 
-        ...prev, 
-        [item.id]: isCurrentlyLiked 
+      setLikedPosts((prev) => ({
+        ...prev,
+        [item.id]: isCurrentlyLiked,
       }));
     }
   };
@@ -308,7 +340,10 @@ export default function Posts() {
           </TouchableOpacity>
         ) : null,
       headerRight: () => (
-        <TouchableOpacity onPress={() => navigateToMyPost({user_id: ownerId })} className="pr-4">
+        <TouchableOpacity
+          onPress={() => navigateToMyPost({ user_id: ownerId })}
+          className="pr-4"
+        >
           <Ionicons name="person-circle-outline" size={30} color="black" />
         </TouchableOpacity>
       ),
@@ -367,11 +402,11 @@ export default function Posts() {
           postId={selectedPost.id}
           type={type}
           refetch={
-            isViewAll 
-              ? loadInitialPosts 
-              : type === "post" 
-                ? refetchPosts 
-                : refetchShared
+            isViewAll
+              ? loadInitialPosts
+              : type === "post"
+              ? refetchPosts
+              : refetchShared
           }
         />
       )}
@@ -382,11 +417,11 @@ export default function Posts() {
           postId={selectedPost.id}
           type={type}
           refetch={
-            isViewAll 
-              ? loadInitialPosts 
-              : type === "post" 
-                ? refetchPosts 
-                : refetchShared
+            isViewAll
+              ? loadInitialPosts
+              : type === "post"
+              ? refetchPosts
+              : refetchShared
           }
         />
       )}

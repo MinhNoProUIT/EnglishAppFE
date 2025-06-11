@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Icon from "@expo/vector-icons/SimpleLineIcons";
 import {
   View,
@@ -62,18 +62,28 @@ const courses = [
 const NullCoursePreviewMenu = {
   id: "",
   title: "",
-  topic: "",
+  topic_id: "",
   level: "",
-  image_url: "",
   description: "",
+  image_url: "",
   price: 0,
-  isActive: true,
+  created_date: "",
+  topics: {
+    name: "",
+  },
+  isBuy: false,
 };
 
 type CoursesScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   "Courses"
 >;
+
+function checkIsActive(isPremium: boolean, isBuy: boolean) {
+  if (isPremium) return true;
+  if (isBuy) return true;
+  return false;
+}
 export default function LockedCourses() {
   const navigation = useNavigation<CoursesScreenNavigationProp>();
   const [previewCourseMenuVisible, setPreviewCourseMenuVisible] =
@@ -81,6 +91,8 @@ export default function LockedCourses() {
   const [selectedCourse, setSelectedCourse] = useState<LockedCourse>(
     NullCoursePreviewMenu
   );
+
+  const [isActive, setIsActive] = useState(false);
 
   //   const route = useRoute<RouteProp<RootStackParamList, "LockedCourses">>();
 
@@ -95,21 +107,22 @@ export default function LockedCourses() {
     refetch,
   } = useGetUserCoursesQuery();
 
-  useFocusEffect(
-    useCallback(() => {
-      refetch();
-    }, [refetch])
-  );
-
   //if (isLoadPayment) refetch();
 
-  const [selectedItem, setSelectedItem] = useState({});
-
-  const userCourseData = userCourseResponse?.Data.courses;
-  if (isLoading) return;
+  const userCourseData = userCourseResponse?.Data.courses as LockedCourse[];
+  if (!userCourseData) {
+    console.log("loi");
+  }
   const isPremium = userCourseResponse?.Data.isPremium;
+
+  useEffect(() => {
+    if (selectedCourse) {
+      setIsActive(checkIsActive(isPremium, selectedCourse?.isBuy));
+    }
+  }, [selectedCourse]);
   console.log("userCourseData", userCourseData);
   console.log("isPremium", isPremium);
+  if (isLoading) return;
 
   return (
     <View style={{ flex: 1 }}>
@@ -134,7 +147,7 @@ export default function LockedCourses() {
                   style={[styles.button, { backgroundColor: "#2563EB" }]}
                   onPress={() => {
                     setPreviewCourseMenuVisible(true);
-                    setSelectedItem(item);
+                    setSelectedCourse(item);
                   }}
                 >
                   <Icon name="arrow-right" size={15} color="white" />
@@ -147,7 +160,7 @@ export default function LockedCourses() {
                   ]}
                   onPress={() => {
                     setpreviewCourseMenuVisibleBuy(true);
-                    setSelectedItem(item);
+                    setSelectedCourse(item);
                   }}
                 >
                   <Entypo name="lock" size={24} color="white" />
@@ -165,21 +178,19 @@ export default function LockedCourses() {
       />
       {/* modals */}
       <PreviewCourseMenu
-        item={selectedItem}
         visible={previewCourseMenuVisible}
-        onClose={() => {
-          setPreviewCourseMenuVisible(false);
-          setSelectedItem({});
-        }}
+        onClose={() => setPreviewCourseMenuVisible(false)}
+        selectedCourse={selectedCourse}
+        isActive={isActive}
       />
 
       <PreviewCourseMenuBuy
-        item={selectedItem}
+        item={selectedCourse}
         refetch={refetch}
         visible={previewCourseMenuVisibleBuy}
         onClose={() => {
           setpreviewCourseMenuVisibleBuy(false);
-          setSelectedItem({});
+          setSelectedCourse(NullCoursePreviewMenu);
         }}
       />
     </View>

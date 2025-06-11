@@ -5,7 +5,7 @@ export const validateToken = async (accessToken: string): Promise<boolean> => {
     const res = await fetch("https://englishapp-uit.onrender.com/auth/me", {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        authorization: `Bearer ${accessToken}`,
       },
     });
     return res.ok;

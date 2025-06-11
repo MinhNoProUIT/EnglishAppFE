@@ -13,113 +13,116 @@ import {
 } from "react-native";
 import { RootStackParamList } from "../../navigations/AppNavigator";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { CourseDetailMenuProps } from "../../interfaces/CourseInterface";
+import {
+  Course,
+  CourseDetailMenuProps,
+} from "../../interfaces/CourseInterface";
 import { CourseType } from "../../types/CourseType";
 import { WordType } from "../../types/WordType";
 import { useGetAllOngoingCoursesQuery } from "../../services/courseService";
 
 const words: WordType[] = [
   {
-    "id": "1",
-    "eng": "student",
-    "vie": "học sinh, sinh viên",
-    "transcription": "'stuː.dənt",
-    "type": "n",
-    "example": "His younger sister is a student at that university.",
-    "image": "https://picsum.photos/200/300?random=1",
-    "level": 3
+    id: "1",
+    eng: "student",
+    vie: "học sinh, sinh viên",
+    transcription: "'stuː.dənt",
+    type: "n",
+    example: "His younger sister is a student at that university.",
+    image: "https://picsum.photos/200/300?random=1",
+    level: 3,
   },
   {
-    "id": "2",
-    "eng": "book",
-    "vie": "sách",
-    "transcription": "bʊk",
-    "type": "n",
-    "example": "She borrowed a book from the library.",
-    "image": "https://picsum.photos/200/300?random=2",
-    "level": 3
+    id: "2",
+    eng: "book",
+    vie: "sách",
+    transcription: "bʊk",
+    type: "n",
+    example: "She borrowed a book from the library.",
+    image: "https://picsum.photos/200/300?random=2",
+    level: 3,
   },
   {
-    "id": "3",
-    "eng": "quickly",
-    "vie": "nhanh chóng",
-    "transcription": "'kwɪk.li",
-    "type": "adv",
-    "example": "He ran quickly to catch the bus.",
-    "image": "https://picsum.photos/200/300?random=3",
-    "level": 2
+    id: "3",
+    eng: "quickly",
+    vie: "nhanh chóng",
+    transcription: "'kwɪk.li",
+    type: "adv",
+    example: "He ran quickly to catch the bus.",
+    image: "https://picsum.photos/200/300?random=3",
+    level: 2,
   },
   {
-    "id": "4",
-    "eng": "beautiful",
-    "vie": "xinh đẹp",
-    "transcription": "'bjuː.tɪ.fəl",
-    "type": "adj",
-    "example": "That flower is really beautiful.",
-    "image": "https://picsum.photos/200/300?random=4",
-    "level": 2
+    id: "4",
+    eng: "beautiful",
+    vie: "xinh đẹp",
+    transcription: "'bjuː.tɪ.fəl",
+    type: "adj",
+    example: "That flower is really beautiful.",
+    image: "https://picsum.photos/200/300?random=4",
+    level: 2,
   },
   {
-    "id": "5",
-    "eng": "engineer",
-    "vie": "kỹ sư",
-    "transcription": ".en.dʒɪˈnɪər",
-    "type": "n",
-    "example": "My uncle is a software engineer.",
-    "image": "https://picsum.photos/200/300?random=5",
-    "level": 3
+    id: "5",
+    eng: "engineer",
+    vie: "kỹ sư",
+    transcription: ".en.dʒɪˈnɪər",
+    type: "n",
+    example: "My uncle is a software engineer.",
+    image: "https://picsum.photos/200/300?random=5",
+    level: 3,
   },
   {
-    "id": "6",
-    "eng": "independence",
-    "vie": "sự độc lập",
-    "transcription": ".ɪn.dɪˈpen.dəns",
-    "type": "n",
-    "example": "The country gained independence in 1945.",
-    "image": "https://picsum.photos/200/300?random=6",
-    "level": 4
+    id: "6",
+    eng: "independence",
+    vie: "sự độc lập",
+    transcription: ".ɪn.dɪˈpen.dəns",
+    type: "n",
+    example: "The country gained independence in 1945.",
+    image: "https://picsum.photos/200/300?random=6",
+    level: 4,
   },
   {
-    "id": "7",
-    "eng": "challenge",
-    "vie": "thử thách",
-    "transcription": "'tʃæl.ɪndʒ",
-    "type": "n",
-    "example": "Learning a new language is a challenge.",
-    "image": "https://picsum.photos/200/300?random=7",
-    "level": 3
+    id: "7",
+    eng: "challenge",
+    vie: "thử thách",
+    transcription: "'tʃæl.ɪndʒ",
+    type: "n",
+    example: "Learning a new language is a challenge.",
+    image: "https://picsum.photos/200/300?random=7",
+    level: 3,
   },
   {
-    "id": "8",
-    "eng": "implement",
-    "vie": "thực hiện, triển khai",
-    "transcription": "'ɪm.plɪ.ment",
-    "type": "v",
-    "example": "The company plans to implement new strategies next month.",
-    "image": "https://picsum.photos/200/300?random=8",
-    "level": 4
+    id: "8",
+    eng: "implement",
+    vie: "thực hiện, triển khai",
+    transcription: "'ɪm.plɪ.ment",
+    type: "v",
+    example: "The company plans to implement new strategies next month.",
+    image: "https://picsum.photos/200/300?random=8",
+    level: 4,
   },
   {
-    "id": "9",
-    "eng": "sustainable",
-    "vie": "bền vững",
-    "transcription": "səˈsteɪ.nə.bəl",
-    "type": "adj",
-    "example": "We must develop sustainable energy sources.",
-    "image": "https://picsum.photos/200/300?random=9",
-    "level": 3
+    id: "9",
+    eng: "sustainable",
+    vie: "bền vững",
+    transcription: "səˈsteɪ.nə.bəl",
+    type: "adj",
+    example: "We must develop sustainable energy sources.",
+    image: "https://picsum.photos/200/300?random=9",
+    level: 3,
   },
   {
-    "id": "10",
-    "eng": "generate",
-    "vie": "tạo ra, sinh ra",
-    "transcription": "'dʒen.ə.reɪt",
-    "type": "v",
-    "example": "Solar panels generate electricity from sunlight.",
-    "image": "https://picsum.photos/200/300?random=10",
-    "level": 3
-  }
-]
+    id: "10",
+    eng: "generate",
+    vie: "tạo ra, sinh ra",
+    transcription: "'dʒen.ə.reɪt",
+    type: "v",
+    example: "Solar panels generate electricity from sunlight.",
+    image: "https://picsum.photos/200/300?random=10",
+    level: 3,
+  },
+];
 
 const courses: CourseType[] = [
   {
@@ -162,18 +165,16 @@ type CoursesScreenNavigationProp = StackNavigationProp<
 export default function OngoingCourses() {
   const navigation = useNavigation<CoursesScreenNavigationProp>();
   const [detailMenuVisible, setDetailMenuVisible] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState<CourseDetailMenuProps>(NullCourseDetailMenu);
+  const [selectedCourse, setSelectedCourse] =
+    useState<CourseDetailMenuProps>(NullCourseDetailMenu);
 
-  const {
-    data: courses,
-    refetch,
-  } = useGetAllOngoingCoursesQuery();
+  const { data: courses, refetch, isLoading } = useGetAllOngoingCoursesQuery();
+  const test = courses as Course[];
 
   useEffect(() => {
     if (courses) {
-      console.log(courses)
-    }
-    else console.log("khong lay duoc course")
+      console.log(courses);
+    } else console.log("khong lay duoc course");
   }, [courses]);
 
   useFocusEffect(
@@ -182,8 +183,12 @@ export default function OngoingCourses() {
     }, [refetch])
   );
 
+  if (isLoading) return;
+
+  console.log(test);
+
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff", }}>
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
       {/* list courses */}
       <FlatList
         style={styles.coursesList}
@@ -196,9 +201,9 @@ export default function OngoingCourses() {
               setSelectedCourse({
                 course_id: item.id,
                 completedWords: item.completedWords,
-                remainWords: item.remainWords
-              })
-              setDetailMenuVisible(true)
+                remainWords: item.remainWords,
+              });
+              setDetailMenuVisible(true);
             }}
           >
             <Image style={styles.image} source={{ uri: item.image }} />
@@ -209,21 +214,29 @@ export default function OngoingCourses() {
                 <View style={styles.detailRow}>
                   <View style={styles.detail}>
                     <Icon name="book-open" size={12} />
-                    <Text style={styles.detailText}>Total words: {item.totalWords}</Text>
+                    <Text style={styles.detailText}>
+                      Total words: {item.totalWords}
+                    </Text>
                   </View>
                   <View style={styles.detail}>
                     <Icon name="star" size={12} />
-                    <Text style={styles.detailText}>Remain: {item.remainWords}</Text>
+                    <Text style={styles.detailText}>
+                      Remain: {item.remainWords}
+                    </Text>
                   </View>
                 </View>
                 <View style={styles.detailRow}>
                   <View style={styles.detail}>
                     <Icon name="book-open" size={12} />
-                    <Text style={styles.detailText}>Ongoing: {item.ongoingWords}</Text>
+                    <Text style={styles.detailText}>
+                      Ongoing: {item.ongoingWords}
+                    </Text>
                   </View>
                   <View style={styles.detail}>
                     <Icon name="star" size={12} />
-                    <Text style={styles.detailText}>Completed: {item.completedWords}</Text>
+                    <Text style={styles.detailText}>
+                      Completed: {item.completedWords}
+                    </Text>
                   </View>
                 </View>
               </View>
@@ -259,7 +272,9 @@ export default function OngoingCourses() {
         }}
         onReview={() => {
           setDetailMenuVisible(false); // Đóng modal trước
-          navigation.navigate("WordsList", { course_id: selectedCourse.course_id }); // Điều hướng đến WordsList
+          navigation.navigate("WordsList", {
+            course_id: selectedCourse.course_id,
+          }); // Điều hướng đến WordsList
         }}
         selectedCourse={selectedCourse}
       />
@@ -322,13 +337,13 @@ const styles = StyleSheet.create({
   level: {
     width: 52,
     height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 4,
-    backgroundColor: '#F4F4F5',
+    backgroundColor: "#F4F4F5",
   },
   levelText: {
     fontSize: 11,
     fontWeight: 500,
-  }
+  },
 });

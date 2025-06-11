@@ -23,13 +23,13 @@ const Achievement = () => {
         />
         <View className="ml-5">
           <Text className="font-bold mb-1" style={{ fontSize: 14 }}>
-            Sổ tay cấp độ 5
+            Sổ tay cấp độ 1
           </Text>
           <Text
             className="font-bold mb-1"
             style={{ fontSize: 14, color: "#FF8C00" }}
           >
-            512 / 700 từ
+            0 / 1000 từ
           </Text>
           <Progress.Bar
             borderRadius={15}
@@ -38,7 +38,7 @@ const Achievement = () => {
             unfilledColor="#e0e0e0" // Màu phần chưa được điền đầy
             borderWidth={0} // Xóa đường viền của ProgressBar
             height={13}
-            progress={0.5}
+            progress={0}
           />
         </View>
       </View>
@@ -58,7 +58,7 @@ const Achievement = () => {
             className="font-bold mb-1"
             style={{ fontSize: 14, color: "#FF8C00" }}
           >
-            512 / 700 từ
+            0 / 1000 từ
           </Text>
           <Progress.Bar
             borderRadius={15}
@@ -67,7 +67,7 @@ const Achievement = () => {
             unfilledColor="#e0e0e0" // Màu phần chưa được điền đầy
             borderWidth={0} // Xóa đường viền của ProgressBar
             height={13}
-            progress={0.7}
+            progress={0}
           />
         </View>
       </View>
@@ -88,7 +88,7 @@ const Achievement = () => {
             className="font-bold mb-1"
             style={{ fontSize: 14, color: "#00FF50" }}
           >
-            25 ngày liên tiếp
+            1 ngày liên tiếp
           </Text>
         </View>
       </View>

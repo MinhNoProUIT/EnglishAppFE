@@ -160,7 +160,9 @@ const Setting = () => {
                 height: 128,
                 borderRadius: 64,
               }}
-              source={{ uri: imageUrl }}
+              source={{
+                uri: imageUrl,
+              }}
             />
 
             {/* Nút TouchableOpacity */}
@@ -236,8 +238,7 @@ const Setting = () => {
                   </View>
 
                   <Text style={{ fontWeight: "bold", fontSize: 18 }}>
-                    {" "}
-                    Thông tin tài khoản
+                    {t("TTTK")}
                   </Text>
                 </View>
 
@@ -250,60 +251,7 @@ const Setting = () => {
             </View>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigateToTersmofService()}>
-          <View>
-            <View
-              style={{
-                justifyContent: "center",
-              }}
-            >
-              <View
-                style={{
-                  borderColor: "rgb(201, 192, 192)",
-                  borderBottomWidth: 1,
-                  padding: 15,
 
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  flexDirection: "row",
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 10,
-                  }}
-                >
-                  <View
-                    style={{
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: 180,
-                    }}
-                  >
-                    <Image
-                      source={require("../../../../assets/terms_of_service.jpg")}
-                      className="w-10 h-10 rounded-full"
-                      resizeMode="contain"
-                    />
-                  </View>
-
-                  <Text style={{ fontWeight: "bold", fontSize: 18 }}>
-                    {" "}
-                    Điều khoản dịch vụ
-                  </Text>
-                </View>
-
-                <Ionicons
-                  name="chevron-forward"
-                  size={24}
-                  color="rgb(10, 179, 66)"
-                />
-              </View>
-            </View>
-          </View>
-        </TouchableOpacity>
         <TouchableOpacity onPress={navigatetoPrivacyPolicy}>
           <View>
             <View
@@ -344,8 +292,7 @@ const Setting = () => {
                   </View>
 
                   <Text style={{ fontWeight: "bold", fontSize: 18 }}>
-                    {" "}
-                    Chính sách bảo mật
+                    {t("CSBM")}
                   </Text>
                 </View>
 
@@ -508,8 +455,7 @@ const Setting = () => {
                   <Text
                     style={{ fontWeight: "bold", fontSize: 18, color: "red" }}
                   >
-                    {" "}
-                    Đăng xuất
+                    {t("DX")}
                   </Text>
                 </View>
 
@@ -564,8 +510,7 @@ const Setting = () => {
                   <Text
                     style={{ fontWeight: "bold", fontSize: 18, color: "red" }}
                   >
-                    {" "}
-                    Xóa tài khoản
+                    {t("XTK")}
                   </Text>
                 </View>
 

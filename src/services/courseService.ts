@@ -5,9 +5,7 @@ import { Course, LockedCourse } from "../interfaces/CourseInterface";
 
 export const courseApi = createApi({
   reducerPath: "courseApi",
-  baseQuery: createBaseQuery(
-    "https://englishapp-uit.onrender.com/api/courses"
-  ),
+  baseQuery: createBaseQuery("https://englishapp-uit.onrender.com/api/courses"),
   endpoints: (builder) => ({
     getAllOngoingCourses: builder.query<Course[], void>({
       query: () => "getAllOngoingCoursesByUser",
@@ -24,5 +22,5 @@ export const courseApi = createApi({
 export const {
   useGetAllOngoingCoursesQuery,
   useGetAllCompletedCoursesQuery,
-  useGetAllLearnMoreCoursesQuery
+  useGetAllLearnMoreCoursesQuery,
 } = courseApi;

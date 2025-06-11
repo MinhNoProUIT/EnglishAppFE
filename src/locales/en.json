@@ -30,5 +30,16 @@
   "1month": "1 Month",
   "3months": "3 Month",
   "1year": "1 Year",
-  "PERIOD": "/turn"
+  "PERIOD": "/turn",
+  "TTTK": "Account information",
+  "CSBM": "Security policy",
+  "DX": "Log out",
+  "XTK": "Delete",
+  "HUAT": "Animation music",
+  "NN": "Background music",
+  "TTMN": "Change background color",
+  "TV": "Vocabulary",
+  "SHOP": "Shop",
+  "KHCC": "Course premium",
+  "THANHTOAN": "Payment"
 }

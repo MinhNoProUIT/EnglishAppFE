@@ -91,8 +91,7 @@ const AnotherSetting = () => {
             width: 200,
           }}
         >
-          {" "}
-          Hiệu ứng âm thanh
+          {t("HUAT")}
         </Text>
         <Slider
           style={{ flex: 1 }}
@@ -135,8 +134,7 @@ const AnotherSetting = () => {
             width: 200,
           }}
         >
-          {" "}
-          Nhạc nền
+          {t("NN")}
         </Text>
         <Slider
           style={{ flex: 1 }}
@@ -255,8 +253,7 @@ const AnotherSetting = () => {
             width: 200,
           }}
         >
-          {" "}
-          Chế độ nền tối
+          {t("TTMN")}
         </Text>
         <View
           style={{

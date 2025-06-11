@@ -73,7 +73,7 @@ export type RootStackParamList = {
   Profile: undefined;
 
   Courses: undefined;
-  LearnScreen: { course_id: string; onFinish: () => void };
+  LearnScreen: { course_id?: string | null; onFinish: () => void };
   PracticeScreen: {
     course_id: string;
     toCheckCompleted: boolean;
@@ -186,7 +186,7 @@ export default function AppNavigator({ initialRoute = "SignIn" }: Props) {
               <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
                 <AntDesign name="arrowleft" size={24} color="white" />
               </TouchableOpacity>
-              <Text style={styles.exerciseHeaderTitle}>Vocabulary</Text>
+              <Text style={styles.exerciseHeaderTitle}>{t("TV")}</Text>
             </View>
           ),
         }}
@@ -210,7 +210,7 @@ export default function AppNavigator({ initialRoute = "SignIn" }: Props) {
               <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
                 <Ionicons name="chevron-back-outline" size={24} color="white" />
               </TouchableOpacity>
-              <Text style={styles.headerTitle}>Cài đặt</Text>
+              <Text style={styles.headerTitle}>{t("SETTING")}</Text>
             </View>
           ),
         }}
@@ -226,7 +226,7 @@ export default function AppNavigator({ initialRoute = "SignIn" }: Props) {
               <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
                 <Ionicons name="chevron-back-outline" size={24} color="white" />
               </TouchableOpacity>
-              <Text style={styles.headerTitle}>Thông tin tài khoản</Text>
+              <Text style={styles.headerTitle}>{t("TTTK")}</Text>
               <TouchableOpacity
                 onPress={() => navigation.navigate("UpdateInfo")}
               >
@@ -267,7 +267,7 @@ export default function AppNavigator({ initialRoute = "SignIn" }: Props) {
               <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
                 <Ionicons name="chevron-back-outline" size={24} color="white" />
               </TouchableOpacity>
-              <Text style={styles.headerTitle}>Điều khoản dịch vụ</Text>
+              <Text style={styles.headerTitle}>{t("")}</Text>
             </View>
           ),
         }}
@@ -283,7 +283,7 @@ export default function AppNavigator({ initialRoute = "SignIn" }: Props) {
               <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
                 <Ionicons name="chevron-back-outline" size={24} color="white" />
               </TouchableOpacity>
-              <Text style={styles.headerTitle}>Chính sách bảo mật</Text>
+              <Text style={styles.headerTitle}>{t("CSBM")}</Text>
             </View>
           ),
         }}
@@ -299,7 +299,7 @@ export default function AppNavigator({ initialRoute = "SignIn" }: Props) {
               <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
                 <Ionicons name="chevron-back-outline" size={24} color="white" />
               </TouchableOpacity>
-              <Text style={styles.headerTitle}>Cửa hàng</Text>
+              <Text style={styles.headerTitle}>{}</Text>
             </View>
           ),
         }}

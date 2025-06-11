@@ -42,7 +42,7 @@ export default function BottomTabs() {
           else if (route.name === "Quizzes")
             iconName = focused ? "book" : "book-outline";
           else if (route.name === "Profile")
-            iconName = focused ? "settings" : "settings-outline";
+            iconName = focused ? "person" : "person-outline";
           else if (route.name === "Posts")
             iconName = focused ? "newspaper" : "newspaper-outline";
           else if (route.name === "Exercises")

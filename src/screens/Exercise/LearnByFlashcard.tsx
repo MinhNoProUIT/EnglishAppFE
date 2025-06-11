@@ -8,19 +8,28 @@ import {
   Image,
   Dimensions,
 } from "react-native";
-import Icon from '@expo/vector-icons/Ionicons';
+import Icon from "@expo/vector-icons/Ionicons";
 import { Word } from "../../interfaces/WordInterface";
 import { useCreateUserProgressMutation } from "../../services/userProgressService";
+import { playTTS } from "../../utils/playTTS";
 
 const { width } = Dimensions.get("window");
 
-export default function LearnByListenAndGuess({ words, onNext }: { words: Word[], onNext: () => void }) {
+export default function LearnByListenAndGuess({
+  words,
+  onNext,
+}: {
+  words: Word[];
+  onNext: () => void;
+}) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isContinuable, setIsContinuable] = useState(false);
   const flipAnimations = useRef(words.map(() => new Animated.Value(0))).current;
   const translateX = useRef(new Animated.Value(0)).current;
-  const [flippedOnce, setFlippedOnce] = useState<boolean[]>(words.map(() => false));
+  const [flippedOnce, setFlippedOnce] = useState<boolean[]>(
+    words.map(() => false)
+  );
   const [createUserProgress] = useCreateUserProgressMutation();
 
   // Hiệu ứng lật thẻ
@@ -67,16 +76,29 @@ export default function LearnByListenAndGuess({ words, onNext }: { words: Word[]
       <View style={styles.mainContentContainer}>
         {/* buttons */}
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.circleButton}>
+          <TouchableOpacity
+            style={styles.circleButton}
+            onPress={() => playTTS(words[currentIndex].englishname, 1.5)}
+          >
             <Icon name="volume-high" size={28} color="#FF991F" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.circleButton}>
-            <Image style={styles.snailImage}
-              source={require("../../../assets/SnailIcon.png")} />
+          <TouchableOpacity
+            style={styles.circleButton}
+            onPress={() => playTTS(words[currentIndex].englishname, 1)}
+          >
+            <Image
+              style={styles.snailImage}
+              source={require("../../../assets/SnailIcon.png")}
+            />
           </TouchableOpacity>
         </View>
 
-        <Animated.View style={[styles.cardsContainer, { transform: [{ translateX }], width: width * words.length, },]}>
+        <Animated.View
+          style={[
+            styles.cardsContainer,
+            { transform: [{ translateX }], width: width * words.length },
+          ]}
+        >
           {words.map((word, i) => {
             const frontAnimatedStyle = {
               transform: [
@@ -101,39 +123,68 @@ export default function LearnByListenAndGuess({ words, onNext }: { words: Word[]
             return (
               <View key={i} style={styles.cardWrapper}>
                 {/* front */}
-                < Animated.View style={[styles.card, styles.cardFront, frontAnimatedStyle]} >
-                  <TouchableOpacity style={styles.cardContent} onPress={() => flipCard(i, word.id)}>
-                    <Image style={styles.image} source={{ uri: word.imageurl }} />
+                <Animated.View
+                  style={[styles.card, styles.cardFront, frontAnimatedStyle]}
+                >
+                  <TouchableOpacity
+                    style={styles.cardContent}
+                    onPress={() => flipCard(i, word.id)}
+                  >
+                    <Image
+                      style={styles.image}
+                      source={{ uri: word.imageurl }}
+                    />
                     <Text style={styles.example}>{word.examplesentence}</Text>
                   </TouchableOpacity>
                 </Animated.View>
 
                 {/* back */}
-                <Animated.View style={[styles.card, styles.cardBack, backAnimatedStyle]}>
-                  <TouchableOpacity style={[styles.cardContent, styles.meaningContent]} onPress={() => flipCard(i, word.id)}>
+                <Animated.View
+                  style={[styles.card, styles.cardBack, backAnimatedStyle]}
+                >
+                  <TouchableOpacity
+                    style={[styles.cardContent, styles.meaningContent]}
+                    onPress={() => flipCard(i, word.id)}
+                  >
                     <Text style={styles.eng}>{word.englishname}</Text>
-                    <Text style={styles.transcription}>/{word.transcription}/</Text>
-                    <Text style={styles.vie}>{word.vietnamesename} ({word.type})</Text>
+                    <Text style={styles.transcription}>
+                      /{word.transcription}/
+                    </Text>
+                    <Text style={styles.vie}>
+                      {word.vietnamesename} ({word.type})
+                    </Text>
                   </TouchableOpacity>
                 </Animated.View>
               </View>
-            )
+            );
           })}
         </Animated.View>
 
         {/* clickIcon */}
-        <Image style={styles.clickIcon}
-          source={require("../../../assets/HandClick.png")} />
+        <Image
+          style={styles.clickIcon}
+          source={require("../../../assets/HandClick.png")}
+        />
       </View>
 
       {/* continue button */}
-      <TouchableOpacity style={[styles.continueButton, !isContinuable && styles.buttonDisabled]} onPress={handleNext} disabled={!isContinuable}>
-        <Text style={[styles.continueButtonText, !isContinuable && styles.buttonDisabledText]}>Tiếp tục</Text>
+      <TouchableOpacity
+        style={[styles.continueButton, !isContinuable && styles.buttonDisabled]}
+        onPress={handleNext}
+        disabled={!isContinuable}
+      >
+        <Text
+          style={[
+            styles.continueButtonText,
+            !isContinuable && styles.buttonDisabledText,
+          ]}
+        >
+          Tiếp tục
+        </Text>
       </TouchableOpacity>
-
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -144,19 +195,19 @@ const styles = StyleSheet.create({
 
   //circle buttons
   buttonContainer: {
-    flexDirection: 'row',
-    alignSelf: 'center',
+    flexDirection: "row",
+    alignSelf: "center",
     gap: 10,
-    position: 'absolute',
+    position: "absolute",
     top: -28,
     zIndex: 10,
   },
   circleButton: {
     height: 55,
     width: 55,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
     borderColor: "#dedede",
     borderRadius: 50,
     borderWidth: 1,
@@ -169,7 +220,7 @@ const styles = StyleSheet.create({
   clickIcon: {
     width: 40,
     height: 40,
-    position: 'absolute',
+    position: "absolute",
     bottom: -20,
     right: 30,
     zIndex: 10,
@@ -223,10 +274,10 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 18,
     textAlign: "center",
-    textAlignVertical: 'center',
+    textAlignVertical: "center",
   },
   meaningContent: {
-    justifyContent: 'center',
+    justifyContent: "center",
     gap: 20,
   },
   eng: {
@@ -246,16 +297,16 @@ const styles = StyleSheet.create({
   continueButton: {
     height: 50,
     width: 220,
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
     borderRadius: 50,
-    backgroundColor: '#2563EB',
-    position: 'absolute',
+    backgroundColor: "#2563EB",
+    position: "absolute",
     bottom: 25,
   },
   continueButtonText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
     fontWeight: 500,
   },
@@ -263,6 +314,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#dedede", // Màu nhạt hơn khi chưa lật thẻ
   },
   buttonDisabledText: {
-    color: 'gray',
-  }
+    color: "gray",
+  },
 });

@@ -10,7 +10,7 @@ export interface update {
   username: string;
   phonenumber: string;
   email: string;
-  birthday: Date;
+  birthday: string;
   gender: boolean;
   fullname: string;
   address: string;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,19 +10,24 @@ import {
 } from "react-native";
 import Icon from "@expo/vector-icons/AntDesign";
 import Icon2 from "@expo/vector-icons/SimpleLineIcons";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { useDispatch } from "react-redux";
-import {
-  userCoinApi,
-  useUpdateTotalCoinMutation,
-} from "../../services/userCoinService";
-
-import { useCreateUserCourseMutation } from "../../services/userCourseService";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../navigations/AppNavigator";
+import { useNavigation } from "@react-navigation/native";
+import { useGetAllByCourseQuery } from "../../services/WordService";
+import { CourseType } from "../../types/CourseType";
+import { WordType } from "../../types/WordType";
+import { LockedCourse } from "../../interfaces/CourseInterface";
 interface CourseMenuProps {
   visible: boolean;
-  item: any;
   onClose: () => void;
+  selectedCourse: LockedCourse | null;
+  isActive: boolean;
 }
+
+type CoursesScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "Courses"
+>;
 
 const course = {
   id: "1",
@@ -34,43 +39,144 @@ const course = {
   image: "https://picsum.photos/200/300",
 };
 
+const words: WordType[] = [
+  {
+    id: "1",
+    eng: "student",
+    vie: "học sinh, sinh viên",
+    transcription: "'stuː.dənt",
+    type: "n",
+    example: "His younger sister is a student at that university.",
+    image: "https://picsum.photos/200/300?random=1",
+    level: 3,
+  },
+  {
+    id: "2",
+    eng: "book",
+    vie: "sách",
+    transcription: "bʊk",
+    type: "n",
+    example: "She borrowed a book from the library.",
+    image: "https://picsum.photos/200/300?random=2",
+    level: 3,
+  },
+  {
+    id: "3",
+    eng: "quickly",
+    vie: "nhanh chóng",
+    transcription: "'kwɪk.li",
+    type: "adv",
+    example: "He ran quickly to catch the bus.",
+    image: "https://picsum.photos/200/300?random=3",
+    level: 2,
+  },
+  {
+    id: "4",
+    eng: "beautiful",
+    vie: "xinh đẹp",
+    transcription: "'bjuː.tɪ.fəl",
+    type: "adj",
+    example: "That flower is really beautiful.",
+    image: "https://picsum.photos/200/300?random=4",
+    level: 2,
+  },
+  {
+    id: "5",
+    eng: "engineer",
+    vie: "kỹ sư",
+    transcription: ".en.dʒɪˈnɪər",
+    type: "n",
+    example: "My uncle is a software engineer.",
+    image: "https://picsum.photos/200/300?random=5",
+    level: 3,
+  },
+  {
+    id: "6",
+    eng: "independence",
+    vie: "sự độc lập",
+    transcription: ".ɪn.dɪˈpen.dəns",
+    type: "n",
+    example: "The country gained independence in 1945.",
+    image: "https://picsum.photos/200/300?random=6",
+    level: 4,
+  },
+  {
+    id: "7",
+    eng: "challenge",
+    vie: "thử thách",
+    transcription: "'tʃæl.ɪndʒ",
+    type: "n",
+    example: "Learning a new language is a challenge.",
+    image: "https://picsum.photos/200/300?random=7",
+    level: 3,
+  },
+  {
+    id: "8",
+    eng: "implement",
+    vie: "thực hiện, triển khai",
+    transcription: "'ɪm.plɪ.ment",
+    type: "v",
+    example: "The company plans to implement new strategies next month.",
+    image: "https://picsum.photos/200/300?random=8",
+    level: 4,
+  },
+  {
+    id: "9",
+    eng: "sustainable",
+    vie: "bền vững",
+    transcription: "səˈsteɪ.nə.bəl",
+    type: "adj",
+    example: "We must develop sustainable energy sources.",
+    image: "https://picsum.photos/200/300?random=9",
+    level: 3,
+  },
+  {
+    id: "10",
+    eng: "generate",
+    vie: "tạo ra, sinh ra",
+    transcription: "'dʒen.ə.reɪt",
+    type: "v",
+    example: "Solar panels generate electricity from sunlight.",
+    image: "https://picsum.photos/200/300?random=10",
+    level: 3,
+  },
+];
+
+const courses: CourseType[] = [
+  {
+    id: "1",
+    title: "Hang out with friends",
+    totalWords: 20,
+    remainWords: 10,
+    ongoingWords: 10,
+    completedWords: 0,
+    topic: "People-lifestyle",
+    level: "A1 - A2",
+    image: "https://picsum.photos/200/300",
+    vocabulary: words,
+  },
+  {
+    id: "2",
+    title: "Friends Series",
+    totalWords: 20,
+    remainWords: 0,
+    ongoingWords: 10,
+    completedWords: 10,
+    topic: "People-lifestyle",
+    level: "A1 - A2",
+    image: "https://picsum.photos/200/150",
+    vocabulary: words,
+  },
+];
+
 const PreviewCourseMenu: React.FC<CourseMenuProps> = ({
   visible,
   onClose,
-  item,
+  selectedCourse,
+  isActive,
 }) => {
-  console.log(item);
+  const navigation = useNavigation<CoursesScreenNavigationProp>();
 
-  const dispatch = useDispatch();
-
-  const [updateTotalCoin] = useUpdateTotalCoinMutation();
-
-  const [courseId, setCourseId] = useState("");
-
-  const [createUserCourse, { isLoading, isError, error, isSuccess }] =
-    useCreateUserCourseMutation();
-
-  const handleCoinUpdate = async (coinChange: number) => {
-    try {
-      // Gọi API để cập nhật coin
-      coinChange = coinChange * -1;
-      await updateTotalCoin({ coinChange }).unwrap();
-
-      const result = await createUserCourse({
-        course_id: item.id,
-      }).unwrap();
-      console.log("Course created:", result);
-
-      // Sau khi cập nhật thành công, tự động cập nhật dữ liệu trong cache
-      dispatch(
-        userCoinApi.util.invalidateTags([{ type: "UserCoin", id: "LIST" }])
-      );
-
-      onClose();
-    } catch (err) {
-      console.error("Error updating coin:", err);
-    }
-  };
   return (
     <Modal visible={visible} transparent={true} animationType="fade">
       <TouchableWithoutFeedback onPress={onClose}>
@@ -78,36 +184,66 @@ const PreviewCourseMenu: React.FC<CourseMenuProps> = ({
           <TouchableWithoutFeedback>
             <View style={styles.menuContainer}>
               {/* image */}
-              <Image style={styles.image} source={{ uri: course.image }} />
+              <Image
+                style={styles.image}
+                source={{ uri: selectedCourse?.image_url }}
+              />
 
               {/* text */}
               <View style={styles.textPart}>
                 <View style={styles.row}>
-                  <Text style={styles.title}>{course.name}</Text>
+                  <Text style={styles.title}>{selectedCourse?.title}</Text>
                   <View style={styles.details}>
-                    <View
-                      style={[styles.detail, { backgroundColor: "#ECF9EF" }]}
-                    >
-                      <Text style={styles.detailText}>
-                        {course.numberOfWords} words
-                      </Text>
-                    </View>
                     <View
                       style={[styles.detail, { backgroundColor: "#F4F4F5" }]}
                     >
-                      <Text style={styles.detailText}>{course.level}</Text>
+                      <Text style={styles.detailText}>
+                        {selectedCourse?.level}
+                      </Text>
                     </View>
                   </View>
                 </View>
                 <Text style={styles.description} numberOfLines={3}>
-                  {course.description}
+                  {selectedCourse?.description}
                 </Text>
               </View>
 
               {/* button */}
-              <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>Start</Text>
-              </TouchableOpacity>
+              {isActive ? (
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    onClose();
+                    navigation.navigate("LearnScreen", {
+                      course_id: selectedCourse?.id,
+                      onFinish: () => {},
+                    }); // Điều hướng đến LearnScreen
+                  }}
+                >
+                  <Text
+                    style={[styles.buttonText, { color: "rgb(255, 255, 255)" }]}
+                  >
+                    Start
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    style={styles.button2}
+                    onPress={() => {
+                      onClose();
+                      navigation.navigate("PaymentIntroduction");
+                    }}
+                  >
+                    <Text style={styles.buttonText}>Get premium</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.button2} onPress={() => {}}>
+                    <Text style={styles.buttonText}>
+                      {selectedCourse?.price} coins
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
           </TouchableWithoutFeedback>
         </View>
@@ -181,12 +317,28 @@ const styles = StyleSheet.create({
     backgroundColor: "#2563EB",
     position: "absolute",
     bottom: 22,
-    gap: 10,
   },
   buttonText: {
     fontSize: 14,
     fontWeight: 500,
-    color: "#fff",
+  },
+
+  buttonContainer: {
+    width: "80%",
+    flexDirection: "row",
+    gap: 15,
+    position: "absolute",
+    bottom: 22,
+  },
+  button2: {
+    flex: 1,
+    height: 50,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    borderColor: "#2563EB",
+    borderWidth: 1,
   },
 });
 
