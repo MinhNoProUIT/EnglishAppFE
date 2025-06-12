@@ -81,29 +81,22 @@ const PreviewCourseMenuBuy: React.FC<CourseMenuProps> = ({
           <TouchableWithoutFeedback>
             <View style={styles.menuContainer}>
               {/* image */}
-              <Image style={styles.image} source={{ uri: course.image }} />
+              <Image style={styles.image} source={{ uri: item.image_url }} />
 
               {/* text */}
               <View style={styles.textPart}>
                 <View style={styles.row}>
-                  <Text style={styles.title}>{course.name}</Text>
+                  <Text style={styles.title}>{item.title}</Text>
                   <View style={styles.details}>
-                    <View
-                      style={[styles.detail, { backgroundColor: "#ECF9EF" }]}
-                    >
-                      <Text style={styles.detailText}>
-                        {course.numberOfWords} words
-                      </Text>
-                    </View>
                     <View
                       style={[styles.detail, { backgroundColor: "#F4F4F5" }]}
                     >
-                      <Text style={styles.detailText}>{course.level}</Text>
+                      <Text style={styles.detailText}>{item.level}</Text>
                     </View>
                   </View>
                 </View>
                 <Text style={styles.description} numberOfLines={3}>
-                  {course.description}
+                  {item.description}
                 </Text>
               </View>
 
