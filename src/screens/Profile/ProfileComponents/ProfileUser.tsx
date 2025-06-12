@@ -329,7 +329,7 @@ const ProfileUser = () => {
             EnglishApp Premium
           </Text>
           <Text>
-            Tài khoản bạn còn 15 MochiCoin, hãy tiếp tục mua thêm để mở khóa
+            Tài khoản bạn còn 15 Coin, hãy tiếp tục mua thêm để mở khóa
             khóa học bạn nhé!!!
           </Text>
 
